@@ -16,8 +16,8 @@ Detailed information about the platform can be found in the `docs` folder:
 
 - [**System Architecture**](./docs/ARCHITECTURE.md) - High-level overview.
 - [**Deployment Architecture**](./docs/DEPLOYMENT.md) - Real-world production roadmap.
-- [**Hosting Alternatives**](./docs/HOSTING_ALTERNATIVES.md) - Comparisons with Vercel and more.
-- [**4EVERLAND Setup Guide**](./docs/4EVERLAND_SETUP.md) - Step-by-step CI/CD configuration.
+- [**Hosting Alternatives**](./docs/HOSTING_ALTERNATIVES.md) - Comparison with Cloudflare and more.
+- [**Vercel Setup Guide**](./docs/VERCEL_SETUP.md) - Automated zero-barrier hosting.
 - [**State Management**](./docs/STATE_MANAGEMENT.md) - How we handle global data with Zustand.
 - [**IPFS & Indexing**](./docs/IPFS_INTEGRATION.md) - Decentralized storage and deep search.
 - [**Component Library**](./docs/COMPONENTS.md) - Overview of our React components.
@@ -25,8 +25,18 @@ Detailed information about the platform can be found in the `docs` folder:
 ## 🚢 Deployment
 
 - **GitHub Actions**: Automate testing and linting.
-- **4EVERLAND**: Automatically deploys the frontend to IPFS directly on every merge to `main`. See [**4EVERLAND_SETUP.md**](./docs/4EVERLAND_SETUP.md) for free-tier configuration.
-- **Alternatives**: See [**HOSTING_ALTERNATIVES.md**](./docs/HOSTING_ALTERNATIVES.md) for other providers like Cloudflare.
+- **Vercel**: Automatically deploys the frontend on every push. See [**VERCEL_SETUP.md**](./docs/VERCEL_SETUP.md) for $0 setup.
+
+### 1. Vercel (Zero-Barrier Choice)
+
+- **Workflow**: Automated GitHub deployments with zero configuration or cost.
+- **Setup Guide**: See [**VERCEL_SETUP.md**](./docs/VERCEL_SETUP.md) for instructions.
+
+### 2. 4EVERLAND (Web3 Choice)
+
+- **Mechanism**: Supports IPFS, Arweave, and BNB Greenfield.
+- **Requires**: Small gas payment (Polygon MATIC) to activate API tokens.
+- **Decentralized Alternatives**: See [**HOSTING_ALTERNATIVES.md**](./docs/HOSTING_ALTERNATIVES.md) for providers like 4EVERLAND or Fleek.
 
 ## ✨ Key Features
 

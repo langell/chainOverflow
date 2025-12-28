@@ -38,18 +38,5 @@ jobs:
     - name: Build Project
       run: npm run build
 
-  deploy:
-    name: Deploy to Decentralized Web (4EVERLAND)
-    needs: test-and-verify
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to 4EVERLAND (IPFS)
-        uses: 4everland/pin-action@main
-        with:
-          token: ${{ secrets.EVER_TOKEN }}
-          path: dist
-          # You can specify a custom site name if needed
-          # name: chain-overflow
+    - name: Build Project
+      run: npm run build
