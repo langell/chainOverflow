@@ -29,7 +29,7 @@ To transition ChainOverflow from a demonstration environment to a "real-world" p
 
 ### Continuous Integration (CI/CD)
 - **GitHub Actions**: Automate testing and linting.
-- **Fleek**: Automatically deploys the frontend to IPFS directly on every merge to `main`.
+- **Fleek**: Automatically deploys the frontend to IPFS directly on every merge to `main`. See [**FLEEK_SETUP.md**](./FLEEK_SETUP.md) for free-tier configuration.
 
 ### Environment Configuration
 Production requires a `.env` file for:
