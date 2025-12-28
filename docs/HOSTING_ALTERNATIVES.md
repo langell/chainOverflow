@@ -6,11 +6,11 @@ While Fleek.xyz is our primary recommendation for decentralized hosting, there a
 
 These platforms focus on censorship resistance and permanent storage, mapping directly to our dApp's decentralized philosophy.
 
-### 1. 4EVERLAND
+### 1. 4EVERLAND (Selected Choice)
 - **Mechanism**: Supports IPFS, Arweave, and BNB Greenfield.
-- **Workflow**: Automated GitHub deployments similar to Fleek. 
-- **Free Tier**: Very generous. Includes 6GB of IPFS storage and ample bandwidth.
-- **Why choose it?**: Excellent if you want to experiment with multiple storage protocols (e.g., permanent storage via Arweave) with one dashboard.
+- **Workflow**: Automated GitHub deployments via our CI/CD pipeline. 
+- **Free Tier**: Very generous (6GB storage).
+- **Setup Guide**: See [**4EVERLAND_SETUP.md**](./4EVERLAND_SETUP.md) for full instructions.
 
 ### 2. Spheron Network
 - **Mechanism**: Aggregates multiple decentralized protocols (Filecoin, IPFS, Arweave).

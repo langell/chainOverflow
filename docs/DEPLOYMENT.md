@@ -6,7 +6,7 @@ To transition ChainOverflow from a demonstration environment to a "real-world" p
 
 | Layer | Component | Production Replacement |
 |-------|-----------|------------------------|
-| **Frontend** | Vite + React | Deployed to **Fleek** or **Vercel** |
+| **Frontend** | Vite + React | Deployed to **4EVERLAND** (IPFS/Arweave) |
 | **Storage** | Mock IPFS | Real IPFS via **Pinata** or **NFT.Storage** |
 | **Logic/State** | Zustand (Local) | **Smart Contracts** (Solidity) on Polygon/Arbitrum |
 | **Indexing** | Local Search | **The Graph** (Subgraphs) for deep content indexing |
@@ -29,7 +29,7 @@ To transition ChainOverflow from a demonstration environment to a "real-world" p
 
 ### Continuous Integration (CI/CD)
 - **GitHub Actions**: Automate testing and linting.
-- **Fleek**: Automatically deploys the frontend to IPFS directly on every merge to `main`. See [**FLEEK_SETUP.md**](./FLEEK_SETUP.md) for free-tier configuration.
+- **4EVERLAND**: Automatically deploys the frontend to IPFS directly on every merge to `main`. See [**4EVERLAND_SETUP.md**](./4EVERLAND_SETUP.md) for free-tier configuration.
 
 ### Environment Configuration
 Production requires a `.env` file for:
@@ -42,4 +42,4 @@ Production requires a `.env` file for:
 1. **Phase 1: Real IPFS**: Swap the `mockIPFSNetwork` for the Pinata API.
 2. **Phase 2: Smart Contracts**: Replace the `addQuestion` store action with a contract call.
 3. **Phase 3: The Graph**: Set up a subgraph to replace the store's `questions` array with live chain data.
-4. **Phase 4: Global CDN**: Point `chainoverflow.eth` (ENS) to the Fleek IPFS deployment.
+4. **Phase 4: Global CDN**: Point `chainoverflow.eth` (ENS) to the 4EVERLAND IPFS deployment.

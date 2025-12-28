@@ -16,8 +16,8 @@ Detailed information about the platform can be found in the `docs` folder:
 
 - [**System Architecture**](./docs/ARCHITECTURE.md) - High-level overview.
 - [**Deployment Architecture**](./docs/DEPLOYMENT.md) - Real-world production roadmap.
-- [**Hosting Alternatives**](./docs/HOSTING_ALTERNATIVES.md) - Fleek, 4EVERLAND, and more.
-- [**Fleek Setup Guide**](./docs/FLEEK_SETUP.md) - Step-by-step CI/CD configuration.
+- [**Hosting Alternatives**](./docs/HOSTING_ALTERNATIVES.md) - Comparisons with Vercel and more.
+- [**4EVERLAND Setup Guide**](./docs/4EVERLAND_SETUP.md) - Step-by-step CI/CD configuration.
 - [**State Management**](./docs/STATE_MANAGEMENT.md) - How we handle global data with Zustand.
 - [**IPFS & Indexing**](./docs/IPFS_INTEGRATION.md) - Decentralized storage and deep search.
 - [**Component Library**](./docs/COMPONENTS.md) - Overview of our React components.
@@ -25,8 +25,8 @@ Detailed information about the platform can be found in the `docs` folder:
 ## 🚢 Deployment
 
 - **GitHub Actions**: Automate testing and linting.
-- **Fleek**: Automatically deploys the frontend to IPFS directly on every merge to `main`. See [**FLEEK_SETUP.md**](./FLEEK_SETUP.md) for free-tier configuration.
-- **Alternatives**: See [**HOSTING_ALTERNATIVES.md**](./HOSTING_ALTERNATIVES.md) for other providers like 4EVERLAND or Cloudflare.
+- **4EVERLAND**: Automatically deploys the frontend to IPFS directly on every merge to `main`. See [**4EVERLAND_SETUP.md**](./docs/4EVERLAND_SETUP.md) for free-tier configuration.
+- **Alternatives**: See [**HOSTING_ALTERNATIVES.md**](./docs/HOSTING_ALTERNATIVES.md) for other providers like Cloudflare.
 
 ## ✨ Key Features
 
