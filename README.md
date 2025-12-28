@@ -15,9 +15,21 @@ ChainOverflow is a decentralized Q&A protocol where developers share expertise a
 Detailed information about the platform can be found in the `docs` folder:
 
 - [**System Architecture**](./docs/ARCHITECTURE.md) - High-level overview.
+- [**Deployment Architecture**](./docs/DEPLOYMENT.md) - Real-world production roadmap.
 - [**State Management**](./docs/STATE_MANAGEMENT.md) - How we handle global data with Zustand.
 - [**IPFS & Indexing**](./docs/IPFS_INTEGRATION.md) - Decentralized storage and deep search.
 - [**Component Library**](./docs/COMPONENTS.md) - Overview of our React components.
+
+## 🚢 Deployment
+
+For professional deployment, we support containerized environments:
+
+```bash
+docker build -t chainoverflow .
+docker run -p 8080:80 chainoverflow
+```
+
+See [**DEPLOYMENT.md**](./docs/DEPLOYMENT.md) for the full decentralized production strategy.
 
 ## ✨ Key Features
 
