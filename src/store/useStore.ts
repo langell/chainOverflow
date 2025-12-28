@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Question } from '../types'
 import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
 
@@ -60,126 +61,138 @@ const INITIAL_QUESTIONS: Question[] = [
     }
 ]
 
-export const useStore = create<AppState>((set, get) => ({
-    questions: INITIAL_QUESTIONS,
-    account: null,
-    isModalOpen: false,
-    isUploading: false,
-    searchQuery: '',
-    isSearching: false,
-    searchResults: null,
+export const useStore = create<AppState>()(
+    persist(
+        (set, get) => ({
+            questions: INITIAL_QUESTIONS,
+            account: null,
+            isModalOpen: false,
+            isUploading: false,
+            searchQuery: '',
+            isSearching: false,
+            searchResults: null,
 
-    setAccount: (account) => set({ account }),
+            setAccount: (account) => set({ account }),
 
-    setIsModalOpen: (isOpen) => set({ isModalOpen: isOpen }),
+            setIsModalOpen: (isOpen) => set({ isModalOpen: isOpen }),
 
-    setSearchQuery: (query) => {
-        set({ searchQuery: query })
-        // Trigger async deep search if query is long enough
-        if (query.length > 2) {
-            get().executeSearch(query)
-        } else {
-            set({ searchResults: null })
-        }
-    },
+            setSearchQuery: (query) => {
+                set({ searchQuery: query })
+                // Trigger async deep search if query is long enough
+                if (query.length > 2) {
+                    get().executeSearch(query)
+                } else {
+                    set({ searchResults: null })
+                }
+            },
 
-    executeSearch: async (query) => {
-        set({ isSearching: true })
-        try {
-            const matchingCIDs = await searchIPFSIndexer(query)
-            const { questions } = get()
+            executeSearch: async (query) => {
+                set({ isSearching: true })
+                try {
+                    const matchingCIDs = await searchIPFSIndexer(query)
+                    const { questions } = get()
 
-            // Map CIDs back to local question IDs
-            const matchingIds = questions
-                .filter(q => q.ipfsHash && matchingCIDs.includes(q.ipfsHash))
-                .map(q => q.id)
+                    // Map CIDs back to local question IDs
+                    const matchingIds = questions
+                        .filter(q => q.ipfsHash && matchingCIDs.includes(q.ipfsHash))
+                        .map(q => q.id)
 
-            set({ searchResults: matchingIds, isSearching: false })
-        } catch (error) {
-            console.error('Search failed', error)
-            set({ isSearching: false })
-        }
-    },
+                    set({ searchResults: matchingIds, isSearching: false })
+                } catch (error) {
+                    console.error('Search failed', error)
+                    set({ isSearching: false })
+                }
+            },
 
-    voteQuestion: (id, delta) => {
-        const { questions } = get()
-        const updatedQuestions = questions.map((q) =>
-            q.id === id ? { ...q, votes: q.votes + delta } : q
-        )
-        set({ questions: updatedQuestions })
-    },
+            voteQuestion: (id, delta) => {
+                const { questions } = get()
+                const updatedQuestions = questions.map((q) =>
+                    q.id === id ? { ...q, votes: q.votes + delta } : q
+                )
+                set({ questions: updatedQuestions })
+            },
 
-    addQuestion: async (data) => {
-        const { questions, account } = get()
+            addQuestion: async (data) => {
+                const { questions, account } = get()
 
-        set({ isUploading: true })
+                set({ isUploading: true })
 
-        try {
-            // Store content on IPFS first
-            const ipfsHash = await uploadToIPFS(data.content)
+                try {
+                    // Store content on IPFS first
+                    const ipfsHash = await uploadToIPFS(data.content)
 
-            const newQuestion: Question = {
-                id: Date.now(),
-                title: data.title,
-                content: data.content,
-                tags: data.tags.split(' ').filter((t) => t),
-                author: account
-                    ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
-                    : 'you.eth',
-                votes: 0,
-                answers: 0,
-                bounty: data.bounty || undefined,
-                timestamp: 'Just now',
-                ipfsHash
+                    const newQuestion: Question = {
+                        id: Date.now(),
+                        title: data.title,
+                        content: data.content,
+                        tags: data.tags.split(' ').filter((t) => t),
+                        author: account
+                            ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
+                            : 'you.eth',
+                        votes: 0,
+                        answers: 0,
+                        bounty: data.bounty || undefined,
+                        timestamp: 'Just now',
+                        ipfsHash
+                    }
+
+                    set({
+                        questions: [newQuestion, ...questions],
+                        isModalOpen: false,
+                        isUploading: false
+                    })
+                } catch (error) {
+                    console.error('Failed to upload to IPFS:', error)
+                    set({ isUploading: false })
+                    alert('IPFS upload failed. Please try again.')
+                }
+            },
+
+            connectWallet: async () => {
+                if (typeof window.ethereum !== 'undefined') {
+                    try {
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+                        set({ account: accounts[0] })
+                    } catch (error) {
+                        console.error('User denied account access', error)
+                    }
+                } else {
+                    alert('Please install MetaMask or another Web3 wallet!')
+                }
+            },
+
+            seedLargeData: async (count) => {
+                const { questions } = get()
+                const newQuestions: Question[] = []
+
+                for (let i = 0; i < count; i++) {
+                    const topic = ['DeFi', 'NFT', 'DAO', 'Bridge', 'L2', 'ZK'][Math.floor(Math.random() * 6)]
+                    const content = `Massive data sample #${i}: Discussing the future of ${topic} protocols and their impact on Ethereum scalability.`
+                    const cid = await uploadToIPFS(content)
+
+                    newQuestions.push({
+                        id: Date.now() + i,
+                        title: `${topic} scaling research paper #${i}`,
+                        content,
+                        tags: [topic.toLowerCase(), 'scaling', 'research'],
+                        author: `researcher_${i}.eth`,
+                        votes: Math.floor(Math.random() * 100),
+                        answers: Math.floor(Math.random() * 10),
+                        timestamp: `${Math.floor(Math.random() * 24)}h ago`,
+                        ipfsHash: cid
+                    })
+                }
+
+                set({ questions: [...newQuestions, ...questions] })
             }
-
-            set({
-                questions: [newQuestion, ...questions],
-                isModalOpen: false,
-                isUploading: false
-            })
-        } catch (error) {
-            console.error('Failed to upload to IPFS:', error)
-            set({ isUploading: false })
-            alert('IPFS upload failed. Please try again.')
+        }),
+        {
+            name: 'chainoverflow-storage', // name of the item in the storage (must be unique)
+            storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+            partialize: (state) => ({
+                questions: state.questions,
+                account: state.account
+            }), // only persist questions and account
         }
-    },
-
-    connectWallet: async () => {
-        if (typeof window.ethereum !== 'undefined') {
-            try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-                set({ account: accounts[0] })
-            } catch (error) {
-                console.error('User denied account access', error)
-            }
-        } else {
-            alert('Please install MetaMask or another Web3 wallet!')
-        }
-    },
-
-    seedLargeData: async (count) => {
-        const { questions } = get()
-        const newQuestions: Question[] = []
-
-        for (let i = 0; i < count; i++) {
-            const topic = ['DeFi', 'NFT', 'DAO', 'Bridge', 'L2', 'ZK'][Math.floor(Math.random() * 6)]
-            const content = `Massive data sample #${i}: Discussing the future of ${topic} protocols and their impact on Ethereum scalability.`
-            const cid = await uploadToIPFS(content)
-
-            newQuestions.push({
-                id: Date.now() + i,
-                title: `${topic} scaling research paper #${i}`,
-                content,
-                tags: [topic.toLowerCase(), 'scaling', 'research'],
-                author: `researcher_${i}.eth`,
-                votes: Math.floor(Math.random() * 100),
-                answers: Math.floor(Math.random() * 10),
-                timestamp: `${Math.floor(Math.random() * 24)}h ago`,
-                ipfsHash: cid
-            })
-        }
-
-        set({ questions: [...newQuestions, ...questions] })
-    }
-}))
+    )
+)

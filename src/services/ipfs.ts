@@ -1,10 +1,5 @@
 /**
- * Advanced Mock IPFS & Indexing Service
- * 
- * In a production dApp, searching IPFS content usually involves:
- * 1. Storage: Uploading JSON to IPFS (Metadata + Content)
- * 2. Indexering: A service (like The Graph or a custom node) monitors CIDs 
- *    and indexes their contents into a searchable database.
+ * Advanced Mock IPFS & Indexing Service with Local Cache Persistence
  */
 
 interface IPFSObject {
@@ -13,8 +8,27 @@ interface IPFSObject {
     timestamp: number
 }
 
-// Simulated IPFS Network Storage
-const mockIPFSNetwork: Record<string, IPFSObject> = {}
+// Simulated IPFS Network Storage with LocalStorage Persistence
+const STORAGE_KEY = 'chainoverflow_ipfs_mock'
+
+const loadNetwork = (): Record<string, IPFSObject> => {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        return saved ? JSON.parse(saved) : {}
+    } catch {
+        return {}
+    }
+}
+
+let mockIPFSNetwork: Record<string, IPFSObject> = loadNetwork()
+
+const saveNetwork = () => {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(mockIPFSNetwork))
+    } catch (e) {
+        console.error('Failed to save IPFS network to localStorage', e)
+    }
+}
 
 /**
  * Uploads content to simulated IPFS.
@@ -32,6 +46,8 @@ export const uploadToIPFS = async (content: string): Promise<string> => {
         timestamp: Date.now()
     }
 
+    saveNetwork()
+
     return cid
 }
 
@@ -45,8 +61,6 @@ export const fetchFromIPFS = async (cid: string): Promise<string | null> => {
 
 /**
  * Mock Global Indexer
- * Simulates searching through a massive decentralized dataset.
- * In reality, this would be a query to a Subgraph or an API.
  */
 export const searchIPFSIndexer = async (query: string): Promise<string[]> => {
     // Simulate heavy indexing search
