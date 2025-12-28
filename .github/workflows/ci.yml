@@ -47,7 +47,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Deploy to 4EVERLAND (IPFS)
-        uses: 4everland/pin-action@v1
+        uses: 4everland/pin-action@main
         with:
           token: ${{ secrets.EVER_TOKEN }}
           path: dist
