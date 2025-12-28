@@ -38,11 +38,17 @@ jobs:
     - name: Build Project
       run: npm run build
 
-  # Placeholder for deployment (e.g. to Fleek or Vercel)
-  # deploy:
-  #   needs: test-and-verify
-  #   if: github.ref == 'refs/heads/main'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Deploy to IPFS (Fleek)
-  #       run: echo "Deploying to decentralized CDN..."
+  deploy:
+    name: Deploy to Decentralized Web (Fleek)
+    needs: test-and-verify
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Fleek (IPFS)
+        uses: fleekxyz/action-deploy@v0
+        with:
+          apiKey: ${{ secrets.FLEEK_TOKEN }}
+          projectId: ${{ secrets.FLEEK_PROJECT_ID }}
+          directory: dist
