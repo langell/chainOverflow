@@ -16,6 +16,7 @@ Detailed information about the platform can be found in the `docs` folder:
 
 - [**System Architecture**](./docs/ARCHITECTURE.md) - High-level overview.
 - [**Deployment Architecture**](./docs/DEPLOYMENT.md) - Real-world production roadmap.
+- [**Hosting Alternatives**](./docs/HOSTING_ALTERNATIVES.md) - Fleek, 4EVERLAND, and more.
 - [**Fleek Setup Guide**](./docs/FLEEK_SETUP.md) - Step-by-step CI/CD configuration.
 - [**State Management**](./docs/STATE_MANAGEMENT.md) - How we handle global data with Zustand.
 - [**IPFS & Indexing**](./docs/IPFS_INTEGRATION.md) - Decentralized storage and deep search.
@@ -23,14 +24,9 @@ Detailed information about the platform can be found in the `docs` folder:
 
 ## 🚢 Deployment
 
-For professional deployment, we support containerized environments:
-
-```bash
-docker build -t chainoverflow .
-docker run -p 8080:80 chainoverflow
-```
-
-See [**FLEEK_SETUP.md**](./docs/FLEEK_SETUP.md) for the step-by-step guide to free decentralized hosting.
+- **GitHub Actions**: Automate testing and linting.
+- **Fleek**: Automatically deploys the frontend to IPFS directly on every merge to `main`. See [**FLEEK_SETUP.md**](./FLEEK_SETUP.md) for free-tier configuration.
+- **Alternatives**: See [**HOSTING_ALTERNATIVES.md**](./HOSTING_ALTERNATIVES.md) for other providers like 4EVERLAND or Cloudflare.
 
 ## ✨ Key Features
 
