@@ -107,12 +107,14 @@ const pinataProvider = {
 // ---------------------------------------------------------
 // 3. Export Logic
 // ---------------------------------------------------------
-const PROVIDER = import.meta.env.VITE_IPFS_PROVIDER || 'mock'
-const activeProvider = PROVIDER === 'pinata' ? pinataProvider : mockProvider
+const getActiveProvider = () => {
+  const PROVIDER = import.meta.env.VITE_IPFS_PROVIDER || 'mock'
+  return PROVIDER === 'pinata' ? pinataProvider : mockProvider
+}
 
-export const uploadToIPFS = (content: string) => activeProvider.upload(content)
-export const fetchFromIPFS = (cid: string) => activeProvider.fetch(cid)
-export const searchIPFSIndexer = (query: string) => activeProvider.search(query)
+export const uploadToIPFS = (content: string) => getActiveProvider().upload(content)
+export const fetchFromIPFS = (cid: string) => getActiveProvider().fetch(cid)
+export const searchIPFSIndexer = (query: string) => getActiveProvider().search(query)
 
 export const getIPFSUrl = (hash: string): string => {
   const gateway = import.meta.env.VITE_PINATA_GATEWAY || 'https://gateway.pinata.cloud'
