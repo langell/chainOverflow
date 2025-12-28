@@ -16,20 +16,28 @@ declare global {
 const App: React.FC = () => {
   const questions = useStore((state) => state.questions)
   const searchQuery = useStore((state) => state.searchQuery)
+  const isSearching = useStore((state) => state.isSearching)
+  const searchResults = useStore((state) => state.searchResults)
 
   const filteredQuestions = useMemo(() => {
     if (!searchQuery) return questions
 
     const query = searchQuery.toLowerCase()
+
+    // Combine local metadata filtering with results from the IPFS indexer
     return questions.filter((q) => {
-      return (
+      const matchesLocal = (
         q.title.toLowerCase().includes(query) ||
-        q.content.toLowerCase().includes(query) ||
         q.author.toLowerCase().includes(query) ||
         q.tags.some((tag) => tag.toLowerCase().includes(query))
       )
+
+      // If the indexer found this question via its content (searchResult IDs)
+      const matchesDeep = searchResults?.includes(q.id)
+
+      return matchesLocal || matchesDeep
     })
-  }, [questions, searchQuery])
+  }, [questions, searchQuery, searchResults])
 
   return (
     <div id="app">
@@ -46,7 +54,19 @@ const App: React.FC = () => {
               marginBottom: '2rem'
             }}
           >
-            <h2>{searchQuery ? `Search Results (${filteredQuestions.length})` : 'Top Questions'}</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <h2>{searchQuery ? `Search Results (${filteredQuestions.length})` : 'Top Questions'}</h2>
+              {isSearching && (
+                <span className="spinner" style={{
+                  width: '16px',
+                  height: '16px',
+                  border: '2px solid rgba(255,255,255,0.1)',
+                  borderTopColor: 'var(--accent-cyan)',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }}></span>
+              )}
+            </div>
             <div className="nav-links" style={{ fontSize: '0.8rem' }}>
               <a href="#" style={{ color: 'var(--text-main)' }}>
                 Newest
@@ -70,15 +90,17 @@ const App: React.FC = () => {
                 border: '1px dashed var(--border-glass)'
               }}>
                 <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-                  No questions found matching "<span style={{ color: 'var(--text-main)' }}>{searchQuery}</span>"
+                  {isSearching ? 'Querying decentralized indexers...' : `No questions found matching "${searchQuery}"`}
                 </p>
-                <button
-                  className="btn-secondary"
-                  style={{ marginTop: '1.5rem' }}
-                  onClick={() => useStore.getState().setSearchQuery('')}
-                >
-                  Clear Search
-                </button>
+                {!isSearching && (
+                  <button
+                    className="btn-secondary"
+                    style={{ marginTop: '1.5rem' }}
+                    onClick={() => useStore.getState().setSearchQuery('')}
+                  >
+                    Clear Search
+                  </button>
+                )}
               </div>
             )}
           </div>

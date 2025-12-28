@@ -7,6 +7,7 @@ const Navbar: React.FC = () => {
     const setIsModalOpen = useStore((state) => state.setIsModalOpen)
     const searchQuery = useStore((state) => state.searchQuery)
     const setSearchQuery = useStore((state) => state.setSearchQuery)
+    const isSearching = useStore((state) => state.isSearching)
 
     return (
         <nav className="navbar">
@@ -15,13 +16,16 @@ const Navbar: React.FC = () => {
             </div>
             <div className="search-container">
                 <div className="search-wrapper">
-                    <span className="search-icon">🔍</span>
+                    <span className="search-icon" style={{ opacity: isSearching ? 1 : 0.5 }}>
+                        {isSearching ? '⏳' : '🔍'}
+                    </span>
                     <input
                         type="text"
                         placeholder="Search questions, tags, or authors..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="search-input"
+                        style={isSearching ? { borderColor: 'var(--accent-cyan)' } : {}}
                     />
                 </div>
             </div>

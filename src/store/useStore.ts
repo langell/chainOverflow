@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { Question } from '../types'
-import { uploadToIPFS } from '../services/ipfs'
+import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
 
 interface AppState {
     questions: Question[]
@@ -8,14 +8,18 @@ interface AppState {
     isModalOpen: boolean
     isUploading: boolean
     searchQuery: string
+    isSearching: boolean
+    searchResults: number[] | null // Store IDs of matching questions from indexer
 
     // Actions
     setAccount: (account: string | null) => void
     setIsModalOpen: (isOpen: boolean) => void
     setSearchQuery: (query: string) => void
+    executeSearch: (query: string) => Promise<void>
     addQuestion: (data: { title: string; tags: string; bounty: string; content: string }) => Promise<void>
     voteQuestion: (id: number, delta: number) => void
     connectWallet: () => Promise<void>
+    seedLargeData: (count: number) => Promise<void>
 }
 
 const INITIAL_QUESTIONS: Question[] = [
@@ -62,12 +66,40 @@ export const useStore = create<AppState>((set, get) => ({
     isModalOpen: false,
     isUploading: false,
     searchQuery: '',
+    isSearching: false,
+    searchResults: null,
 
     setAccount: (account) => set({ account }),
 
     setIsModalOpen: (isOpen) => set({ isModalOpen: isOpen }),
 
-    setSearchQuery: (query) => set({ searchQuery: query }),
+    setSearchQuery: (query) => {
+        set({ searchQuery: query })
+        // Trigger async deep search if query is long enough
+        if (query.length > 2) {
+            get().executeSearch(query)
+        } else {
+            set({ searchResults: null })
+        }
+    },
+
+    executeSearch: async (query) => {
+        set({ isSearching: true })
+        try {
+            const matchingCIDs = await searchIPFSIndexer(query)
+            const { questions } = get()
+
+            // Map CIDs back to local question IDs
+            const matchingIds = questions
+                .filter(q => q.ipfsHash && matchingCIDs.includes(q.ipfsHash))
+                .map(q => q.id)
+
+            set({ searchResults: matchingIds, isSearching: false })
+        } catch (error) {
+            console.error('Search failed', error)
+            set({ isSearching: false })
+        }
+    },
 
     voteQuestion: (id, delta) => {
         const { questions } = get()
@@ -87,7 +119,7 @@ export const useStore = create<AppState>((set, get) => ({
             const ipfsHash = await uploadToIPFS(data.content)
 
             const newQuestion: Question = {
-                id: Date.now(), // Better ID generation
+                id: Date.now(),
                 title: data.title,
                 content: data.content,
                 tags: data.tags.split(' ').filter((t) => t),
@@ -124,5 +156,30 @@ export const useStore = create<AppState>((set, get) => ({
         } else {
             alert('Please install MetaMask or another Web3 wallet!')
         }
+    },
+
+    seedLargeData: async (count) => {
+        const { questions } = get()
+        const newQuestions: Question[] = []
+
+        for (let i = 0; i < count; i++) {
+            const topic = ['DeFi', 'NFT', 'DAO', 'Bridge', 'L2', 'ZK'][Math.floor(Math.random() * 6)]
+            const content = `Massive data sample #${i}: Discussing the future of ${topic} protocols and their impact on Ethereum scalability.`
+            const cid = await uploadToIPFS(content)
+
+            newQuestions.push({
+                id: Date.now() + i,
+                title: `${topic} scaling research paper #${i}`,
+                content,
+                tags: [topic.toLowerCase(), 'scaling', 'research'],
+                author: `researcher_${i}.eth`,
+                votes: Math.floor(Math.random() * 100),
+                answers: Math.floor(Math.random() * 10),
+                timestamp: `${Math.floor(Math.random() * 24)}h ago`,
+                ipfsHash: cid
+            })
+        }
+
+        set({ questions: [...newQuestions, ...questions] })
     }
 }))
