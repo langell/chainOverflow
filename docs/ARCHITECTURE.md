@@ -4,6 +4,8 @@ ChainOverflow is a decentralized Q&A platform built with modern web technologies
 
 ## High-Level Overview
 
+ChainOverflow is built with a modern, modular architecture designed for decentralization. See the [**Visual System Diagram**](./SYSTEM_DIAGRAM.md) for a layered overview of the stack.
+
 The application follows a modular architecture with clear separation of concerns:
 
 - **Frontend (UI Layer)**: React with TypeScript, providing a responsive and premium user experience.
