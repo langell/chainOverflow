@@ -3,7 +3,7 @@
 Fleek provides a generous **Hobby/Free Tier** that is perfect for development work and small-scale decentralized applications. This guide will walk you through setting up your account and connecting it to our GitHub CI/CD pipeline.
 
 ## 1. Sign Up for Fleek
-- Go to [**Fleek.co**](https://fleek.xyz/) and click **Sign Up**.
+- Go to [**Fleek.xyz**](https://fleek.xyz/) and click **Sign Up**.
 - **Important**: Choose the **"Hobby" plan** if prompted. This is free and includes ample bandwidth and IPFS storage for development.
 - I recommend signing in with **GitHub** to simplify repository access later.
 
@@ -14,7 +14,7 @@ Fleek provides a generous **Hobby/Free Tier** that is perfect for development wo
    - **Framework**: Vite
    - **Build Command**: `npm run build`
    - **Publish Directory**: `dist`
-4. Click **"Deploy Site"**. Fleek will perform an initial manual deployment and provide you with a permanent `.fleek.co` URL.
+4. Click **"Deploy Site"**. Fleek will perform an initial manual deployment and provide you with a permanent `.fleek.xyz` URL.
 
 ## 3. Get Your API Credentials
 To automate deployments via GitHub Actions, you need two pieces of information:
