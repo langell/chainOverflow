@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 import QuestionCard from '../components/QuestionCard'
 import { useStore } from '../store/useStore'
 
@@ -33,13 +34,21 @@ describe('QuestionCard', () => {
   })
 
   it('renders title and tags correctly', () => {
-    render(<QuestionCard question={mockQuestion} />)
+    render(
+      <MemoryRouter>
+        <QuestionCard question={mockQuestion} />
+      </MemoryRouter>
+    )
     expect(screen.getByText('How to use Markdown?')).toBeInTheDocument()
     expect(screen.getByText('#markdown')).toBeInTheDocument()
   })
 
   it('renders markdown content correctly', () => {
-    render(<QuestionCard question={mockQuestion} />)
+    render(
+      <MemoryRouter>
+        <QuestionCard question={mockQuestion} />
+      </MemoryRouter>
+    )
     // Use regex for flexible matching due to markdown node splitting
     expect(screen.getByText(/This is/)).toBeInTheDocument()
     expect(screen.getByText(/bold/)).toBeInTheDocument()
@@ -51,7 +60,11 @@ describe('QuestionCard', () => {
       ...mockQuestion,
       content: 'A'.repeat(200) // Long enough to trigger "Read More"
     }
-    render(<QuestionCard question={longQuestion} />)
+    render(
+      <MemoryRouter>
+        <QuestionCard question={longQuestion} />
+      </MemoryRouter>
+    )
 
     const readMoreBtn = screen.getByText('Read More...')
     expect(readMoreBtn).toBeInTheDocument()
@@ -61,7 +74,11 @@ describe('QuestionCard', () => {
   })
 
   it('calls voteQuestion when upvote is clicked', () => {
-    render(<QuestionCard question={mockQuestion} />)
+    render(
+      <MemoryRouter>
+        <QuestionCard question={mockQuestion} />
+      </MemoryRouter>
+    )
     const upvoteBtn = screen.getByText('▲')
     fireEvent.click(upvoteBtn)
     expect(mockVoteQuestion).toHaveBeenCalledWith(1, 1)

@@ -1,11 +1,10 @@
-import React, { useMemo } from 'react'
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './style.css'
-import { useStore } from './store/useStore'
 import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import QuestionCard from './components/QuestionCard'
-import Sidebar from './components/Sidebar'
 import QuestionModal from './components/QuestionModal'
+import Home from './pages/Home'
+import QuestionDetail from './pages/QuestionDetail'
 
 declare global {
   interface Window {
@@ -14,103 +13,19 @@ declare global {
 }
 
 const App: React.FC = () => {
-  const questions = useStore((state) => state.questions)
-  const searchQuery = useStore((state) => state.searchQuery)
-  const isSearching = useStore((state) => state.isSearching)
-  const searchResults = useStore((state) => state.searchResults)
-
-  const filteredQuestions = useMemo(() => {
-    if (!searchQuery) return questions
-
-    const query = searchQuery.toLowerCase()
-
-    // Combine local metadata filtering with results from the IPFS indexer
-    return questions.filter((q) => {
-      const matchesLocal = (
-        q.title.toLowerCase().includes(query) ||
-        q.author.toLowerCase().includes(query) ||
-        q.tags.some((tag) => tag.toLowerCase().includes(query))
-      )
-
-      // If the indexer found this question via its content (searchResult IDs)
-      const matchesDeep = searchResults?.includes(q.id)
-
-      return matchesLocal || matchesDeep
-    })
-  }, [questions, searchQuery, searchResults])
-
   return (
-    <div id="app">
-      <Navbar />
-      <Hero />
+    <Router>
+      <div id="app">
+        <Navbar />
 
-      <main className="question-grid">
-        <section className="feed">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '2rem'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <h2>{searchQuery ? `Search Results (${filteredQuestions.length})` : 'Top Questions'}</h2>
-              {isSearching && (
-                <span className="spinner" style={{
-                  width: '16px',
-                  height: '16px',
-                  border: '2px solid rgba(255,255,255,0.1)',
-                  borderTopColor: 'var(--accent-cyan)',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite'
-                }}></span>
-              )}
-            </div>
-            <div className="nav-links" style={{ fontSize: '0.8rem' }}>
-              <a href="#" style={{ color: 'var(--text-main)' }}>
-                Newest
-              </a>
-              <a href="#">Active</a>
-              <a href="#">Unanswered</a>
-            </div>
-          </div>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/question/:id" element={<QuestionDetail />} />
+        </Routes>
 
-          <div id="questions-container">
-            {filteredQuestions.length > 0 ? (
-              filteredQuestions.map((q) => (
-                <QuestionCard key={q.id} question={q} />
-              ))
-            ) : (
-              <div style={{
-                padding: '4rem 2rem',
-                textAlign: 'center',
-                background: 'var(--bg-card)',
-                borderRadius: '20px',
-                border: '1px dashed var(--border-glass)'
-              }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-                  {isSearching ? 'Querying decentralized indexers...' : `No questions found matching "${searchQuery}"`}
-                </p>
-                {!isSearching && (
-                  <button
-                    className="btn-secondary"
-                    style={{ marginTop: '1.5rem' }}
-                    onClick={() => useStore.getState().setSearchQuery('')}
-                  >
-                    Clear Search
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-
-        <Sidebar />
-      </main>
-
-      <QuestionModal />
-    </div>
+        <QuestionModal />
+      </div>
+    </Router>
   )
 }
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { Question } from '../types'
@@ -12,6 +13,7 @@ interface QuestionCardProps {
 const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const voteQuestion = useStore((state) => state.voteQuestion)
+  const navigate = useNavigate()
 
   return (
     <div className="card question-card">
@@ -34,7 +36,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
         </div>
         <h3
           style={{ marginBottom: '1rem', cursor: 'pointer' }}
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => navigate(`/question/${question.id}`)}
         >
           {question.title}
         </h3>
@@ -65,9 +67,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
           <div
             style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}
           >
-            <span>
+            <Link
+              to={`/question/${question.id}`}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
               <strong>{question.answers}</strong> answers
-            </span>
+            </Link>
           </div>
         </div>
 

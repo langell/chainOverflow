@@ -10,3 +10,13 @@ export interface Question {
   timestamp: string
   ipfsHash?: string
 }
+
+export interface Answer {
+  id: number
+  questionId: number
+  content: string
+  author: string
+  votes: number
+  timestamp: string
+  isAccepted?: boolean
+}
