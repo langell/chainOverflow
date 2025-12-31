@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import { useStore } from '../store/useStore'
 import Hero from '../components/Hero'
 import QuestionCard from '../components/QuestionCard'
@@ -9,6 +9,12 @@ const Home: React.FC = () => {
   const searchQuery = useStore((state) => state.searchQuery)
   const isSearching = useStore((state) => state.isSearching)
   const searchResults = useStore((state) => state.searchResults)
+  const isLoading = useStore((state) => state.isLoading)
+  const fetchFeed = useStore((state) => state.fetchFeed)
+
+  useEffect(() => {
+    fetchFeed()
+  }, [fetchFeed])
 
   const filteredQuestions = useMemo(() => {
     if (!searchQuery) return questions
@@ -66,7 +72,23 @@ const Home: React.FC = () => {
           </div>
 
           <div id="questions-container">
-            {filteredQuestions.length > 0 ? (
+            {isLoading ? (
+              <div style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+                <span
+                  className="spinner"
+                  style={{
+                    display: 'inline-block',
+                    width: '40px',
+                    height: '40px',
+                    border: '4px solid rgba(255,255,255,0.1)',
+                    borderTopColor: 'var(--accent-cyan)',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}
+                ></span>
+                <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>Loading feed...</p>
+              </div>
+            ) : filteredQuestions.length > 0 ? (
               filteredQuestions.map((q) => <QuestionCard key={q.id} question={q} />)
             ) : (
               <div

@@ -3,6 +3,8 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Question, Answer } from '../types'
 import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
 
+const API_BASE = 'http://localhost:3001/api'
+
 interface AppState {
   questions: Question[]
   answers: Answer[] // New: Store answers
@@ -12,8 +14,11 @@ interface AppState {
   searchQuery: string
   isSearching: boolean
   searchResults: number[] | null
+  isLoading: boolean
 
   // Actions
+  fetchFeed: () => Promise<void>
+  fetchQuestion: (id: number) => Promise<void>
   setAccount: (account: string | null) => void
   setIsModalOpen: (isOpen: boolean) => void
   setSearchQuery: (query: string) => void
@@ -32,6 +37,9 @@ interface AppState {
   addAnswer: (questionId: number, content: string) => Promise<void>
   voteAnswer: (id: number, delta: number) => void
   markAnswerAccepted: (questionId: number, answerId: number) => void
+
+  // Internal Helpers
+  requestWithPayment: (path: string, options?: RequestInit) => Promise<any>
 }
 
 const INITIAL_QUESTIONS: Question[] = [
@@ -103,6 +111,93 @@ export const useStore = create<AppState>()(
       searchQuery: '',
       isSearching: false,
       searchResults: null,
+      isLoading: false,
+
+      fetchFeed: async () => {
+        set({ isLoading: true })
+        try {
+          const response = await fetch(`${API_BASE}/feed`)
+          const data = await response.json()
+
+          // Transform backend data to frontend types
+          const questions: Question[] = data.map((q: any) => ({
+            id: q.id,
+            title: q.title,
+            content: q.content,
+            tags: typeof q.tags === 'string' ? q.tags.split(',').filter(Boolean) : q.tags || [],
+            author: q.author,
+            votes: q.votes,
+            bounty: q.bounty,
+            timestamp: q.timestamp,
+            ipfsHash: q.ipfsHash,
+            answers: q.answers ? q.answers.length : 0
+          }))
+
+          const answers: Answer[] = data.flatMap((q: any) =>
+            (q.answers || []).map((a: any) => ({
+              id: a.id,
+              questionId: a.question_id,
+              content: a.content,
+              author: a.author,
+              votes: a.votes,
+              timestamp: a.timestamp,
+              isAccepted: Boolean(a.is_accepted)
+            }))
+          )
+
+          set({ questions, answers, isLoading: false })
+        } catch (error) {
+          console.error('Failed to fetch feed:', error)
+          set({ isLoading: false })
+        }
+      },
+
+      fetchQuestion: async (id: number) => {
+        set({ isLoading: true })
+        try {
+          const response = await fetch(`${API_BASE}/questions/${id}`)
+          if (!response.ok) throw new Error('Question not found')
+          const q = await response.json()
+
+          // Transform backend data
+          const question: Question = {
+            id: q.id,
+            title: q.title,
+            content: q.content,
+            tags: typeof q.tags === 'string' ? q.tags.split(',').filter(Boolean) : q.tags || [],
+            author: q.author,
+            votes: q.votes,
+            bounty: q.bounty,
+            timestamp: q.timestamp,
+            ipfsHash: q.ipfsHash,
+            answers: q.answers ? q.answers.length : 0
+          }
+
+          const questionAnswers: Answer[] = (q.answers || []).map((a: any) => ({
+            id: a.id,
+            questionId: a.question_id,
+            content: a.content,
+            author: a.author,
+            votes: a.votes,
+            timestamp: a.timestamp,
+            isAccepted: Boolean(a.is_accepted)
+          }))
+
+          // Update local state: merge existing answers, update question
+          const { questions, answers } = get()
+          const otherQuestions = questions.filter((prev) => prev.id !== id)
+          const otherAnswers = answers.filter((prev) => prev.questionId !== id)
+
+          set({
+            questions: [question, ...otherQuestions],
+            answers: [...otherAnswers, ...questionAnswers],
+            isLoading: false
+          })
+        } catch (error) {
+          console.error('Failed to fetch question:', error)
+          set({ isLoading: false })
+        }
+      },
 
       setAccount: (account) => set({ account }),
 
@@ -141,34 +236,78 @@ export const useStore = create<AppState>()(
       },
 
       addQuestion: async (data) => {
-        const { questions, account } = get()
+        const { account } = get()
         set({ isUploading: true })
         try {
+          // 1. Upload to IPFS (Simulated/Mock)
           const ipfsHash = await uploadToIPFS(data.content)
-          const newQuestion: Question = {
-            id: Date.now(),
-            title: data.title,
-            content: data.content,
-            tags: data.tags.split(' ').filter((t) => t),
-            author: account
-              ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
-              : 'you.eth',
-            votes: 0,
-            answers: 0,
-            bounty: data.bounty || undefined,
-            timestamp: 'Just now',
-            ipfsHash
-          }
-          set({
-            questions: [newQuestion, ...questions],
-            isModalOpen: false,
-            isUploading: false
+
+          // 2. Post to Backend with Payment Handling
+          await get().requestWithPayment('/questions', {
+            method: 'POST',
+            body: JSON.stringify({
+              title: data.title,
+              content: data.content,
+              tags: data.tags,
+              author: account || 'anonymous',
+              bounty: data.bounty,
+              ipfsHash
+            })
           })
+
+          // 3. Refresh feed from DB
+          await get().fetchFeed()
+          set({ isModalOpen: false, isUploading: false })
         } catch (error) {
-          console.error('Failed to upload to IPFS:', error)
+          console.error('Add Question failed:', error)
           set({ isUploading: false })
-          alert('IPFS upload failed. Please try again.')
+          alert(error instanceof Error ? error.message : 'Failed to add question')
         }
+      },
+
+      requestWithPayment: async (path: string, options: RequestInit = {}) => {
+        // Initial attempt
+        let response = await fetch(`${API_BASE}${path}`, {
+          ...options,
+          headers: {
+            ...options.headers,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (response.status === 402) {
+          const data = await response.json()
+          console.log('L402 Payment Required', data)
+
+          // In a real app, this is where we would:
+          // 1. Show a modal to the user with the Lightning Invoice
+          // 2. Wait for them to pay it via their wallet (WebLN or similar)
+          // 3. Get the preimage
+
+          // For this implementation, we simulate the payment for a seamless experience
+          console.log(
+            `L402 Payment Required: \nInvoice: ${data.invoice}\n\n[MOCK] Simulating payment...`
+          )
+
+          const mockPreimage = 'preimage_for_' + data.macaroon.substring(0, 10)
+
+          // Retry with Authorization header
+          response = await fetch(`${API_BASE}${path}`, {
+            ...options,
+            headers: {
+              ...options.headers,
+              'Content-Type': 'application/json',
+              Authorization: `L402 ${data.macaroon}:${mockPreimage}`
+            }
+          })
+        }
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({ error: 'Request failed' }))
+          throw new Error(err.error || `Request failed with ${response.status}`)
+        }
+
+        return response.json()
       },
 
       connectWallet: async () => {
@@ -208,31 +347,25 @@ export const useStore = create<AppState>()(
 
       // Answer Logic
       addAnswer: async (questionId, content) => {
-        const { answers, account, questions } = get()
-        // 1. Upload to IPFS? (Optional for now, but consistent)
-        // const ipfsHash = await uploadToIPFS(content)
+        const { account } = get()
+        set({ isLoading: true })
+        try {
+          await get().requestWithPayment('/answers', {
+            method: 'POST',
+            body: JSON.stringify({
+              questionId,
+              content,
+              author: account || 'anonymous'
+            })
+          })
 
-        const newAnswer: Answer = {
-          id: Date.now(),
-          questionId,
-          content,
-          author: account
-            ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
-            : 'you.eth',
-          votes: 0,
-          timestamp: 'Just now'
-          // ipfsHash
+          await get().fetchFeed()
+        } catch (error) {
+          console.error('Add Answer failed:', error)
+          alert(error instanceof Error ? error.message : 'Failed to post answer')
+        } finally {
+          set({ isLoading: false })
         }
-
-        // Update question answer count
-        const updatedQuestions = questions.map((q) =>
-          q.id === questionId ? { ...q, answers: q.answers + 1 } : q
-        )
-
-        set({
-          answers: [...answers, newAnswer],
-          questions: updatedQuestions
-        })
       },
 
       voteAnswer: (id, delta) => {

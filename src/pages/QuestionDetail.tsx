@@ -10,16 +10,53 @@ const QuestionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const numericId = Number(id)
 
-  const question = useStore((state) => state.questions.find((q) => q.id === numericId))
-  const answers = useStore((state) => state.answers.filter((a) => a.questionId === numericId))
+  const questions = useStore((state) => state.questions)
+  const allAnswers = useStore((state) => state.answers)
   const voteQuestion = useStore((state) => state.voteQuestion)
   const voteAnswer = useStore((state) => state.voteAnswer)
   const addAnswer = useStore((state) => state.addAnswer)
   const isUploading = useStore((state) => state.isUploading)
+  const fetchQuestion = useStore((state) => state.fetchQuestion)
+  const isLoading = useStore((state) => state.isLoading)
   const account = useStore((state) => state.account)
+
+  const question = React.useMemo(
+    () => questions.find((q) => q.id === numericId),
+    [questions, numericId]
+  )
+  const answers = React.useMemo(
+    () => allAnswers.filter((a) => a.questionId === numericId),
+    [allAnswers, numericId]
+  )
 
   const [newAnswerContent, setNewAnswerContent] = useState('')
   const [viewMode, setViewMode] = useState<'write' | 'preview'>('write')
+
+  React.useEffect(() => {
+    if (numericId) {
+      fetchQuestion(numericId)
+    }
+  }, [numericId, fetchQuestion])
+
+  if (isLoading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '4rem' }}>
+        <span
+          className="spinner"
+          style={{
+            display: 'inline-block',
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(255,255,255,0.1)',
+            borderTopColor: 'var(--accent-cyan)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}
+        ></span>
+        <p style={{ color: 'var(--text-muted)', marginTop: '1rem' }}>Loading question...</p>
+      </div>
+    )
+  }
 
   if (!question) {
     return (

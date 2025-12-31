@@ -11,7 +11,7 @@
 - **Language:** Prioritize TypeScript (`.tsx` and `.ts` files) for all new code. Migrate existing JavaScript files to TypeScript when making modifications.
 - **Styling:** Use CSS modules or a specific styling solution configured in the project (e.g., Tailwind CSS, Styled Components).
 - **Linting/Formatting:** Adhere strictly to the project's ESLint and Prettier rules. Run `npm run lint` and `npm run format` after generating code.
-- **Testing:** Generate unit tests using the existing framework (e.g., Jest and React Testing Library) for all new logic or components.
+- **Testing:** ALWAYS create or update unit tests using the existing framework (Vitest and React Testing Library) for all new logic, components, or updates.
 
 ## React Specific Guidelines
 

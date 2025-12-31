@@ -16,7 +16,8 @@ export default [
       sourceType: 'module',
       globals: {
         ...globals.browser,
-        ...globals.es2020
+        ...globals.es2020,
+        ...globals.node
       }
     },
     plugins: {
@@ -31,11 +32,20 @@ export default [
         'warn',
         { allowConstantExport: true }
       ],
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_'
+        }
+      ],
+      'no-undef': 'off'
     }
   },
   prettier,
   {
-    ignores: ['dist', 'node_modules', '.github']
+    ignores: ['dist', 'node_modules', '.github', 'server/dist']
   }
 ]

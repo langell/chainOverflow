@@ -8,11 +8,34 @@ vi.mock('../services/ipfs', () => ({
   getIPFSUrl: vi.fn().mockReturnValue('https://ipfs.io/ipfs/QmTest123')
 }))
 
+// Mock global fetch
+const mockFetch = vi.fn()
+vi.stubGlobal('fetch', mockFetch)
+
 describe('Zustand Store', () => {
   beforeEach(() => {
+    vi.clearAllMocks()
     // Reset store before each test
     // We can't easily reset a persisted store without clearing localStorage or using a helper
     localStorage.clear()
+    // Default mock response
+    mockFetch.mockImplementation((url) => {
+      if (url.includes('/api/feed')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([])
+        })
+      }
+      if (url.includes('/api/questions')) {
+        return Promise.resolve({
+          ok: true,
+          status: 201,
+          json: () => Promise.resolve({ id: 123, ipfsHash: 'QmTest123' })
+        })
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
+    })
+
     // Trigger a fresh state - this is a bit hacky for persist middleware but works for basic tests
     useStore.setState({
       questions: [],
@@ -45,7 +68,37 @@ describe('Zustand Store', () => {
   })
 
   it('should add a question and upload to IPFS', async () => {
-    const { addQuestion } = useStore.getState()
+    const { addQuestion, setAccount } = useStore.getState()
+    setAccount('tester')
+
+    // Mock feed to return the question after addQuestion calls it
+    mockFetch.mockImplementation((url) => {
+      if (url.includes('/api/feed')) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              {
+                id: 123,
+                title: 'Test Title',
+                content: 'Test Content',
+                tags: 'test,tags',
+                author: 'tester',
+                votes: 0,
+                bounty: '1 ETH',
+                timestamp: 'now',
+                ipfsHash: 'QmTest123'
+              }
+            ])
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 201,
+        json: () => Promise.resolve({ id: 123, ipfsHash: 'QmTest123' })
+      })
+    })
+
     const questionData = {
       title: 'Test Title',
       tags: 'test tags',
@@ -120,6 +173,169 @@ describe('Zustand Store', () => {
     expect(useStore.getState().questions.length).toBe(5)
     // Verify one of the titles contains a topic
     expect(useStore.getState().questions[0].title).toMatch(/scaling research paper/)
+  })
+
+  it('should handle L402 payment retry logic', async () => {
+    const { addQuestion, setAccount } = useStore.getState()
+    setAccount('tester')
+
+    let calls = 0
+    mockFetch.mockImplementation((url) => {
+      if (url.includes('/api/questions')) {
+        calls++
+        if (calls === 1) {
+          return Promise.resolve({
+            status: 402,
+            ok: false,
+            json: () =>
+              Promise.resolve({
+                message: 'Payment Required',
+                invoice: 'lnbc...',
+                macaroon: 'mock-mac'
+              })
+          })
+        }
+        return Promise.resolve({
+          status: 201,
+          ok: true,
+          json: () => Promise.resolve({ id: 123, ipfsHash: 'QmTest' })
+        })
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
+    })
+
+    const questionData = {
+      title: 'Paid Q',
+      tags: 'tags',
+      bounty: '10',
+      content: 'Content'
+    }
+
+    await addQuestion(questionData)
+
+    expect(calls).toBe(2) // Initial + Retry
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/questions'),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: expect.stringContaining('L402 mock-mac:')
+        })
+      })
+    )
+  })
+
+  it('should fetch a specific question and its answers', async () => {
+    const { fetchQuestion } = useStore.getState()
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          id: 1,
+          title: 'Single Q',
+          content: 'Content',
+          tags: 't1,t2',
+          author: 'me',
+          votes: 10,
+          bounty: '5',
+          timestamp: 'now',
+          answers: [
+            {
+              id: 10,
+              question_id: 1,
+              content: 'Ans 1',
+              author: 'him',
+              votes: 2,
+              is_accepted: 1,
+              timestamp: 'then'
+            }
+          ]
+        })
+    })
+
+    await fetchQuestion(1)
+
+    const state = useStore.getState()
+    const q = state.questions.find((q) => q.id === 1)
+    expect(q).toBeDefined()
+    expect(q?.title).toBe('Single Q')
+    expect(q?.tags).toEqual(['t1', 't2'])
+
+    const a = state.answers.find((ans) => ans.id === 10)
+    expect(a).toBeDefined()
+    expect(a?.isAccepted).toBe(true)
+  })
+
+  it('should add an answer via API', async () => {
+    const { addAnswer, setAccount } = useStore.getState()
+    setAccount('expert')
+
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: () => Promise.resolve({ id: 99, message: 'Success' })
+    })
+
+    await addAnswer(1, 'Great Solution')
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/answers'),
+      expect.objectContaining({ method: 'POST' })
+    )
+  })
+
+  it('should handle answer votes', () => {
+    const { voteAnswer } = useStore.getState()
+    const dummyId = 55
+    useStore.setState({
+      answers: [
+        {
+          id: dummyId,
+          questionId: 1,
+          content: '...',
+          author: 'a',
+          votes: 0,
+          timestamp: 'now',
+          isAccepted: false
+        }
+      ]
+    })
+
+    voteAnswer(dummyId, 1)
+    expect(useStore.getState().answers[0].votes).toBe(1)
+  })
+
+  it('should mark answer as accepted', () => {
+    const { markAnswerAccepted } = useStore.getState()
+    const qId = 1
+    const aId = 10
+    useStore.setState({
+      answers: [
+        {
+          id: aId,
+          questionId: qId,
+          content: '...',
+          author: 'a',
+          votes: 0,
+          timestamp: 'now',
+          isAccepted: false
+        },
+        {
+          id: 11,
+          questionId: qId,
+          content: '...',
+          author: 'b',
+          votes: 0,
+          timestamp: 'now',
+          isAccepted: false
+        }
+      ]
+    })
+
+    markAnswerAccepted(qId, aId)
+    const state = useStore.getState()
+    expect(state.answers.find((a) => a.id === aId)?.isAccepted).toBe(true)
+    expect(state.answers.find((a) => a.id === 11)?.isAccepted).toBe(false)
   })
 
   describe('connectWallet', () => {
