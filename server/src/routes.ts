@@ -1,8 +1,28 @@
 import express, { type Request, type Response } from 'express'
-import { getDB } from './db.js'
+import { getDB, seedDB } from './db.js'
 import { releaseBounty } from './services/contract.js'
 
 const router = express.Router()
+
+// Health check
+router.get('/ping', (_req: Request, res: Response) => {
+  res.json({
+    status: 'alive',
+    db: 'Vercel Postgres',
+    time: new Date().toISOString()
+  })
+})
+
+// Seed database
+router.get('/seed', async (_req: Request, res: Response) => {
+  try {
+    const result = await seedDB()
+    res.json(result)
+  } catch (error) {
+    console.error('SEED_ERROR:', error)
+    res.status(500).json({ error: 'Seed failed', message: (error as any).message })
+  }
+})
 
 // GET /feed (Latest 20 questions with answers)
 router.get('/feed', async (_req: Request, res: Response) => {

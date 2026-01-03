@@ -80,7 +80,12 @@ class MockDatabase implements IDatabase {
     if (q.includes('from questions where title = ?')) {
       return this.questions.find((item) => item.title == params[0])
     }
-    return this.questions[0]
+    if (q.includes('from answers where id = ?')) {
+      return this.answers.find(
+        (item) => item.id == (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
+      )
+    }
+    return null
   }
 
   async run(query: string, params: any[] = []) {
@@ -95,14 +100,19 @@ class MockDatabase implements IDatabase {
     }
     if (q.includes('insert into questions')) {
       this.lastId++
-      // INSERT INTO questions (title, content, author) VALUES (?, ?, ?)
-      this.questions.push({
+      const newQ = {
         id: this.lastId,
         title: params[0],
         content: params[1],
-        author: params[2],
+        tags: params[2],
+        author: params[3],
+        bounty: params[4],
+        ipfsHash: params[5],
+        votes: 0,
+        timestamp: new Date().toISOString(),
         answers: []
-      })
+      }
+      this.questions.push(newQ)
       return { lastID: this.lastId }
     }
     if (q.includes('insert into answers')) {
@@ -111,7 +121,11 @@ class MockDatabase implements IDatabase {
         id: this.lastId,
         question_id: params[0],
         content: params[1],
-        author: params[2]
+        author: params[2],
+        ipfsHash: params[3],
+        votes: 0,
+        is_accepted: false,
+        timestamp: new Date().toISOString()
       })
       return { lastID: this.lastId }
     }
@@ -171,6 +185,54 @@ export const initDB = async () => {
   }
 
   return db
+}
+
+export const seedDB = async () => {
+  const database = await initDB()
+
+  // Check if we already have questions
+  const existing = await database.all('SELECT id FROM questions LIMIT 1')
+  if (existing.length > 0) {
+    return { message: 'Database already has data. Skipping seed.' }
+  }
+
+  console.log('Seeding database...')
+
+  const q1 = await database.run(
+    'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
+    [
+      'How to implement L402 in Express?',
+      'I am trying to add payment-required headers to my API. Any examples?',
+      'l402,express,bitcoin',
+      '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+      '100000000000000',
+      'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco'
+    ]
+  )
+
+  await database.run(
+    'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
+    [
+      'Vercel Postgres vs SQLite for serverless?',
+      'Why does SQLite crash on Vercel but work locally?',
+      'vercel,postgres,sqlite',
+      '0x4db2460Bdec9A87EE212001A848D080C0B080808',
+      '50000000000000',
+      'QmYwAPJzvT97TjRAnz8MhC5Mhy15TJJFFG3oXW4G4yXkKA'
+    ]
+  )
+
+  await database.run(
+    'INSERT INTO answers (question_id, content, author, ipfsHash) VALUES (?, ?, ?, ?)',
+    [
+      q1.lastID,
+      'Check out the @x402/express library. It handles macaroons and lightning invoices perfectly.',
+      '0x0000000000000000000000000000000000000000',
+      'QmZ4tjZYnd6fBy7C25Ff2P2MhW6oF4ZAnXn7H8J8B8H8H8'
+    ]
+  )
+
+  return { message: 'Seed successful', questionsAdded: 2 }
 }
 
 export const getDB = () => {
