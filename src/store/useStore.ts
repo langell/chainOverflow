@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { ethers } from 'ethers'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Question, Answer } from '../types'
 import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
@@ -279,7 +280,7 @@ export const useStore = create<AppState>()(
           const data = await response.json()
           console.log('L402 ETH Payment Required', data)
 
-          const { payTo, price, macaroon } = data
+          const { payTo, price, macaroon, vaultAddress, method } = data
 
           if (!window.ethereum) {
             throw new Error('MetaMask required for ETH L402 payments')
@@ -294,20 +295,51 @@ export const useStore = create<AppState>()(
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
           const sender = accounts[0]
 
-          console.log(`Requesting payment of ${price} Wei to ${payTo}`)
+          console.log(
+            `Requesting payment of ${price} Wei. Strategy: ${vaultAddress ? 'Smart Contract' : 'Direct Transfer'}`
+          )
 
           try {
-            // 2. Execute ETH transaction
-            const txHash = await window.ethereum.request({
-              method: 'eth_sendTransaction',
-              params: [
-                {
-                  from: sender,
-                  to: payTo,
-                  value: BigInt(price).toString(16) // Convert to hex for standard RPC
-                }
-              ]
-            })
+            let txHash: string
+
+            if (vaultAddress) {
+              // Smart Contract Call Strategy
+              const iface = new ethers.Interface([
+                'function payForQuestion(string questionId) payable',
+                'function payFee(string resourceId) payable'
+              ])
+
+              // Use a dummy ID if we don't have the final one yet,
+              // or handle it based on path. For /questions, we might need the IPFS hash or similar.
+              const resourceId = options.body
+                ? JSON.parse(options.body as string).title || 'generic'
+                : 'generic'
+              const callData = iface.encodeFunctionData(method, [resourceId])
+
+              txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [
+                  {
+                    from: sender,
+                    to: vaultAddress,
+                    value: BigInt(price).toString(16),
+                    data: callData
+                  }
+                ]
+              })
+            } else {
+              // Direct Transfer Fallback
+              txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [
+                  {
+                    from: sender,
+                    to: payTo,
+                    value: BigInt(price).toString(16)
+                  }
+                ]
+              })
+            }
 
             console.log('Payment successful, TX Hash:', txHash)
 
@@ -400,18 +432,21 @@ export const useStore = create<AppState>()(
         set({ answers: updatedAnswers })
       },
 
-      markAnswerAccepted: (questionId, answerId) => {
-        const { answers } = get()
-        // Ensure only one accepted answer per question? Use logic here if needed.
-        const updatedAnswers = answers.map((a) => {
-          if (a.questionId === questionId) {
-            // Uncheck others if we want single-select
-            if (a.id === answerId) return { ...a, isAccepted: true }
-            return { ...a, isAccepted: false }
-          }
-          return a
-        })
-        set({ answers: updatedAnswers })
+      markAnswerAccepted: async (_questionId, answerId) => {
+        set({ isLoading: true })
+        try {
+          await fetch(`${API_BASE}/answers/${answerId}/accept`, {
+            method: 'POST'
+          })
+
+          // Refresh state
+          await get().fetchFeed()
+        } catch (error) {
+          console.error('Accept Answer failed:', error)
+          alert('Failed to accept answer on-chain.')
+        } finally {
+          set({ isLoading: false })
+        }
       }
     }),
     {

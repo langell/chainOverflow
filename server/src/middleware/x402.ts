@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
+import { internalAddress } from '../services/wallet'
 
-// Recipient address for payments (Use an environment variable or a placeholder)
-const RECIPIENT_ADDRESS =
-  process.env.PAYMENT_ADDRESS || '0x0000000000000000000000000000000000000000'
+const VAULT_ADDRESS = process.env.VAULT_ADDRESS || ''
 
 // Default price for operations (in Wei or token subunits)
 // For 0.0001 ETH, it's 100000000000000 Wei
@@ -27,9 +26,9 @@ export const legacyX402Middleware = async (req: Request, res: Response, next: Ne
 
   // This is the mock one we had before, keeping it as a fallback or for non-ETH tests if needed
   const authHeader = req.headers['authorization']
-  if (!authHeader) return requestPayment(res)
+  if (!authHeader) return requestPayment(req, res)
   const [scheme, credentials] = authHeader.split(' ')
-  if (scheme !== 'L402' || !credentials) return requestPayment(res)
+  if (scheme !== 'L402' || !credentials) return requestPayment(req, res)
   const [token, preimage] = credentials.split(':')
 
   if (token) {
@@ -42,13 +41,18 @@ export const legacyX402Middleware = async (req: Request, res: Response, next: Ne
   return res.status(402).json({ error: 'Invalid payment proof' })
 }
 
-const requestPayment = (res: Response) => {
+const requestPayment = (req: Request, res: Response) => {
   const macaroon = 'mock_macaroon_' + Math.random().toString(36).substring(7)
+  const isQuestion = req.path.includes('questions')
+  const methodName = isQuestion ? 'payForQuestion' : 'payFee'
+
   res.set('WWW-Authenticate', `L402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
   return res.status(402).json({
-    message: 'Payment Required (ETH/Base)',
-    detail: 'This endpoint requires an ETH payment on Base via L402.',
-    payTo: RECIPIENT_ADDRESS,
+    message: 'Payment Required (Smart Contract)',
+    detail: `This endpoint requires a contract call to ${methodName} on Base.`,
+    payTo: internalAddress, // Fallback
+    vaultAddress: VAULT_ADDRESS, // Primary if available
+    method: methodName,
     price: DEFAULT_PRICE,
     macaroon
   })

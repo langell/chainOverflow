@@ -1,5 +1,6 @@
 import express from 'express'
 import { getDB } from './db'
+import { releaseBounty } from './services/contract'
 
 const router = express.Router()
 
@@ -145,6 +146,41 @@ router.post('/answers', async (req, res) => {
     })
   } catch (_error) {
     res.status(500).json({ error: 'Failed to post answer' })
+  }
+})
+
+// POST /answers/:id/accept (Release Bounty)
+router.post('/answers/:id/accept', async (req, res) => {
+  try {
+    const { id } = req.params
+    const db = getDB()
+
+    // 1. Mark as accepted in DB
+    await db.run(`UPDATE answers SET is_accepted = 1 WHERE id = ?`, [id])
+
+    // 2. Get details for on-chain payout
+    const answer = await db.get(`SELECT * FROM answers WHERE id = ?`, [id])
+    if (!answer) return res.status(404).json({ error: 'Answer not found' })
+
+    const question = await db.get(`SELECT * FROM questions WHERE id = ?`, [answer.question_id])
+    if (!question) return res.status(404).json({ error: 'Question not found' })
+
+    // 3. Trigger smart contract payout
+    // question.id is used as the questionId in the contract
+    let txHash = null
+    try {
+      txHash = await releaseBounty(question.id.toString(), answer.author)
+    } catch (contractError) {
+      console.error('Failed to release bounty on-chain:', contractError)
+      // We don't fail the whole request, but return the error info
+    }
+
+    res.json({
+      message: 'Answer accepted and bounty release triggered',
+      txHash
+    })
+  } catch (_error) {
+    res.status(500).json({ error: 'Failed to accept answer' })
   }
 })
 
