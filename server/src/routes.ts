@@ -48,9 +48,10 @@ router.get('/debug-db', async (_req: Request, res: Response) => {
 })
 
 // Seed database
-router.get('/seed', async (_req: Request, res: Response) => {
+router.get('/seed', async (req: Request, res: Response) => {
   try {
-    const result = await seedDB()
+    const force = req.query.force === 'true'
+    const result = await seedDB(force)
     res.json(result)
   } catch (error) {
     console.error('SEED_ERROR:', error)

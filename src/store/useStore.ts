@@ -397,8 +397,6 @@ export const useStore = create<AppState>()(
       name: 'chainoverflow-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        questions: state.questions,
-        answers: state.answers,
         account: state.account
       })
     }

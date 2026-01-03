@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres'
+import { db as pool } from '@vercel/postgres'
 
 /**
  * Interface that abstracts database operations
@@ -15,13 +15,13 @@ let db: IDatabase | null = null
 class PostgresWrapper implements IDatabase {
   async all(query: string, params: any[] = []) {
     const pgQuery = this.toPostgres(query)
-    const { rows } = await sql.query(pgQuery, params)
+    const { rows } = await pool.query(pgQuery, params)
     return rows
   }
 
   async get(query: string, params: any[] = []) {
     const pgQuery = this.toPostgres(query)
-    const { rows } = await sql.query(pgQuery, params)
+    const { rows } = await pool.query(pgQuery, params)
     return rows[0]
   }
 
@@ -30,13 +30,13 @@ class PostgresWrapper implements IDatabase {
     if (pgQuery.trim().toLowerCase().startsWith('insert')) {
       pgQuery += ' RETURNING id'
     }
-    const { rows } = await sql.query(pgQuery, params)
+    const { rows } = await pool.query(pgQuery, params)
     return { lastID: rows[0]?.id }
   }
 
   async exec(query: string) {
     const pgQuery = this.toPostgres(query)
-    await sql.query(pgQuery)
+    await pool.query(pgQuery)
   }
 
   private toPostgres(query: string): string {
@@ -150,7 +150,7 @@ export const initDB = async () => {
     return db
   }
 
-  console.log('Initializing Vercel Postgres...')
+  console.log('Initializing Vercel Postgres Pool...')
   db = new PostgresWrapper()
 
   try {
@@ -192,13 +192,19 @@ export const initDB = async () => {
   return db
 }
 
-export const seedDB = async () => {
+export const seedDB = async (force: boolean = false) => {
   const database = await initDB()
 
-  const existing = await database.all('SELECT id FROM questions LIMIT 1')
-  if (existing.length > 0) {
-    console.log('Database already has data. Skipping seed.')
-    return { message: 'Database already has data. Skipping seed.' }
+  if (!force) {
+    const existing = await database.all('SELECT id FROM questions LIMIT 1')
+    if (existing.length > 0) {
+      console.log('Database already has data. Skipping seed.')
+      return { message: 'Database already has data. Skipping seed.' }
+    }
+  } else {
+    console.log('Force re-seeding...')
+    await database.exec('DELETE FROM answers')
+    await database.exec('DELETE FROM questions')
   }
 
   console.log('Seeding database started...')
