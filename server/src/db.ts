@@ -57,22 +57,64 @@ class PostgresWrapper implements IDatabase {
  * In-memory mock for tests so we don't need a real Postgres URL in CI
  */
 class MockDatabase implements IDatabase {
-  private data: any = { questions: [], answers: [], invoices: [] }
+  private questions: any[] = []
+  private answers: any[] = []
   private lastId = 0
 
   async all(query: string, _params: any[] = []) {
-    if (query.includes('questions')) return this.data.questions
-    if (query.includes('answers')) return this.data.answers
+    const q = query.toLowerCase()
+    if (q.includes('from questions')) return this.questions
+    if (q.includes('from answers')) return this.answers
     return []
   }
-  async get(query: string, _params: any[] = []) {
-    if (query.includes('FROM questions')) return this.data.questions[0]
-    return null
+
+  async get(query: string, params: any[] = []) {
+    const q = query.toLowerCase()
+    if (q.includes('from questions where id = ?')) {
+      return this.questions.find((item) => item.id === params[0])
+    }
+    if (q.includes('from questions where title = ?')) {
+      return this.questions.find((item) => item.title === params[0])
+    }
+    return this.questions[0]
   }
-  async run(_query: string, _params: any[] = []) {
-    this.lastId++
-    return { lastID: this.lastId }
+
+  async run(query: string, params: any[] = []) {
+    const q = query.toLowerCase()
+    if (q.includes('delete from questions')) {
+      this.questions = []
+      return {}
+    }
+    if (q.includes('delete from answers')) {
+      this.answers = []
+      return {}
+    }
+    if (q.includes('insert into questions')) {
+      this.lastId++
+      const newQ = {
+        id: this.lastId,
+        title: params[0],
+        content: params[1],
+        author: params[2],
+        answers: []
+      }
+      this.questions.push(newQ)
+      return { lastID: this.lastId }
+    }
+    if (q.includes('insert into answers')) {
+      this.lastId++
+      const newA = {
+        id: this.lastId,
+        question_id: params[0],
+        content: params[1],
+        author: params[2]
+      }
+      this.answers.push(newA)
+      return { lastID: this.lastId }
+    }
+    return { lastID: ++this.lastId }
   }
+
   async exec(_query: string) {
     return
   }
@@ -82,7 +124,6 @@ export const initDB = async () => {
   if (db) return db
 
   if (process.env.NODE_ENV === 'test') {
-    console.log('Using Mock Database for tests')
     db = new MockDatabase()
     return db
   }
