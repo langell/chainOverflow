@@ -1,15 +1,25 @@
-const hre = require("hardhat");
+const { ethers, upgrades } = require("hardhat");
 
 async function main() {
-  const [deployer] = await hre.ethers.getSigners();
+  const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account:", deployer.address);
 
-  const Vault = await hre.ethers.getContractFactory("ChainOverflowVault");
-  const vault = await Vault.deploy();
+  const Vault = await ethers.getContractFactory("ChainOverflowVault");
+  
+  console.log("Deploying ChainOverflowVault (Proxy)...");
+  const vault = await upgrades.deployProxy(Vault, [], {
+    initializer: "initialize",
+    kind: "uups",
+  });
 
   await vault.waitForDeployment();
+  const proxyAddress = await vault.getAddress();
 
-  console.log("ChainOverflowVault deployed to:", await vault.getAddress());
+  console.log("ChainOverflowVault deployed to:", proxyAddress);
+  
+  // Verify implementation address
+  const implementationAddress = await upgrades.erc1967.getImplementationAddress(proxyAddress);
+  console.log("Implementation address:", implementationAddress);
 }
 
 main()

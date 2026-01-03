@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.22;
+
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * @title ChainOverflowVault
  * @dev A vault for managing L402 payments and question bounties for ChainOverflow.
+ * This version is UUPS upgradeable.
  */
-contract ChainOverflowVault {
-    address public owner;
-    uint256 public protocolFee = 100000000000000; // 0.0001 ETH default
+contract ChainOverflowVault is Initializable, UUPSUpgradeable, OwnableUpgradeable {
+    uint256 public protocolFee;
 
     struct Bounty {
         uint256 amount;
@@ -15,24 +19,25 @@ contract ChainOverflowVault {
         bool released;
     }
 
-    // Mapping from questionId (could be a slug or hash) to Bounty
+    // Mapping from questionId to Bounty
     mapping(string => Bounty) public bounties;
 
     event PaymentReceived(address indexed payer, string resourceId, uint256 amount);
     event BountyReleased(string indexed questionId, address indexed winner, uint256 amount);
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
-        owner = msg.sender;
+        _disableInitializers();
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call this");
-        _;
+    function initialize() public initializer {
+        __Ownable_init(msg.sender);
+        __UUPSUpgradeable_init();
+        protocolFee = 100000000000000; // 0.0001 ETH default
     }
 
     /**
      * @dev Process a payment for asking a question and setting a bounty.
-     * The entire msg.value is treated as the bounty.
      */
     function payForQuestion(string memory questionId) external payable {
         require(msg.value > 0, "Payment must be greater than 0");
@@ -57,7 +62,6 @@ contract ChainOverflowVault {
 
     /**
      * @dev Release a bounty to the winning answerer.
-     * Controlled by the API (owner) after an answer is accepted.
      */
     function releaseBounty(string memory questionId, address payable winner) external onlyOwner {
         Bounty storage bounty = bounties[questionId];
@@ -74,13 +78,11 @@ contract ChainOverflowVault {
     }
 
     /**
-     * @dev Withdraw protocol fees collected via payFee.
+     * @dev Withdraw protocol fees.
      */
     function withdrawFees() external onlyOwner {
         uint256 balance = address(this).balance;
-        // In a real app, you'd track fee balance separately from active bounties
-        // For this demo, we can just withdraw the whole balance if needed
-        (bool success, ) = payable(owner).call{value: balance}("");
+        (bool success, ) = payable(owner()).call{value: balance}("");
         require(success, "Withdrawal failed");
     }
 
@@ -90,6 +92,11 @@ contract ChainOverflowVault {
     function setProtocolFee(uint256 _newFee) external onlyOwner {
         protocolFee = _newFee;
     }
+
+    /**
+     * @dev Required by UUPSUpgradeable to authorize an upgrade.
+     */
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // Function to receive ETH
     receive() external payable {}
