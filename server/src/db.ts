@@ -71,6 +71,8 @@ class PostgresWrapper implements IDatabase {
       /DATETIME DEFAULT CURRENT_TIMESTAMP/gi,
       'TIMESTAMP DEFAULT CURRENT_TIMESTAMP'
     )
+    pgQuery = pgQuery.replace(/BOOLEAN DEFAULT 0/gi, 'BOOLEAN DEFAULT FALSE')
+    pgQuery = pgQuery.replace(/BOOLEAN DEFAULT 1/gi, 'BOOLEAN DEFAULT TRUE')
     return pgQuery
   }
 }
@@ -93,7 +95,7 @@ export const initDB = async () => {
 
   await db.exec(`
     CREATE TABLE IF NOT EXISTS questions (
-      id SERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       content TEXT NOT NULL,
       tags TEXT,
@@ -101,25 +103,25 @@ export const initDB = async () => {
       ipfsHash TEXT,
       bounty TEXT,
       votes INTEGER DEFAULT 0,
-      timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS answers (
-      id SERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       question_id INTEGER,
       content TEXT NOT NULL,
       author TEXT,
       ipfsHash TEXT,
       votes INTEGER DEFAULT 0,
-      is_accepted BOOLEAN DEFAULT FALSE,
-      timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      is_accepted BOOLEAN DEFAULT 0,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     );
     
     CREATE TABLE IF NOT EXISTS invoices (
       payment_hash TEXT PRIMARY KEY,
       amount INTEGER,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      is_paid BOOLEAN DEFAULT FALSE
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      is_paid BOOLEAN DEFAULT 0
     );
   `)
 
