@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import { initDB } from './db'
@@ -16,7 +16,7 @@ console.log('Environment:', process.env.NODE_ENV || 'development')
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (_req, res) => {
+app.get('/', (_req: Request, res: Response) => {
   res.send('ChainOverflow API is running. use /api/questions to interact.')
 })
 

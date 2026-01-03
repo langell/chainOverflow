@@ -1,11 +1,11 @@
-import express from 'express'
+import express, { type Request, type Response } from 'express'
 import { getDB } from './db'
 import { releaseBounty } from './services/contract'
 
 const router = express.Router()
 
 // GET /feed (Latest 20 questions with answers)
-router.get('/feed', async (_req, res) => {
+router.get('/feed', async (_req: Request, res: Response) => {
   try {
     const db = getDB()
 
@@ -44,7 +44,7 @@ router.get('/feed', async (_req, res) => {
 })
 
 // GET /questions/:id (Single question with all answers)
-router.get('/questions/:id', async (req, res) => {
+router.get('/questions/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     const db = getDB()
@@ -71,7 +71,7 @@ router.get('/questions/:id', async (req, res) => {
 })
 
 // GET /search (Free access)
-router.get('/search', async (req, res) => {
+router.get('/search', async (req: Request, res: Response) => {
   try {
     const { q } = req.query
     if (!q) return res.json([])
@@ -96,7 +96,7 @@ router.get('/search', async (req, res) => {
 })
 
 // POST /questions (Paid)
-router.post('/questions', async (req, res) => {
+router.post('/questions', async (req: Request, res: Response) => {
   try {
     const { title, content, tags, author, bounty } = req.body
     const db = getDB()
@@ -124,7 +124,7 @@ router.post('/questions', async (req, res) => {
 })
 
 // POST /answers (Paid)
-router.post('/answers', async (req, res) => {
+router.post('/answers', async (req: Request, res: Response) => {
   try {
     const { questionId, content, author } = req.body
     const db = getDB()
@@ -150,7 +150,7 @@ router.post('/answers', async (req, res) => {
 })
 
 // POST /answers/:id/accept (Release Bounty)
-router.post('/answers/:id/accept', async (req, res) => {
+router.post('/answers/:id/accept', async (req: Request, res: Response) => {
   try {
     const { id } = req.params
     const db = getDB()
