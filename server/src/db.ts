@@ -54,7 +54,7 @@ class PostgresWrapper implements IDatabase {
 }
 
 /**
- * In-memory mock for tests so we don't need a real Postgres URL in CI
+ * In-memory mock for tests
  */
 class MockDatabase implements IDatabase {
   private questions: any[] = []
@@ -63,19 +63,9 @@ class MockDatabase implements IDatabase {
 
   async all(query: string, params: any[] = []) {
     const q = query.toLowerCase()
-    if (q.includes('where question_id in')) {
-      return this.answers.filter((a) => params.includes(a.question_id))
-    }
-    if (q.includes('where question_id = ?')) {
-      return this.answers.filter((a) => a.question_id === params[0])
-    }
-    if (q.includes('from questions where title like')) {
-      const searchTerm = params[0].replace(/%/g, '').toLowerCase()
-      return this.questions.filter(
-        (item) =>
-          item.title.toLowerCase().includes(searchTerm) ||
-          item.content.toLowerCase().includes(searchTerm)
-      )
+    if (q.includes('where title like')) {
+      const term = params[0].replace(/%/g, '').toLowerCase()
+      return this.questions.filter((item) => item.title.toLowerCase().includes(term))
     }
     if (q.includes('from questions')) return this.questions
     if (q.includes('from answers')) return this.answers
@@ -85,17 +75,10 @@ class MockDatabase implements IDatabase {
   async get(query: string, params: any[] = []) {
     const q = query.toLowerCase()
     if (q.includes('from questions where id = ?')) {
-      return this.questions.find(
-        (item) => item.id === (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
-      )
+      return this.questions.find((item) => item.id == params[0])
     }
     if (q.includes('from questions where title = ?')) {
-      return this.questions.find((item) => item.title === params[0])
-    }
-    if (q.includes('from answers where id = ?')) {
-      return this.answers.find(
-        (item) => item.id === (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
-      )
+      return this.questions.find((item) => item.title == params[0])
     }
     return this.questions[0]
   }
@@ -112,27 +95,24 @@ class MockDatabase implements IDatabase {
     }
     if (q.includes('insert into questions')) {
       this.lastId++
-      const newQ = {
+      // INSERT INTO questions (title, content, author) VALUES (?, ?, ?)
+      this.questions.push({
         id: this.lastId,
         title: params[0],
         content: params[1],
-        author: params[3],
-        answers: [],
-        tags: params[2],
-        bounty: params[4]
-      }
-      this.questions.push(newQ)
+        author: params[2],
+        answers: []
+      })
       return { lastID: this.lastId }
     }
     if (q.includes('insert into answers')) {
       this.lastId++
-      const newA = {
+      this.answers.push({
         id: this.lastId,
         question_id: params[0],
         content: params[1],
         author: params[2]
-      }
-      this.answers.push(newA)
+      })
       return { lastID: this.lastId }
     }
     return { lastID: ++this.lastId }
