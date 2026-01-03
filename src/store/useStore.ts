@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Question, Answer } from '../types'
 import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
 
-const API_BASE = 'http://localhost:3001/api'
+const API_BASE = '/api'
 
 interface AppState {
   questions: Question[]
@@ -43,69 +43,13 @@ interface AppState {
   requestWithPayment: (path: string, options?: RequestInit) => Promise<any>
 }
 
-const INITIAL_QUESTIONS: Question[] = [
-  {
-    id: 1,
-    title: 'How do I optimize loops in Solidity to avoid out-of-gas errors?',
-    content:
-      'I have a large array that I iterate over, and I keep hitting gas limits. What are the best practices for batching or off-chain computation?',
-    tags: ['solidity', 'gas-optimization', 'evm'],
-    author: 'vitalik.eth',
-    votes: 42,
-    answers: 2,
-    bounty: '0.5 ETH',
-    timestamp: '2h ago',
-    ipfsHash: 'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco'
-  },
-  {
-    id: 2,
-    title: 'Difference between Transparent vs UUPS proxy patterns?',
-    content: 'Thinking about upgradeability for my next project. Which one is safer/cheaper?',
-    tags: ['proxies', 'upgradeability', 'security'],
-    author: 'open_zeppelin.eth',
-    votes: 28,
-    answers: 1,
-    timestamp: '5h ago',
-    ipfsHash: 'QmT5NvUtoM5nWFfrQdVrFzGfCu9Ab1QYMD8yV7JkDvJp99'
-  }
-]
-
-const INITIAL_ANSWERS: Answer[] = [
-  {
-    id: 101,
-    questionId: 1,
-    content:
-      'You should avoid iterating over unbounded arrays in your transactions. Instead, consider using a **pagination** pattern where you process a chunk of the array at a time.\n\nAlternatively, move the computation off-chain and verify the result on-chain using a Merkle Proof or ZK-SNARK if applicable.',
-    author: 'gavin.eth',
-    votes: 15,
-    timestamp: '1h ago',
-    isAccepted: true
-  },
-  {
-    id: 102,
-    questionId: 1,
-    content:
-      'Check out the "Pull over Push" payment pattern as well. If this is for distributing rewards, let users claim them instead of sending to everyone in a loop.',
-    author: 'andreas.eth',
-    votes: 8,
-    timestamp: '30m ago'
-  },
-  {
-    id: 103,
-    questionId: 2,
-    content:
-      'UUPS is generally cheaper to deploy because the upgrade logic is in the implementation contract, not the proxy. However, it carries a risk: if you deploy a broken implementation that lacks the upgrade logic, you brick the contract forever.',
-    author: 'sam.eth',
-    votes: 12,
-    timestamp: '4h ago'
-  }
-]
+// Initial data removed to ensure production data is fetched from DB
 
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
-      questions: INITIAL_QUESTIONS,
-      answers: INITIAL_ANSWERS,
+      questions: [],
+      answers: [],
       account: null,
       isModalOpen: false,
       isUploading: false,

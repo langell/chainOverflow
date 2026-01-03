@@ -197,36 +197,48 @@ export const seedDB = async () => {
 
   const existing = await database.all('SELECT id FROM questions LIMIT 1')
   if (existing.length > 0) {
+    console.log('Database already has data. Skipping seed.')
     return { message: 'Database already has data. Skipping seed.' }
   }
 
-  console.log('Seeding database...')
+  console.log('Seeding database started...')
 
-  await database.run(
-    'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
-    [
-      'How to implement L402 in Express?',
-      'I am trying to add payment-required headers to my API. Any examples?',
-      'l402,express,bitcoin',
-      '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-      '100000000000000',
-      'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco'
-    ]
-  )
+  try {
+    const q1 = await database.run(
+      'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        'How to implement L402 in Express?',
+        'I am trying to add payment-required headers to my API. Any examples?',
+        'l402,express,bitcoin',
+        '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
+        '100000000000000',
+        'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco'
+      ]
+    )
+    console.log('Seed: Inserted Question 1, ID:', q1.lastID)
 
-  await database.run(
-    'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
-    [
-      'Vercel Postgres vs SQLite for serverless?',
-      'Why does SQLite crash on Vercel but work locally?',
-      'vercel,postgres,sqlite',
-      '0x4db2460Bdec9A87EE212001A848D080C0B080808',
-      '50000000000000',
-      'QmYwAPJzvT97TjRAnz8MhC5Mhy15TJJFFG3oXW4G4yXkKA'
-    ]
-  )
+    const q2 = await database.run(
+      'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        'Vercel Postgres vs SQLite for serverless?',
+        'Why does SQLite crash on Vercel but work locally?',
+        'vercel,postgres,sqlite',
+        '0x4db2460Bdec9A87EE212001A848D080C0B080808',
+        '50000000000000',
+        'QmYwAPJzvT97TjRAnz8MhC5Mhy15TJJFFG3oXW4G4yXkKA'
+      ]
+    )
+    console.log('Seed: Inserted Question 2, ID:', q2.lastID)
 
-  return { message: 'Seed successful', questionsAdded: 2 }
+    return {
+      message: 'Seed successful',
+      questionsAdded: 2,
+      ids: [q1.lastID, q2.lastID]
+    }
+  } catch (error) {
+    console.error('CRITICAL SEED ERROR:', error)
+    throw error
+  }
 }
 
 export const getDB = () => {
