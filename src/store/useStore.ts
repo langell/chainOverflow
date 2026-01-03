@@ -18,7 +18,7 @@ interface AppState {
   isLoading: boolean
 
   // Actions
-  fetchFeed: () => Promise<void>
+  fetchFeed: (sort?: string) => Promise<void>
   fetchQuestion: (id: number) => Promise<void>
   setAccount: (account: string | null) => void
   setIsModalOpen: (isOpen: boolean) => void
@@ -58,10 +58,11 @@ export const useStore = create<AppState>()(
       searchResults: null,
       isLoading: false,
 
-      fetchFeed: async () => {
+      fetchFeed: async (sort?: string) => {
         set({ isLoading: true })
         try {
-          const response = await fetch(`${API_BASE}/feed`)
+          const url = sort ? `${API_BASE}/feed?sort=${sort}` : `${API_BASE}/feed`
+          const response = await fetch(url)
           const data = await response.json()
 
           // Transform backend data to frontend types

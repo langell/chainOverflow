@@ -5,6 +5,7 @@ import QuestionCard from '../components/QuestionCard'
 import Sidebar from '../components/Sidebar'
 
 const Home: React.FC = () => {
+  const [currentSort, setCurrentSort] = React.useState('newest')
   const questions = useStore((state) => state.questions)
   const searchQuery = useStore((state) => state.searchQuery)
   const isSearching = useStore((state) => state.isSearching)
@@ -13,8 +14,8 @@ const Home: React.FC = () => {
   const fetchFeed = useStore((state) => state.fetchFeed)
 
   useEffect(() => {
-    fetchFeed()
-  }, [fetchFeed])
+    fetchFeed(currentSort)
+  }, [fetchFeed, currentSort])
 
   const filteredQuestions = useMemo(() => {
     if (!searchQuery) return questions
@@ -31,6 +32,11 @@ const Home: React.FC = () => {
     })
   }, [questions, searchQuery, searchResults])
 
+  const handleSortChange = (e: React.MouseEvent, sort: string) => {
+    e.preventDefault()
+    setCurrentSort(sort)
+  }
+
   return (
     <>
       <Hero />
@@ -46,7 +52,13 @@ const Home: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <h2>
-                {searchQuery ? `Search Results (${filteredQuestions.length})` : 'Top Questions'}
+                {searchQuery
+                  ? `Search Results (${filteredQuestions.length})`
+                  : currentSort === 'newest'
+                    ? 'Top Questions'
+                    : currentSort === 'active'
+                      ? 'Active Activity'
+                      : 'Unanswered Questions'}
               </h2>
               {isSearching && (
                 <span
@@ -63,11 +75,27 @@ const Home: React.FC = () => {
               )}
             </div>
             <div className="nav-links" style={{ fontSize: '0.8rem' }}>
-              <a href="#" style={{ color: 'var(--text-main)' }}>
+              <a
+                href="#"
+                onClick={(e) => handleSortChange(e, 'newest')}
+                style={{ color: currentSort === 'newest' ? 'var(--text-main)' : 'inherit' }}
+              >
                 Newest
               </a>
-              <a href="#">Active</a>
-              <a href="#">Unanswered</a>
+              <a
+                href="#"
+                onClick={(e) => handleSortChange(e, 'active')}
+                style={{ color: currentSort === 'active' ? 'var(--text-main)' : 'inherit' }}
+              >
+                Active
+              </a>
+              <a
+                href="#"
+                onClick={(e) => handleSortChange(e, 'unanswered')}
+                style={{ color: currentSort === 'unanswered' ? 'var(--text-main)' : 'inherit' }}
+              >
+                Unanswered
+              </a>
             </div>
           </div>
 

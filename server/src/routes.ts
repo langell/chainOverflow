@@ -60,27 +60,52 @@ router.get('/seed', async (req: Request, res: Response) => {
 })
 
 // GET /feed (Latest 20 questions with answers)
-router.get('/feed', async (_req: Request, res: Response) => {
+router.get('/feed', async (req: Request, res: Response) => {
   try {
     const db = getDB()
+    const sort = (req.query.sort as string) || 'newest'
 
-    // 1. Get latest 20 questions
-    const questions = await db.all(`
-            SELECT * FROM questions 
-            ORDER BY timestamp DESC 
-            LIMIT 20
-        `)
+    let questionsQuery = ''
+    if (sort === 'unanswered') {
+      questionsQuery = `
+        SELECT q.* FROM questions q 
+        LEFT JOIN answers a ON q.id = a.question_id 
+        GROUP BY q.id 
+        HAVING COUNT(a.id) = 0 
+        ORDER BY q.timestamp DESC 
+        LIMIT 20
+      `
+    } else if (sort === 'active') {
+      // Sort by most recent activity (latest question or latest answer)
+      questionsQuery = `
+        SELECT q.*, GREATEST(q.timestamp, COALESCE(MAX(a.timestamp), q.timestamp)) as last_activity
+        FROM questions q
+        LEFT JOIN answers a ON q.id = a.question_id
+        GROUP BY q.id
+        ORDER BY last_activity DESC
+        LIMIT 20
+      `
+    } else {
+      // Default: newest
+      questionsQuery = `
+        SELECT * FROM questions 
+        ORDER BY timestamp DESC 
+        LIMIT 20
+      `
+    }
+
+    const questions = await db.all(questionsQuery)
 
     if (questions.length === 0) return res.json([])
 
     // 2. Get answers for these questions
     const questionIds = questions.map((q) => q.id)
-    const placeholders = questionIds.map(() => '?').join(',')
+    const qMarkPlaceholders = questionIds.map(() => '?').join(',')
 
     const answers = await db.all(
       `
             SELECT * FROM answers 
-            WHERE question_id IN (${placeholders})
+            WHERE question_id IN (${qMarkPlaceholders})
             ORDER BY timestamp ASC
         `,
       questionIds
