@@ -9,36 +9,34 @@ const DEFAULT_PRICE = '100000000000000'
 
 /**
  * L402 ETH/EVM Middleware
- * This uses the official @x402/express middleware.
+ * This protects write operations and requires payment proof.
  */
-export const x402Middleware = (_price: string = DEFAULT_PRICE) => {
-  // Always use legacy mock for now to ensure server stability while refining @x402/express
-  return legacyX402Middleware
-}
+export const x402Middleware = () => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    // Only protect write operations
+    const protectedPaths = ['/api/questions', '/api/answers']
+    if (!protectedPaths.includes(req.path)) {
+      return next()
+    }
 
-// Legacy export for compatibility during migration
-export const legacyX402Middleware = async (req: Request, res: Response, next: NextFunction) => {
-  // Only protect write operations
-  const protectedPaths = ['/api/questions', '/api/answers']
-  if (!protectedPaths.includes(req.path)) {
-    return next()
+    const authHeader = req.headers['authorization']
+    if (!authHeader) return requestPayment(req, res)
+
+    const [scheme, credentials] = authHeader.split(' ')
+    if (scheme !== 'L402' || !credentials) return requestPayment(req, res)
+
+    const [token, preimage] = credentials.split(':')
+
+    // Debug logging for development
+    if (process.env.NODE_ENV !== 'test') {
+      console.log('x402: verifying credentials', { token, preimage })
+    }
+
+    // Current mock validation: proof must be > 5 chars
+    if (preimage && preimage.length > 5) return next()
+
+    return res.status(402).json({ error: 'Invalid payment proof' })
   }
-
-  // This is the mock one we had before, keeping it as a fallback or for non-ETH tests if needed
-  const authHeader = req.headers['authorization']
-  if (!authHeader) return requestPayment(req, res)
-  const [scheme, credentials] = authHeader.split(' ')
-  if (scheme !== 'L402' || !credentials) return requestPayment(req, res)
-  const [token, preimage] = credentials.split(':')
-
-  if (token) {
-    console.log('token', token)
-  }
-  console.log('credentials', credentials)
-  console.log('preimage', preimage)
-
-  if (preimage && preimage.length > 5) return next()
-  return res.status(402).json({ error: 'Invalid payment proof' })
 }
 
 const requestPayment = (req: Request, res: Response) => {
@@ -50,8 +48,8 @@ const requestPayment = (req: Request, res: Response) => {
   return res.status(402).json({
     message: 'Payment Required (Smart Contract)',
     detail: `This endpoint requires a contract call to ${methodName} on Base.`,
-    payTo: internalAddress, // Fallback
-    vaultAddress: VAULT_ADDRESS, // Primary if available
+    payTo: internalAddress,
+    vaultAddress: VAULT_ADDRESS,
     method: methodName,
     price: DEFAULT_PRICE,
     macaroon
