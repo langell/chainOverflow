@@ -1,9 +1,9 @@
 import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { initDB } from './db'
-import apiRoutes from './routes'
-import { x402Middleware } from './middleware/x402'
+import { initDB } from './db.js'
+import apiRoutes from './routes.js'
+import { x402Middleware } from './middleware/x402.js'
 
 dotenv.config()
 

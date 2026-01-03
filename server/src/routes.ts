@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express'
-import { getDB } from './db'
-import { releaseBounty } from './services/contract'
+import { getDB } from './db.js'
+import { releaseBounty } from './services/contract.js'
 
 const router = express.Router()
 
@@ -40,12 +40,10 @@ router.get('/feed', async (_req: Request, res: Response) => {
     res.json(feed)
   } catch (error) {
     console.error('FEED_ERROR:', error)
-    res
-      .status(500)
-      .json({
-        error: 'Failed to fetch feed',
-        details: error instanceof Error ? error.message : String(error)
-      })
+    res.status(500).json({
+      error: 'Failed to fetch feed',
+      details: error instanceof Error ? error.message : String(error)
+    })
   }
 })
 

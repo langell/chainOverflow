@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { internalAddress } from '../services/wallet'
+import { internalAddress } from '../services/wallet.js'
 
 const VAULT_ADDRESS = process.env.VAULT_ADDRESS || ''
 

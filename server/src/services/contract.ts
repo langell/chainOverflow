@@ -1,6 +1,6 @@
 import { createPublicClient, createWalletClient, http, getContract, defineChain } from 'viem'
 import { baseSepolia } from 'viem/chains'
-import { internalAccount } from './wallet'
+import { internalAccount } from './wallet.js'
 import dotenv from 'dotenv'
 
 dotenv.config()
