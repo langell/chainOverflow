@@ -38,8 +38,14 @@ router.get('/feed', async (_req: Request, res: Response) => {
     }))
 
     res.json(feed)
-  } catch (_error) {
-    res.status(500).json({ error: 'Failed to fetch feed' })
+  } catch (error) {
+    console.error('FEED_ERROR:', error)
+    res
+      .status(500)
+      .json({
+        error: 'Failed to fetch feed',
+        details: error instanceof Error ? error.message : String(error)
+      })
   }
 })
 
@@ -65,7 +71,8 @@ router.get('/questions/:id', async (req: Request, res: Response) => {
       ...question,
       answers
     })
-  } catch (_error) {
+  } catch (error) {
+    console.error('QUESTION_ID_ERROR:', error)
     res.status(500).json({ error: 'Failed to fetch question' })
   }
 })
@@ -118,7 +125,8 @@ router.post('/questions', async (req: Request, res: Response) => {
       message: 'Question created successfully',
       ipfsHash
     })
-  } catch (_error) {
+  } catch (error) {
+    console.error('CREATE_QUESTION_ERROR:', error)
     res.status(500).json({ error: 'Failed to create question' })
   }
 })
