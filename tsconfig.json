@@ -30,9 +30,12 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src",
+    "api",
+    "server/src"
   ],
   "exclude": [
-    "src/test"
+    "src/test",
+    "server/test"
   ]
 }

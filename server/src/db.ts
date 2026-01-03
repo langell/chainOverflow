@@ -6,8 +6,10 @@ let db: Database | null = null
 export const initDB = async () => {
   if (db) return db
 
+  const filename = process.env.VERCEL ? '/tmp/database.sqlite' : './database.sqlite'
+
   db = await open({
-    filename: './database.sqlite',
+    filename,
     driver: sqlite3.Database
   })
 

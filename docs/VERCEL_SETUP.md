@@ -18,20 +18,31 @@ Vercel is the premier platform for hosting React/Vite applications. It offers a 
    - **Output Directory**: `dist`
 4. Click **"Deploy"**.
 
-## 3. How Automated Deployments Work
+## 3. API Layer Deployment
 
-Vercel handles everything automatically:
+The API layer is automatically deployed alongside the React frontend using Vercel Functions.
 
-- **Push to `main`**: Triggers a stable production deployment.
-- **Pull Requests**: Vercel will automatically generate a **"Preview Deployment"** for every PR, allowing you to test changes before merging.
+- **Backend Entry**: `api/index.ts` (redirects to `server/src/index.ts`).
+- **Path**: All requests to `/api/*` are handled by the Express backend.
+- **Database**: Uses `/tmp/database.sqlite` on Vercel (Note: Data is ephemeral and does not persist across requests in a serverless environment). For production, please switch to a managed DB like Vercel Postgres.
 
-## 4. Environment Variables
+## 4. Automated Deployment (GitHub Actions)
 
-If you eventually add actual IPFS API keys or Contract addresses:
+We use a GitHub Action for stable deployments. To enable this, you must add the following secrets to your GitHub Repository (**Settings > Secrets and variables > Actions**):
 
-1. Go to your project in Vercel.
-2. Navigate to **Settings > Environment Variables**.
-3. Add your keys here (e.g., `VITE_APP_ENV`).
+1. `VERCEL_TOKEN`: Your Vercel Personal Access Token.
+2. `VERCEL_ORG_ID`: Found in your Vercel Project settings.
+3. `VERCEL_PROJECT_ID`: Found in your Vercel Project settings.
+
+The deployment will trigger automatically on every push to the `main` branch.
+
+## 5. Environment Variables
+
+Go to your project in Vercel under **Settings > Environment Variables** and add:
+
+- `VAULT_ADDRESS`: Your deployed contract address.
+- `INTERNAL_WALLET_PRIVATE_KEY`: Private key for the service wallet.
+- `NODE_ENV`: `production`
 
 ## 💰 Cost Management
 

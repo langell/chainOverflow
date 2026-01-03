@@ -71,13 +71,14 @@ Detailed information about the platform can be found in the `docs` folder:
 
 ## 🚢 Deployment
 
-- **GitHub Actions**: Automate testing and linting.
-- **Vercel**: Automatically deploys the frontend on every push. See [**VERCEL_SETUP.md**](./docs/VERCEL_SETUP.md) for $0 setup.
+- **GitHub Actions**: Automate testing, linting, and **Vercel Deployment** (both Frontend and API).
+- **Vercel**: Automatically hosts the React frontend and Express API as serverless functions. See [**VERCEL_SETUP.md**](./docs/VERCEL_SETUP.md) for $0 setup.
 
-### 1. Vercel (Zero-Barrier Choice)
+### 1. Vercel (Recommended Hybrid Deployment)
 
-- **Workflow**: Automated GitHub deployments with zero configuration or cost.
-- **Setup Guide**: See [**VERCEL_SETUP.md**](./docs/VERCEL_SETUP.md) for instructions.
+- **Workflow**: Automated GitHub deployments via Actions.
+- **API Layer**: Deployed as Vercel Functions (routed via `/api/*`).
+- **Setup Guide**: See [**VERCEL_SETUP.md**](./docs/VERCEL_SETUP.md) for instructions on adding secrets.
 
 ### 2. 4EVERLAND (Web3 Choice)
 

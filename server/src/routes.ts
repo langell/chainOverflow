@@ -5,7 +5,7 @@ import { releaseBounty } from './services/contract'
 const router = express.Router()
 
 // GET /feed (Latest 20 questions with answers)
-router.get('/feed', async (req, res) => {
+router.get('/feed', async (_req, res) => {
   try {
     const db = getDB()
 

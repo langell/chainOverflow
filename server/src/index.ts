@@ -16,7 +16,7 @@ console.log('Environment:', process.env.NODE_ENV || 'development')
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.send('ChainOverflow API is running. use /api/questions to interact.')
 })
 
@@ -26,7 +26,7 @@ app.use('/api', apiRoutes)
 // Initialize DB and start listening
 initDB()
   .then(() => {
-    if (process.env.NODE_ENV !== 'test') {
+    if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
       const server = app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`)
       })
