@@ -13,6 +13,40 @@ router.get('/ping', (_req: Request, res: Response) => {
   })
 })
 
+// Debug database
+router.get('/debug-db', async (_req: Request, res: Response) => {
+  try {
+    const db = getDB()
+    const url = process.env.POSTGRES_URL || 'NOT_SET'
+    const maskedUrl = url.replace(/:[^@:]+@/, ':****@')
+
+    // Check tables in public schema
+    const tables = await db.all(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public'
+    `)
+
+    const questionsCount = await db
+      .get('SELECT COUNT(*) as count FROM questions')
+      .catch(() => ({ count: 'TABLE_NOT_FOUND' }))
+
+    res.json({
+      url: maskedUrl,
+      env: process.env.NODE_ENV,
+      tables: tables.map((t) => t.table_name),
+      questionsCount: questionsCount.count,
+      vercelEnv: process.env.VERCEL_ENV || 'local'
+    })
+  } catch (error) {
+    res.status(500).json({
+      error: 'Debug failed',
+      message: (error as any).message,
+      stack: (error as any).stack
+    })
+  }
+})
+
 // Seed database
 router.get('/seed', async (_req: Request, res: Response) => {
   try {
