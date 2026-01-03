@@ -61,8 +61,22 @@ class MockDatabase implements IDatabase {
   private answers: any[] = []
   private lastId = 0
 
-  async all(query: string, _params: any[] = []) {
+  async all(query: string, params: any[] = []) {
     const q = query.toLowerCase()
+    if (q.includes('where question_id in')) {
+      return this.answers.filter((a) => params.includes(a.question_id))
+    }
+    if (q.includes('where question_id = ?')) {
+      return this.answers.filter((a) => a.question_id === params[0])
+    }
+    if (q.includes('from questions where title like')) {
+      const searchTerm = params[0].replace(/%/g, '').toLowerCase()
+      return this.questions.filter(
+        (item) =>
+          item.title.toLowerCase().includes(searchTerm) ||
+          item.content.toLowerCase().includes(searchTerm)
+      )
+    }
     if (q.includes('from questions')) return this.questions
     if (q.includes('from answers')) return this.answers
     return []
@@ -71,10 +85,17 @@ class MockDatabase implements IDatabase {
   async get(query: string, params: any[] = []) {
     const q = query.toLowerCase()
     if (q.includes('from questions where id = ?')) {
-      return this.questions.find((item) => item.id === params[0])
+      return this.questions.find(
+        (item) => item.id === (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
+      )
     }
     if (q.includes('from questions where title = ?')) {
       return this.questions.find((item) => item.title === params[0])
+    }
+    if (q.includes('from answers where id = ?')) {
+      return this.answers.find(
+        (item) => item.id === (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
+      )
     }
     return this.questions[0]
   }
@@ -95,8 +116,10 @@ class MockDatabase implements IDatabase {
         id: this.lastId,
         title: params[0],
         content: params[1],
-        author: params[2],
-        answers: []
+        author: params[3],
+        answers: [],
+        tags: params[2],
+        bounty: params[4]
       }
       this.questions.push(newQ)
       return { lastID: this.lastId }
