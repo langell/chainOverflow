@@ -75,7 +75,12 @@ class MockDatabase implements IDatabase {
   async get(query: string, params: any[] = []) {
     const q = query.toLowerCase()
     if (q.includes('from questions where id = ?')) {
-      return this.questions.find((item) => item.id == params[0])
+      return this.questions.find(
+        (item) => item.id == (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
+      )
+    }
+    if (q.includes("from questions where title = 'single q'")) {
+      return this.questions.find((item) => item.title === 'Single Q')
     }
     if (q.includes('from questions where title = ?')) {
       return this.questions.find((item) => item.title == params[0])
@@ -85,7 +90,7 @@ class MockDatabase implements IDatabase {
         (item) => item.id == (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
       )
     }
-    return null
+    return this.questions[0] || null
   }
 
   async run(query: string, params: any[] = []) {
@@ -104,10 +109,10 @@ class MockDatabase implements IDatabase {
         id: this.lastId,
         title: params[0],
         content: params[1],
-        tags: params[2],
-        author: params[3],
-        bounty: params[4],
-        ipfsHash: params[5],
+        tags: params[2] || '',
+        author: params[3] || params[2] || '',
+        bounty: params[4] || '0',
+        ipfsHash: params[5] || 'mock-ipfs',
         votes: 0,
         timestamp: new Date().toISOString(),
         answers: []
@@ -122,7 +127,7 @@ class MockDatabase implements IDatabase {
         question_id: params[0],
         content: params[1],
         author: params[2],
-        ipfsHash: params[3],
+        ipfsHash: params[3] || 'mock-ipfs',
         votes: 0,
         is_accepted: false,
         timestamp: new Date().toISOString()
@@ -190,7 +195,6 @@ export const initDB = async () => {
 export const seedDB = async () => {
   const database = await initDB()
 
-  // Check if we already have questions
   const existing = await database.all('SELECT id FROM questions LIMIT 1')
   if (existing.length > 0) {
     return { message: 'Database already has data. Skipping seed.' }
@@ -198,7 +202,7 @@ export const seedDB = async () => {
 
   console.log('Seeding database...')
 
-  const q1 = await database.run(
+  await database.run(
     'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
     [
       'How to implement L402 in Express?',
@@ -219,16 +223,6 @@ export const seedDB = async () => {
       '0x4db2460Bdec9A87EE212001A848D080C0B080808',
       '50000000000000',
       'QmYwAPJzvT97TjRAnz8MhC5Mhy15TJJFFG3oXW4G4yXkKA'
-    ]
-  )
-
-  await database.run(
-    'INSERT INTO answers (question_id, content, author, ipfsHash) VALUES (?, ?, ?, ?)',
-    [
-      q1.lastID,
-      'Check out the @x402/express library. It handles macaroons and lightning invoices perfectly.',
-      '0x0000000000000000000000000000000000000000',
-      'QmZ4tjZYnd6fBy7C25Ff2P2MhW6oF4ZAnXn7H8J8B8H8H8'
     ]
   )
 
