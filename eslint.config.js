@@ -9,7 +9,7 @@ import globals from 'globals'
 export default [
   js.configs.recommended,
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{ts,tsx,js,cjs}'],
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 'latest',
@@ -41,11 +41,12 @@ export default [
           caughtErrorsIgnorePattern: '^_'
         }
       ],
-      'no-undef': 'off'
+      'no-undef': 'off',
+      '@typescript-eslint/no-require-imports': 'off'
     }
   },
   prettier,
   {
-    ignores: ['dist', 'node_modules', '.github', 'server/dist']
+    ignores: ['dist', 'node_modules', '.github', 'server/dist', 'coverage', 'server/coverage']
   }
 ]
