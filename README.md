@@ -2,13 +2,60 @@
 
 **The Knowledge Engine of Web3 Development.**
 
-ChainOverflow is a decentralized Q&A protocol where developers share expertise and earn on-chain reputation through transparency and decentralized storage.
+ChainOverflow is a Q&A protocol where developers share expertise and earn through on-chain bounties and **x402-powered monetization**. Built for speed and transparency, it combines the best of Web2 performance with Web3 trust.
 
 ## 🚀 Quick Start
 
-1. **Install Dependencies**: `npm install`
-2. **Run Dev Server**: `npm run dev`
-3. **Run Tests**: `npm run test`
+1.  **Install Dependencies**: `npm run setup`
+2.  **Start All Layers**: `npm run dev:all`
+    - Starts Hardhat (localhost:8545), Express Server (3001), and Vite (5173).
+3.  **Deploy Locally**: `npm run deploy:local` (in a separate terminal)
+4.  **Seed Data**: `npm run db:seed`
+
+## 🏗️ Technical Architecture
+
+ChainOverflow is built across three primary layers:
+
+### 1. Smart Contracts (`/contracts`)
+
+The protocol logic for on-chain bounties and vault management.
+
+- **Framework**: Hardhat
+- **Network**: Local or Base Sepolia
+- **Key Commands**:
+  - `npm run compile`: Compile Solidity contracts.
+  - `npm run dev:node`: Start local Ethereum node.
+  - `npm run deploy:local`: Deploy to localhost.
+  - `npm run deploy:base-sepolia`: Deploy to Base Sepolia testnet.
+
+### 2. Backend Server (`/server`)
+
+An Express-based L402-enabled gateway and database.
+
+- **Tech Stack**: TypeScript, Express, SQLite, L402 (Lightning Payments).
+- **Key Commands**:
+  - `npm run dev:server`: Start backend with hot reload.
+  - `npm run db:seed`: Reset and seed the local database.
+  - `npm run test:server`: Run server-side unit/integration tests.
+
+### 3. Frontend Web (`/src`)
+
+A modern React application with Web3 integration.
+
+- **Tech Stack**: React 19, TypeScript, Vite, Zustand, Tailwind/CSS Modules.
+- **Key Commands**:
+  - `npm run dev`: Start frontend dev server.
+  - `npm run test`: Run frontend tests.
+
+## 🛠️ Full CLI Reference
+
+| Command            | Layer    | Description                                           |
+| :----------------- | :------- | :---------------------------------------------------- |
+| `npm run setup`    | Root     | Installs all packages across root and server folders. |
+| `npm run dev:all`  | Full App | Starts Web, Server, and Chain node concurrently.      |
+| `npm run test:all` | Testing  | Runs both frontend and backend test suites.           |
+| `npm run lint`     | General  | Lints the entire codebase.                            |
+| `npm run format`   | General  | Formats all files with Prettier.                      |
 
 ## 📖 Documentation
 
@@ -40,8 +87,8 @@ Detailed information about the platform can be found in the `docs` folder:
 
 ## ✨ Key Features
 
-- **Decentralized Storage**: All question content is pinned to a mock IPFS network with persistent CIDs.
-- **Deep Search**: Search through question metadata and content buried in the decentralized network.
-- **Democratic Voting**: A reactive upvote/downvote system.
-- **Persistent State**: Your wallet connection and questions survive page refreshes.
+- **x402 Monetization**: Integrated with the `@coinbase/x402` protocol to enable programmatic payments and L402-gated access to premium knowledge.
+- **High-Speed Storage**: Questions and answers are stored in a performant centralized database to ensure sub-millisecond search and retrieval, avoiding the latency of decentralized storage.
+- **On-Chain Bounties**: Trustless fund management and bounty distribution using Solidty smart contracts on the Base network.
+- **Democratic Voting**: A reactive upvote/downvote system for reputation.
 - **Premium Design**: Built with modern CSS, glassmorphism, and responsive layouts.
