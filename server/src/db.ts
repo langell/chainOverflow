@@ -1,5 +1,3 @@
-import sqlite3 from 'sqlite3'
-import { open, Database } from 'sqlite'
 import { sql } from '@vercel/postgres'
 
 /**
@@ -15,8 +13,8 @@ export interface IDatabase {
 let db: IDatabase | null = null
 
 class SQLiteWrapper implements IDatabase {
-  private sqlite: Database
-  constructor(sqlite: Database) {
+  private sqlite: any
+  constructor(sqlite: any) {
     this.sqlite = sqlite
   }
   async all(query: string, params: any[] = []) {
@@ -85,6 +83,10 @@ export const initDB = async () => {
     db = new PostgresWrapper()
   } else {
     console.log('Using Local SQLite')
+    // DYNAMIC IMPORT to prevent crash on Vercel where sqlite3 is not supported
+    const sqlite3 = (await import('sqlite3')).default
+    const { open } = await import('sqlite')
+
     const filename = './database.sqlite'
     const sqlite = await open({
       filename,
@@ -93,37 +95,41 @@ export const initDB = async () => {
     db = new SQLiteWrapper(sqlite)
   }
 
-  await db.exec(`
-    CREATE TABLE IF NOT EXISTS questions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      content TEXT NOT NULL,
-      tags TEXT,
-      author TEXT,
-      ipfsHash TEXT,
-      bounty TEXT,
-      votes INTEGER DEFAULT 0,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
+  try {
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        tags TEXT,
+        author TEXT,
+        ipfsHash TEXT,
+        bounty TEXT,
+        votes INTEGER DEFAULT 0,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
 
-    CREATE TABLE IF NOT EXISTS answers (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      question_id INTEGER,
-      content TEXT NOT NULL,
-      author TEXT,
-      ipfsHash TEXT,
-      votes INTEGER DEFAULT 0,
-      is_accepted BOOLEAN DEFAULT 0,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-    
-    CREATE TABLE IF NOT EXISTS invoices (
-      payment_hash TEXT PRIMARY KEY,
-      amount INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      is_paid BOOLEAN DEFAULT 0
-    );
-  `)
+      CREATE TABLE IF NOT EXISTS answers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        question_id INTEGER,
+        content TEXT NOT NULL,
+        author TEXT,
+        ipfsHash TEXT,
+        votes INTEGER DEFAULT 0,
+        is_accepted BOOLEAN DEFAULT 0,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+      
+      CREATE TABLE IF NOT EXISTS invoices (
+        payment_hash TEXT PRIMARY KEY,
+        amount INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        is_paid BOOLEAN DEFAULT 0
+      );
+    `)
+  } catch (schemaError) {
+    console.warn('Schema creation failed (might already exist):', schemaError)
+  }
 
   return db
 }
