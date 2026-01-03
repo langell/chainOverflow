@@ -16,17 +16,24 @@ console.log('Environment:', process.env.NODE_ENV || 'development')
 app.use(cors())
 app.use(express.json())
 
+app.get('/api/ping', (_req: Request, res: Response) => {
+  res.json({ status: 'alive', environment: process.env.NODE_ENV, vercel: !!process.env.VERCEL })
+})
+
 app.get('/', (_req: Request, res: Response) => {
   res.send('ChainOverflow API is running. use /api/questions to interact.')
 })
 
 // Database initialization middleware for Serverless
-app.use(async (_req, _res, next) => {
+app.use(async (req, _res, next) => {
+  // Skip DB for ping check
+  if (req.path === '/api/ping') return next()
+
   try {
     await initDB()
     next()
   } catch (err) {
-    console.error('Database middleware failed:', err)
+    console.error('DATABASE_INIT_CRASH:', err)
     next(err)
   }
 })
