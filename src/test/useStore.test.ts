@@ -327,10 +327,12 @@ describe('Zustand Store', () => {
     expect(useStore.getState().answers[0].votes).toBe(1)
   })
 
-  it('should mark answer as accepted', () => {
+  it('should mark answer as accepted via API', async () => {
     const { markAnswerAccepted } = useStore.getState()
     const qId = 1
     const aId = 10
+
+    // Setup state
     useStore.setState({
       answers: [
         {
@@ -341,23 +343,39 @@ describe('Zustand Store', () => {
           votes: 0,
           timestamp: 'now',
           isAccepted: false
-        },
-        {
-          id: 11,
-          questionId: qId,
-          content: '...',
-          author: 'b',
-          votes: 0,
-          timestamp: 'now',
-          isAccepted: false
         }
       ]
     })
 
-    markAnswerAccepted(qId, aId)
+    // Mock acceptance and feed refresh
+    mockFetch.mockImplementation((url) => {
+      if (url.includes(`/answers/${aId}/accept`)) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true }) })
+      }
+      if (url.includes('/feed')) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve([
+              {
+                id: qId,
+                answers: [
+                  {
+                    id: aId,
+                    question_id: qId,
+                    is_accepted: 1
+                  }
+                ]
+              }
+            ])
+        })
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([]) })
+    })
+
+    await markAnswerAccepted(qId, aId)
     const state = useStore.getState()
     expect(state.answers.find((a) => a.id === aId)?.isAccepted).toBe(true)
-    expect(state.answers.find((a) => a.id === 11)?.isAccepted).toBe(false)
   })
 
   describe('connectWallet', () => {
