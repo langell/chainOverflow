@@ -41,10 +41,10 @@ app.use(async (req, _res, next) => {
 app.use(x402Middleware())
 app.use('/api', apiRoutes)
 
-// Initialize DB and start listening
-initDB()
-  .then(() => {
-    if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+// Note: DB initialization is handled via middleware for Serverless compatibility
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+  initDB()
+    .then(() => {
       const server = app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`)
       })
@@ -52,11 +52,11 @@ initDB()
       server.on('error', (err: any) => {
         console.error('SERVER ERROR:', err)
       })
-    }
-  })
-  .catch((err) => {
-    console.error('CRITICAL: Failed to init DB', err)
-  })
+    })
+    .catch((err) => {
+      console.error('CRITICAL: Failed to init DB', err)
+    })
+}
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason)
