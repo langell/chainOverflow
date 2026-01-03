@@ -15,14 +15,24 @@ let db: IDatabase | null = null
 class PostgresWrapper implements IDatabase {
   async all(query: string, params: any[] = []) {
     const pgQuery = this.toPostgres(query)
-    const { rows } = await pool.query(pgQuery, params)
-    return rows
+    const client = await pool.connect()
+    try {
+      const { rows } = await client.query(pgQuery, params)
+      return rows
+    } finally {
+      client.release()
+    }
   }
 
   async get(query: string, params: any[] = []) {
     const pgQuery = this.toPostgres(query)
-    const { rows } = await pool.query(pgQuery, params)
-    return rows[0]
+    const client = await pool.connect()
+    try {
+      const { rows } = await client.query(pgQuery, params)
+      return rows[0]
+    } finally {
+      client.release()
+    }
   }
 
   async run(query: string, params: any[] = []) {
@@ -30,13 +40,23 @@ class PostgresWrapper implements IDatabase {
     if (pgQuery.trim().toLowerCase().startsWith('insert')) {
       pgQuery += ' RETURNING id'
     }
-    const { rows } = await pool.query(pgQuery, params)
-    return { lastID: rows[0]?.id }
+    const client = await pool.connect()
+    try {
+      const { rows } = await client.query(pgQuery, params)
+      return { lastID: rows[0]?.id }
+    } finally {
+      client.release()
+    }
   }
 
   async exec(query: string) {
     const pgQuery = this.toPostgres(query)
-    await pool.query(pgQuery)
+    const client = await pool.connect()
+    try {
+      await client.query(pgQuery)
+    } finally {
+      client.release()
+    }
   }
 
   private toPostgres(query: string): string {
@@ -110,7 +130,7 @@ class MockDatabase implements IDatabase {
         title: params[0],
         content: params[1],
         tags: params[2] || '',
-        author: params[3] || params[2] || '',
+        author: params[3] || '',
         bounty: params[4] || '0',
         ipfsHash: params[5] || 'mock-ipfs',
         votes: 0,
@@ -193,25 +213,26 @@ export const initDB = async () => {
 }
 
 export const seedDB = async (force: boolean = false) => {
-  const database = await initDB()
-
-  if (!force) {
-    const existing = await database.all('SELECT id FROM questions LIMIT 1')
-    if (existing.length > 0) {
-      console.log('Database already has data. Skipping seed.')
-      return { message: 'Database already has data. Skipping seed.' }
-    }
-  } else {
-    console.log('Force re-seeding...')
-    await database.exec('DELETE FROM answers')
-    await database.exec('DELETE FROM questions')
-  }
-
-  console.log('Seeding database started...')
+  await initDB()
+  const client = await pool.connect()
 
   try {
-    const q1 = await database.run(
-      'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
+    if (!force) {
+      const { rows } = await client.query('SELECT id FROM questions LIMIT 1')
+      if (rows.length > 0) {
+        return { message: 'Database already has data. Skipping seed.' }
+      }
+    } else {
+      console.log('Force re-seeding...')
+      await client.query('DELETE FROM answers')
+      await client.query('DELETE FROM questions')
+    }
+
+    console.log('Seeding database started...')
+
+    const q1 = await client.query(
+      `INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [
         'How to implement L402 in Express?',
         'I am trying to add payment-required headers to my API. Any examples?',
@@ -221,10 +242,11 @@ export const seedDB = async (force: boolean = false) => {
         'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco'
       ]
     )
-    console.log('Seed: Inserted Question 1, ID:', q1.lastID)
+    console.log('Seed: Inserted Q1, ID:', q1.rows[0].id)
 
-    const q2 = await database.run(
-      'INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) VALUES (?, ?, ?, ?, ?, ?)',
+    const q2 = await client.query(
+      `INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
       [
         'Vercel Postgres vs SQLite for serverless?',
         'Why does SQLite crash on Vercel but work locally?',
@@ -234,16 +256,18 @@ export const seedDB = async (force: boolean = false) => {
         'QmYwAPJzvT97TjRAnz8MhC5Mhy15TJJFFG3oXW4G4yXkKA'
       ]
     )
-    console.log('Seed: Inserted Question 2, ID:', q2.lastID)
+    console.log('Seed: Inserted Q2, ID:', q2.rows[0].id)
 
     return {
       message: 'Seed successful',
       questionsAdded: 2,
-      ids: [q1.lastID, q2.lastID]
+      ids: [q1.rows[0].id, q2.rows[0].id]
     }
   } catch (error) {
     console.error('CRITICAL SEED ERROR:', error)
     throw error
+  } finally {
+    client.release()
   }
 }
 
