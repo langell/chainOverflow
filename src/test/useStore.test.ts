@@ -15,9 +15,22 @@ vi.stubGlobal('fetch', mockFetch)
 describe('Zustand Store', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Reset store before each test
-    // We can't easily reset a persisted store without clearing localStorage or using a helper
     localStorage.clear()
+
+    // Mock window.ethereum
+    const mockRequest = vi.fn().mockImplementation(({ method }) => {
+      if (method === 'eth_requestAccounts') return Promise.resolve(['0xTestAccount'])
+      if (method === 'eth_sendTransaction') return Promise.resolve('0xMockTxHash')
+      return Promise.resolve()
+    })
+    vi.stubGlobal('window', {
+      ethereum: { request: mockRequest },
+      location: { reload: vi.fn() }
+    })
+
+    // Mock global alert
+    vi.stubGlobal('alert', vi.fn())
+
     // Default mock response
     mockFetch.mockImplementation((url) => {
       if (url.includes('/api/feed')) {
@@ -190,7 +203,8 @@ describe('Zustand Store', () => {
             json: () =>
               Promise.resolve({
                 message: 'Payment Required',
-                invoice: 'lnbc...',
+                payTo: '0xRecipient',
+                price: '100',
                 macaroon: 'mock-mac'
               })
           })
@@ -218,7 +232,7 @@ describe('Zustand Store', () => {
       expect.stringContaining('/api/questions'),
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: expect.stringContaining('L402 mock-mac:')
+          Authorization: expect.stringContaining('L402 mock-mac:0xMockTxHash')
         })
       })
     )
@@ -270,10 +284,18 @@ describe('Zustand Store', () => {
     const { addAnswer, setAccount } = useStore.getState()
     setAccount('expert')
 
-    mockFetch.mockResolvedValue({
-      ok: true,
-      status: 201,
-      json: () => Promise.resolve({ id: 99, message: 'Success' })
+    mockFetch.mockImplementation((url) => {
+      if (url.includes('/answers')) {
+        return Promise.resolve({
+          ok: true,
+          status: 201,
+          json: () => Promise.resolve({ id: 99, message: 'Success' })
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve([]) // Ensure feed returns array
+      })
     })
 
     await addAnswer(1, 'Great Solution')

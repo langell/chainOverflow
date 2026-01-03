@@ -277,29 +277,53 @@ export const useStore = create<AppState>()(
 
         if (response.status === 402) {
           const data = await response.json()
-          console.log('L402 Payment Required', data)
+          console.log('L402 ETH Payment Required', data)
 
-          // In a real app, this is where we would:
-          // 1. Show a modal to the user with the Lightning Invoice
-          // 2. Wait for them to pay it via their wallet (WebLN or similar)
-          // 3. Get the preimage
+          const { payTo, price, macaroon } = data
 
-          // For this implementation, we simulate the payment for a seamless experience
-          console.log(
-            `L402 Payment Required: \nInvoice: ${data.invoice}\n\n[MOCK] Simulating payment...`
-          )
+          if (!window.ethereum) {
+            throw new Error('MetaMask required for ETH L402 payments')
+          }
 
-          const mockPreimage = 'preimage_for_' + data.macaroon.substring(0, 10)
+          // 1. Prompt user for ETH payment
+          const from = get().account
+          if (!from) {
+            await get().connectWallet()
+          }
 
-          // Retry with Authorization header
-          response = await fetch(`${API_BASE}${path}`, {
-            ...options,
-            headers: {
-              ...options.headers,
-              'Content-Type': 'application/json',
-              Authorization: `L402 ${data.macaroon}:${mockPreimage}`
-            }
-          })
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+          const sender = accounts[0]
+
+          console.log(`Requesting payment of ${price} Wei to ${payTo}`)
+
+          try {
+            // 2. Execute ETH transaction
+            const txHash = await window.ethereum.request({
+              method: 'eth_sendTransaction',
+              params: [
+                {
+                  from: sender,
+                  to: payTo,
+                  value: BigInt(price).toString(16) // Convert to hex for standard RPC
+                }
+              ]
+            })
+
+            console.log('Payment successful, TX Hash:', txHash)
+
+            // 3. Retry with Authorization header using txHash as proof
+            response = await fetch(`${API_BASE}${path}`, {
+              ...options,
+              headers: {
+                ...options.headers,
+                'Content-Type': 'application/json',
+                Authorization: `L402 ${macaroon}:${txHash}`
+              }
+            })
+          } catch (err) {
+            console.error('Payment failed or cancelled', err)
+            throw new Error('Payment required to complete this action.')
+          }
         }
 
         if (!response.ok) {

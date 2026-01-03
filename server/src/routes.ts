@@ -96,7 +96,7 @@ router.get('/search', async (req, res) => {
 })
 
 // POST /questions (Paid)
-router.post('/questions', x402Middleware, async (req, res) => {
+router.post('/questions', x402Middleware(), async (req, res) => {
   try {
     const { title, content, tags, author, bounty } = req.body
     const db = getDB()
@@ -124,7 +124,7 @@ router.post('/questions', x402Middleware, async (req, res) => {
 })
 
 // POST /answers (Paid)
-router.post('/answers', x402Middleware, async (req, res) => {
+router.post('/answers', x402Middleware(), async (req, res) => {
   try {
     const { questionId, content, author } = req.body
     const db = getDB()
