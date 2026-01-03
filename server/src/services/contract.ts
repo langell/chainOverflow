@@ -72,3 +72,38 @@ export async function releaseBounty(questionId: string, winnerAddress: string) {
   console.log(`Transaction submitted: ${hash}`)
   return hash
 }
+
+/**
+ * Verify an on-chain transaction for L402 payment
+ */
+export async function verifyPayment(txHash: string, expectedAmount: string) {
+  try {
+    const receipt = await publicClient.getTransactionReceipt({
+      hash: txHash as `0x${string}`
+    })
+
+    if (receipt.status !== 'success') {
+      return { valid: false, reason: 'Transaction failed' }
+    }
+
+    const tx = await publicClient.getTransaction({
+      hash: txHash as `0x${string}`
+    })
+
+    const isToVault = tx.to?.toLowerCase() === vaultAddress?.toLowerCase()
+    const isToInternal = tx.to?.toLowerCase() === internalAccount.address.toLowerCase()
+
+    if (!isToVault && !isToInternal) {
+      return { valid: false, reason: 'Invalid recipient address' }
+    }
+
+    if (tx.value < BigInt(expectedAmount)) {
+      return { valid: false, reason: 'Insufficient payment amount' }
+    }
+
+    return { valid: true }
+  } catch (error) {
+    console.error('Verification error:', error)
+    return { valid: false, reason: 'Transaction not found or error during verification' }
+  }
+}

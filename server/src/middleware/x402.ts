@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import { internalAddress } from '../services/wallet.js'
+import { verifyPayment } from '../services/contract.js'
 
 const VAULT_ADDRESS = process.env.VAULT_ADDRESS || ''
 
@@ -32,10 +33,19 @@ export const x402Middleware = () => {
       console.log('x402: verifying credentials', { token, preimage })
     }
 
-    // Current mock validation: proof must be > 5 chars
-    if (preimage && preimage.length > 5) return next()
+    if (!preimage) return requestPayment(req, res)
 
-    return res.status(402).json({ error: 'Invalid payment proof' })
+    // Bypass real verification in test environment or for special mock proof
+    if (process.env.NODE_ENV === 'test' || preimage === 'mock_proof') {
+      if (preimage && preimage.length > 5) return next()
+      return res.status(402).json({ error: 'Invalid payment proof' })
+    }
+
+    // Real on-chain verification
+    const { valid, reason } = await verifyPayment(preimage, DEFAULT_PRICE)
+    if (valid) return next()
+
+    return res.status(402).json({ error: reason || 'Invalid payment proof' })
   }
 }
 
