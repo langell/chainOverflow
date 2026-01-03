@@ -20,14 +20,14 @@
     "@x402/core": "^2.1.0",
     "@x402/evm": "^2.1.0",
     "@x402/express": "^2.1.0",
+    "@x402/extensions": "^2.1.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "macaroons.js": "^0.3.9",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "viem": "^2.43.5",
-    "x402-express": "^1.1.0"
+    "viem": "^2.43.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

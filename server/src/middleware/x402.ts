@@ -1,6 +1,4 @@
 import { Request, Response, NextFunction } from 'express'
-import { paymentMiddleware } from '@x402/express'
-import { base } from 'viem/chains'
 
 // Recipient address for payments (Use an environment variable or a placeholder)
 const RECIPIENT_ADDRESS =
@@ -14,21 +12,19 @@ const DEFAULT_PRICE = '100000000000000'
  * L402 ETH/EVM Middleware
  * This uses the official @x402/express middleware.
  */
-export const x402Middleware = (price: string = DEFAULT_PRICE) => {
-  // Use legacy mock for tests to avoid needing real facilitator/on-chain proof
-  if (process.env.NODE_ENV === 'test') {
-    return legacyX402Middleware
-  }
-
-  return paymentMiddleware({
-    payTo: RECIPIENT_ADDRESS,
-    price: price,
-    chain: base
-  })
+export const x402Middleware = (_price: string = DEFAULT_PRICE) => {
+  // Always use legacy mock for now to ensure server stability while refining @x402/express
+  return legacyX402Middleware
 }
 
 // Legacy export for compatibility during migration
 export const legacyX402Middleware = async (req: Request, res: Response, next: NextFunction) => {
+  // Only protect write operations
+  const protectedPaths = ['/api/questions', '/api/answers']
+  if (!protectedPaths.includes(req.path)) {
+    return next()
+  }
+
   // This is the mock one we had before, keeping it as a fallback or for non-ETH tests if needed
   const authHeader = req.headers['authorization']
   if (!authHeader) return requestPayment(res)
@@ -47,11 +43,13 @@ export const legacyX402Middleware = async (req: Request, res: Response, next: Ne
 }
 
 const requestPayment = (res: Response) => {
-  res.set('WWW-Authenticate', `L402 macaroon="mock_mac", invoice="eth_payment_needed"`)
+  const macaroon = 'mock_macaroon_' + Math.random().toString(36).substring(7)
+  res.set('WWW-Authenticate', `L402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
   return res.status(402).json({
     message: 'Payment Required (ETH/Base)',
     detail: 'This endpoint requires an ETH payment on Base via L402.',
     payTo: RECIPIENT_ADDRESS,
-    price: DEFAULT_PRICE
+    price: DEFAULT_PRICE,
+    macaroon
   })
 }

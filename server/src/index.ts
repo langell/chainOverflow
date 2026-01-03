@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { initDB } from './db'
 import apiRoutes from './routes'
+import { x402Middleware } from './middleware/x402'
 
 dotenv.config()
 
@@ -15,11 +16,12 @@ console.log('Environment:', process.env.NODE_ENV || 'development')
 app.use(cors())
 app.use(express.json())
 
-app.use('/api', apiRoutes)
-
 app.get('/', (req, res) => {
   res.send('ChainOverflow API is running. use /api/questions to interact.')
 })
+
+app.use(x402Middleware())
+app.use('/api', apiRoutes)
 
 // Initialize DB and start listening
 initDB()
