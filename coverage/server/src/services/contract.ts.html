@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Code coverage report for src/services/ipfs.ts</title>
+    <title>Code coverage report for server/src/services/contract.ts</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type="text/css">
       .coverage-summary .sorter {
-        background-image: url(../../sort-arrow-sprite.png);
+        background-image: url(../../../sort-arrow-sprite.png);
       }
     </style>
   </head>
@@ -18,31 +18,32 @@
     <div class="wrapper">
       <div class="pad1">
         <h1>
-          <a href="../../index.html">All files</a> / <a href="index.html">src/services</a> ipfs.ts
+          <a href="../../../index.html">All files</a> /
+          <a href="index.html">server/src/services</a> contract.ts
         </h1>
         <div class="clearfix">
           <div class="fl pad1y space-right2">
-            <span class="strong">90% </span>
+            <span class="strong">76.47% </span>
             <span class="quiet">Statements</span>
-            <span class="fraction">54/60</span>
+            <span class="fraction">26/34</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">68.18% </span>
+            <span class="strong">66.66% </span>
             <span class="quiet">Branches</span>
-            <span class="fraction">15/22</span>
+            <span class="fraction">12/18</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">94.44% </span>
+            <span class="strong">100% </span>
             <span class="quiet">Functions</span>
-            <span class="fraction">17/18</span>
+            <span class="fraction">2/2</span>
           </div>
 
           <div class="fl pad1y space-right2">
-            <span class="strong">90.38% </span>
+            <span class="strong">76.47% </span>
             <span class="quiet">Lines</span>
-            <span class="fraction">47/52</span>
+            <span class="fraction">26/34</span>
           </div>
         </div>
         <p class="quiet">
@@ -56,7 +57,7 @@
           </div>
         </template>
       </div>
-      <div class="status-line high"></div>
+      <div class="status-line medium"></div>
       <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -180,108 +181,123 @@
 <a name='L120'></a><a href='#L120'>120</a>
 <a name='L121'></a><a href='#L121'>121</a>
 <a name='L122'></a><a href='#L122'>122</a>
-<a name='L123'></a><a href='#L123'>123</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -289,140 +305,128 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
- * IPFS Service Layer - Supports Mock and Pinata Implementations
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { createPublicClient, createWalletClient, http, getContract, defineChain } from 'viem'
+import { baseSepolia } from 'viem/chains'
+import { internalAccount } from './wallet.js'
+import dotenv from 'dotenv'
+&nbsp;
+dotenv.config()
+&nbsp;
+const hardhat = defineChain({
+  id: 31337,
+  name: 'Hardhat',
+  network: 'hardhat',
+  nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: { http: ['http://127.0.0.1:8545'] },
+    public: { http: ['http://127.0.0.1:8545'] }
+  }
+})
+&nbsp;
+const VAULT_ABI = [
+  {
+    inputs: [
+      { name: 'questionId', type: 'string' },
+      { name: 'winner', type: 'address' }
+    ],
+    name: 'releaseBounty',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  }
+] as const
+&nbsp;
+const vaultAddress = process.env.VAULT_ADDRESS as `0x${string}`
+// Use local hardhat if we are in dev and have a vault address
+const chain = process.env.NODE_ENV === 'development' ? hardhat : baseSepolia
+const transportUrl = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8545' : undefined
+&nbsp;
+export const publicClient = createPublicClient({
+  chain: chain,
+  transport: http(transportUrl)
+})
+&nbsp;
+export const walletClient = createWalletClient({
+  account: internalAccount,
+  chain: chain,
+  transport: http(transportUrl)
+})
+&nbsp;
+/**
+ * Interface with the ChainOverflowVault contract
  */
+export const vaultContract = vaultAddress
+  ? getContract({
+      address: vaultAddress,
+      abi: VAULT_ABI,
+      client: { public: publicClient, wallet: walletClient }
+    })
+  : null
 &nbsp;
-interface IPFSObject {
-  cid: string
-  content: string
-  timestamp: number
+/**
+ * Release a bounty to a winner on-chain
+ */
+export async function releaseBounty(questionId: string, winnerAddress: string) {
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!vaultContract) {
+<span class="cstat-no" title="statement not covered" >    console.error('VAULT_ADDRESS not configured')</span>
+<span class="cstat-no" title="statement not covered" >    throw new Error('Vault contract not initialized')</span>
+  }
+&nbsp;
+  console.log(`Releasing bounty for question ${questionId} to ${winnerAddress}...`)
+&nbsp;
+  const hash = await vaultContract.write.releaseBounty([questionId, winnerAddress as `0x${string}`])
+&nbsp;
+  console.log(`Transaction submitted: ${hash}`)
+  return hash
 }
 &nbsp;
-// ---------------------------------------------------------
-// 1. Mock Implementation
-// ---------------------------------------------------------
-const STORAGE_KEY = 'chainoverflow_ipfs_mock'
-&nbsp;
-const loadNetwork = (): Record&lt;string, IPFSObject&gt; =&gt; {
+/**
+ * Verify an on-chain transaction for L402 payment
+ */
+export async function verifyPayment(txHash: string, expectedAmount: string) {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    return saved ? <span class="branch-0 cbranch-no" title="branch not covered" >JSON.parse(saved) : {</span>}
-  } catch {
-<span class="cstat-no" title="statement not covered" >    return {}</span>
-  }
-}
+    console.log(`Verifying payment for TX: ${txHash}...`)
 &nbsp;
-let mockIPFSNetwork: Record&lt;string, IPFSObject&gt; = loadNetwork()
-&nbsp;
-const saveNetwork = () =&gt; {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(mockIPFSNetwork))
-  } catch (e) {
-<span class="cstat-no" title="statement not covered" >    console.error('Failed to save IPFS network to localStorage', e)</span>
-  }
-}
-&nbsp;
-const mockProvider = {
-  upload: async (content: string): Promise&lt;string&gt; =&gt; {
-    await new Promise((resolve) =&gt; setTimeout(resolve, 600))
-    const randomStr = Math.random().toString(36).substring(2, 12)
-    const cid = `Qm${randomStr}${Date.now().toString(36)}`
-    mockIPFSNetwork[cid] = { cid, content, timestamp: Date.now() }
-    saveNetwork()
-    return cid
-  },
-  fetch: async (cid: string): Promise&lt;string | null&gt; =&gt; {
-    await new Promise((resolve) =&gt; setTimeout(resolve, 200))
-    return mockIPFSNetwork[cid]?.content || null
-  },
-  search: async (query: string): Promise&lt;string[]&gt; =&gt; {
-    await new Promise((resolve) =&gt; setTimeout(resolve, 400))
-    const term = query.toLowerCase()
-    return Object.values(mockIPFSNetwork)
-      .filter((obj) =&gt; obj.content.toLowerCase().includes(term))
-      .map((obj) =&gt; obj.cid)
-  }
-}
-&nbsp;
-// ---------------------------------------------------------
-// 2. Pinata Implementation
-// ---------------------------------------------------------
-const pinataProvider = {
-  upload: async (content: string): Promise&lt;string&gt; =&gt; {
-    const jwt = import.meta.env.VITE_PINATA_JWT
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!jwt) <span class="cstat-no" title="statement not covered" >throw new Error('Pinata JWT is not configured')</span>
-&nbsp;
-    const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`
-      },
-      body: JSON.stringify({
-        pinataContent: { text: content },
-        pinataMetadata: { name: `ChainOverflow_${Date.now()}` }
-      })
+    // Wait for the transaction to be mined (with 45s timeout to stay inside function limits)
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash: txHash as `0x${string}`,
+      timeout: 45000
     })
 &nbsp;
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(`Pinata upload failed: ${error.error || <span class="branch-1 cbranch-no" title="branch not covered" >response.statusText}</span>`)
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (receipt.status !== 'success') {
+<span class="cstat-no" title="statement not covered" >      return { valid: false, reason: 'Transaction failed on-chain' }</span>
     }
 &nbsp;
-    const data = await response.json()
-    return data.IpfsHash
-  },
-  fetch: async (cid: string): Promise&lt;string | null&gt; =&gt; {
-    const gateway = import.meta.env.VITE_PINATA_GATEWAY || <span class="branch-1 cbranch-no" title="branch not covered" >'https://gateway.pinata.cloud'</span>
-    try {
-      const response = await fetch(`${gateway}/ipfs/${cid}`)
-      if (!response.ok) return null
-      const data = await response.json()
-      return data.text || <span class="branch-1 cbranch-no" title="branch not covered" >JSON.stringify(data)</span>
-    } catch (e) {
-<span class="cstat-no" title="statement not covered" >      console.error('IPFS Fetch Error:', e)</span>
-<span class="cstat-no" title="statement not covered" >      return null</span>
+    const tx = await publicClient.getTransaction({
+      hash: txHash as `0x${string}`
+    })
+&nbsp;
+    const isToVault = tx.to?.toLowerCase() === vaultAddress?.toLowerCase()
+    const isToInternal = tx.to?.toLowerCase() === internalAccount.address.toLowerCase()
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!isToVault &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >!isToInternal) {</span>
+      const msg = <span class="cstat-no" title="statement not covered" >`Payment sent to ${tx.to}, but we expected ${vaultAddress || internalAccount.address}.`</span>
+<span class="cstat-no" title="statement not covered" >      console.warn(msg)</span>
+<span class="cstat-no" title="statement not covered" >      return { valid: false, reason: `Invalid recipient address. ${msg}` }</span>
     }
-  },
-  search: <span class="fstat-no" title="function not covered" >async (q</span>uery: string): Promise&lt;string[]&gt; =&gt; {
-    /**
-     * Note: Pinata does not provide a full-text search index for file content.
-     * Real-world dApps use Indexing Layers (The Graph) or a separate database.
-     * For now, we fall back to searching our local mock network to show UI functionality.
-     */
-<span class="cstat-no" title="statement not covered" >    return mockProvider.search(query)</span>
+&nbsp;
+    if (tx.value &lt; BigInt(expectedAmount)) {
+      return {
+        valid: false,
+        reason: `Insufficient payment. Received ${tx.value}, expected ${expectedAmount}.`
+      }
+    }
+&nbsp;
+    console.log('Payment verified successfully')
+    return { valid: true }
+  } catch (error) {
+<span class="cstat-no" title="statement not covered" >    console.error('Verification error:', error)</span>
+<span class="cstat-no" title="statement not covered" >    return {</span>
+      valid: false,
+      reason:
+        'Transaction verification timed out or failed. Please ensure you are on the correct network (Base Sepolia).'
+    }
   }
-}
-&nbsp;
-// ---------------------------------------------------------
-// 3. Export Logic
-// ---------------------------------------------------------
-const getActiveProvider = () =&gt; {
-  const PROVIDER = import.meta.env.VITE_IPFS_PROVIDER || <span class="branch-1 cbranch-no" title="branch not covered" >'mock'</span>
-  return PROVIDER === 'pinata' ? pinataProvider : mockProvider
-}
-&nbsp;
-export const uploadToIPFS = (content: string) =&gt; getActiveProvider().upload(content)
-export const fetchFromIPFS = (cid: string) =&gt; getActiveProvider().fetch(cid)
-export const searchIPFSIndexer = (query: string) =&gt; getActiveProvider().search(query)
-&nbsp;
-export const getIPFSUrl = (hash: string): string =&gt; {
-  const gateway = import.meta.env.VITE_PINATA_GATEWAY || <span class="branch-1 cbranch-no" title="branch not covered" >'https://gateway.pinata.cloud'</span>
-  return `${gateway}/ipfs/${hash}`
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -435,13 +439,13 @@ export const getIPFSUrl = (hash: string): string =&gt; {
       <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
       at 2026-01-04T15:35:33.560Z
     </div>
-    <script src="../../prettify.js"></script>
+    <script src="../../../prettify.js"></script>
     <script>
       window.onload = function () {
         prettyPrint()
       }
     </script>
-    <script src="../../sorter.js"></script>
-    <script src="../../block-navigation.js"></script>
+    <script src="../../../sorter.js"></script>
+    <script src="../../../block-navigation.js"></script>
   </body>
 </html>

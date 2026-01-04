@@ -12,8 +12,7 @@ export const formatBounty = (wei: string | number): string => {
       minimumFractionDigits: 0,
       maximumFractionDigits: 6
     })
-  } catch (e) {
-    console.error('Error formatting bounty:', e)
+  } catch (_e) {
     return wei.toString()
   }
 }
@@ -33,6 +32,10 @@ export const formatDate = (timestamp: string): string => {
   if (!timestamp) return 'No date'
   try {
     const date = new Date(timestamp)
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return timestamp
+    }
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -40,8 +43,7 @@ export const formatDate = (timestamp: string): string => {
       hour: '2-digit',
       minute: '2-digit'
     }).format(date)
-  } catch (e) {
-    console.error('Error formatting date:', e)
+  } catch (_e) {
     return timestamp
   }
 }

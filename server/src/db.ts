@@ -87,8 +87,25 @@ class MockDatabase implements IDatabase {
       const term = params[0].replace(/%/g, '').toLowerCase()
       return this.questions.filter((item) => item.title.toLowerCase().includes(term))
     }
-    if (q.includes('from questions')) return this.questions
-    if (q.includes('from answers')) return this.answers
+
+    if (q.includes('from questions')) {
+      // Basic simulation of HAVING COUNT(a.id) = 0
+      if (q.includes('having count(a.id) = 0')) {
+        return this.questions.filter((q) => {
+          const hasAnswers = this.answers.some((a) => a.question_id === q.id)
+          return !hasAnswers
+        })
+      }
+      return this.questions
+    }
+
+    if (q.includes('from answers')) {
+      if (q.includes('where question_id in')) {
+        // Simple mock: assume questionIds are passed
+        return this.answers.filter((a) => params.includes(a.question_id))
+      }
+      return this.answers
+    }
     return []
   }
 

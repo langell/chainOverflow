@@ -39,6 +39,40 @@ describe('Server API', () => {
       expect(question.answers.length).toBe(1)
       expect(question.answers[0].content).toBe('Feed Ans')
     })
+
+    it('should support sort=unanswered', async () => {
+      const db = getDB()
+      await db.run('DELETE FROM questions')
+      await db.run('DELETE FROM answers')
+      // Insert one with answer, one without
+      await db.run('INSERT INTO questions (title, content, author) VALUES (?, ?, ?)', [
+        'Answered',
+        '...',
+        'A'
+      ])
+      const q = await db.get('SELECT id FROM questions WHERE title = "Answered"')
+      await db.run('INSERT INTO answers (question_id, content, author) VALUES (?, ?, ?)', [
+        q.id,
+        'ans',
+        'B'
+      ])
+      await db.run('INSERT INTO questions (title, content, author) VALUES (?, ?, ?)', [
+        'Unanswered',
+        '...',
+        'A'
+      ])
+
+      const res = await request(app).get('/api/feed?sort=unanswered')
+      expect(res.status).toBe(200)
+      expect(res.body.length).toBeGreaterThan(0)
+      expect(res.body.every((q: any) => q.answers.length === 0)).toBe(true)
+    })
+
+    it('should support sort=active', async () => {
+      const res = await request(app).get('/api/feed?sort=active')
+      expect(res.status).toBe(200)
+      expect(Array.isArray(res.body)).toBe(true)
+    })
   })
 
   describe('GET /api/questions/:id', () => {

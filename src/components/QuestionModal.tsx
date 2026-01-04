@@ -91,12 +91,17 @@ const QuestionModal: React.FC = () => {
             />
           </div>
           <div className="form-group">
-            <label>Bounty (Optional)</label>
+            <label>Bounty ( in ETH )</label>
             <input
               type="text"
               value={formData.bounty}
-              onChange={(e) => setFormData({ ...formData, bounty: e.target.value })}
-              placeholder="e.g. 0.1 ETH"
+              onChange={(e) => {
+                const val = e.target.value
+                if (val === '' || /^[0-9]*\.?[0-9]*$/.test(val)) {
+                  setFormData({ ...formData, bounty: val })
+                }
+              }}
+              placeholder="0.1"
               disabled={isUploading}
             />
             {formData.bounty && !isNaN(parseFloat(formData.bounty)) && (
