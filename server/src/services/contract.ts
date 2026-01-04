@@ -80,9 +80,10 @@ export async function verifyPayment(txHash: string, expectedAmount: string) {
   try {
     console.log(`Verifying payment for TX: ${txHash}...`)
 
-    // Wait for the transaction to be mined (max 30s by default in viem)
+    // Wait for the transaction to be mined (with 45s timeout to stay inside function limits)
     const receipt = await publicClient.waitForTransactionReceipt({
-      hash: txHash as `0x${string}`
+      hash: txHash as `0x${string}`,
+      timeout: 45000
     })
 
     if (receipt.status !== 'success') {
@@ -97,20 +98,26 @@ export async function verifyPayment(txHash: string, expectedAmount: string) {
     const isToInternal = tx.to?.toLowerCase() === internalAccount.address.toLowerCase()
 
     if (!isToVault && !isToInternal) {
-      console.warn(
-        `Payment to unexpected address: ${tx.to}. Expected: ${vaultAddress} or ${internalAccount.address}`
-      )
-      return { valid: false, reason: 'Invalid recipient address' }
+      const msg = `Payment sent to ${tx.to}, but we expected ${vaultAddress || internalAccount.address}.`
+      console.warn(msg)
+      return { valid: false, reason: `Invalid recipient address. ${msg}` }
     }
 
     if (tx.value < BigInt(expectedAmount)) {
-      return { valid: false, reason: 'Insufficient payment amount' }
+      return {
+        valid: false,
+        reason: `Insufficient payment. Received ${tx.value}, expected ${expectedAmount}.`
+      }
     }
 
     console.log('Payment verified successfully')
     return { valid: true }
   } catch (error) {
     console.error('Verification error:', error)
-    return { valid: false, reason: 'Transaction indexer timeout or error' }
+    return {
+      valid: false,
+      reason:
+        'Transaction verification timed out or failed. Please ensure you are on the correct network (Base Sepolia).'
+    }
   }
 }
