@@ -61,6 +61,14 @@ const requestPayment = (req: Request, res: Response) => {
   const requiredAmount = BigInt(bounty) > BigInt(DEFAULT_PRICE) ? bounty : DEFAULT_PRICE
 
   res.set('WWW-Authenticate', `L402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
+
+  logger.info({
+    msg: 'L402 Payment Requested',
+    vault: VAULT_ADDRESS,
+    payTo: internalAddress,
+    price: requiredAmount
+  })
+
   return res.status(402).json({
     message: 'Payment Required (Smart Contract)',
     detail: `This endpoint requires a contract call to ${methodName} on Base.`,

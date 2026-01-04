@@ -248,12 +248,19 @@ export const useStore = create<AppState>()(
           const sender = accounts[0]
 
           // --- NEW: Network Switching Logic ---
-          const isDev =
+          const envChainId = import.meta.env.VITE_NETWORK_ID
+            ? '0x' +
+              parseInt(import.meta.env.VITE_NETWORK_ID)
+                .toString(16)
+                .toLowerCase()
+            : null
+          const isDevHost =
             window.location.hostname === 'localhost' ||
             window.location.hostname === '127.0.0.1' ||
-            window.location.hostname.includes('gitpod.io') // Common dev environment
+            window.location.hostname.includes('gitpod.io')
 
-          const targetChainId = isDev ? HARDHAT_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID
+          const targetChainId = envChainId || (isDevHost ? HARDHAT_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID)
+          const isDev = targetChainId === HARDHAT_CHAIN_ID
 
           let currentChainId = await window.ethereum.request({ method: 'eth_chainId' })
 
@@ -270,7 +277,13 @@ export const useStore = create<AppState>()(
           const normCurrent = normalizeId(currentChainId)
           const normTarget = normalizeId(targetChainId)
 
-          logger.info({ msg: 'Checking network', current: normCurrent, target: normTarget, isDev })
+          logger.info({
+            msg: 'Checking network',
+            current: normCurrent,
+            target: normTarget,
+            isDev,
+            envSetting: !!envChainId
+          })
 
           if (normCurrent !== normTarget) {
             logger.info({
