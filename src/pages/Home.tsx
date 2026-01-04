@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore'
 import Hero from '../components/Hero'
 import QuestionCard from '../components/QuestionCard'
 import Sidebar from '../components/Sidebar'
+import pkg from '../../package.json'
 
 const Home: React.FC = () => {
   const [currentSort, setCurrentSort] = React.useState('newest')
@@ -148,6 +149,16 @@ const Home: React.FC = () => {
         </section>
         <Sidebar />
       </main>
+      <footer
+        style={{
+          textAlign: 'center',
+          padding: '2rem',
+          fontSize: '0.8rem',
+          color: 'var(--text-muted)'
+        }}
+      >
+        v{pkg.version} - Decentralized Knowledge Base
+      </footer>
     </>
   )
 }
