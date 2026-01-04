@@ -119,13 +119,9 @@ class MockDatabase implements IDatabase {
     if (q.includes("from questions where title = 'single q'")) {
       return this.questions.find((item) => item.title === 'Single Q')
     }
-    if (q.includes('from questions where title = ?')) {
-      return this.questions.find((item) => item.title == params[0])
-    }
-    if (q.includes('from answers where id = ?')) {
-      return this.answers.find(
-        (item) => item.id == (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
-      )
+    if (q.includes('from questions where id = ?')) {
+      const id = typeof params[0] === 'string' ? parseInt(params[0]) : params[0]
+      return this.questions.find((item) => item.id == id) || null
     }
     return this.questions[0] || null
   }

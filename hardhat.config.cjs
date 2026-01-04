@@ -14,7 +14,7 @@ module.exports = {
       chainId: 31337,
     },
     "base-sepolia": {
-      url: "https://sepolia.base.org",
+      url: "https://base-sepolia-rpc.publicnode.com",
       accounts: process.env.INTERNAL_WALLET_PRIVATE_KEY ? [process.env.INTERNAL_WALLET_PRIVATE_KEY] : [],
     },
   },

@@ -199,7 +199,7 @@ router.post('/questions', async (req: Request, res: Response) => {
       [title, content, tags, author, bounty, ipfsHash]
     )
 
-    logger.info({ msg: 'Question created', id: result.lastID, author })
+    logger.info({ msg: 'Question created', id: result.lastID, author, bounty })
 
     res.status(201).json({
       id: result.lastID,
