@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from 'express'
 import { getDB, seedDB } from './db.js'
 import { releaseBounty } from './services/contract.js'
+import { logger } from './utils/logger.js'
 
 const router = express.Router()
 
@@ -54,7 +55,7 @@ router.get('/seed', async (req: Request, res: Response) => {
     const result = await seedDB(force)
     res.json(result)
   } catch (error) {
-    console.error('SEED_ERROR:', error)
+    logger.error({ error, msg: 'SEED_ERROR' })
     res.status(500).json({ error: 'Seed failed', message: (error as any).message })
   }
 })
@@ -119,7 +120,7 @@ router.get('/feed', async (req: Request, res: Response) => {
 
     res.json(feed)
   } catch (error) {
-    console.error('FEED_ERROR:', error)
+    logger.error({ error, msg: 'FEED_ERROR' })
     res.status(500).json({
       error: 'Failed to fetch feed',
       details: error instanceof Error ? error.message : String(error)
@@ -150,7 +151,7 @@ router.get('/questions/:id', async (req: Request, res: Response) => {
       answers
     })
   } catch (error) {
-    console.error('QUESTION_ID_ERROR:', error)
+    logger.error({ error, msg: 'QUESTION_ID_ERROR', id: req.params.id })
     res.status(500).json({ error: 'Failed to fetch question' })
   }
 })
@@ -198,13 +199,15 @@ router.post('/questions', async (req: Request, res: Response) => {
       [title, content, tags, author, bounty, ipfsHash]
     )
 
+    logger.info({ msg: 'Question created', id: result.lastID, author })
+
     res.status(201).json({
       id: result.lastID,
       message: 'Question created successfully',
       ipfsHash
     })
   } catch (error) {
-    console.error('CREATE_QUESTION_ERROR:', error)
+    logger.error({ error, msg: 'CREATE_QUESTION_ERROR', body: req.body })
     res.status(500).json({ error: 'Failed to create question' })
   }
 })
@@ -225,12 +228,15 @@ router.post('/answers', async (req: Request, res: Response) => {
       [questionId, content, author, ipfsHash]
     )
 
+    logger.info({ msg: 'Answer posted', id: result.lastID, questionId, author })
+
     res.status(201).json({
       id: result.lastID,
       message: 'Answer posted successfully',
       ipfsHash
     })
-  } catch (_error) {
+  } catch (error) {
+    logger.error({ error, msg: 'CREATE_ANSWER_ERROR', body: req.body })
     res.status(500).json({ error: 'Failed to post answer' })
   }
 })
@@ -256,16 +262,22 @@ router.post('/answers/:id/accept', async (req: Request, res: Response) => {
     let txHash = null
     try {
       txHash = await releaseBounty(question.id.toString(), answer.author)
+      logger.info({
+        msg: 'Bounty released',
+        questionId: question.id,
+        winner: answer.author,
+        txHash
+      })
     } catch (contractError) {
-      console.error('Failed to release bounty on-chain:', contractError)
-      // We don't fail the whole request, but return the error info
+      logger.error({ err: contractError, msg: 'Failed to release bounty on-chain' })
     }
 
     res.json({
       message: 'Answer accepted and bounty release triggered',
       txHash
     })
-  } catch (_error) {
+  } catch (error) {
+    logger.error({ error, msg: 'ACCEPT_ANSWER_ERROR', id: req.params.id })
     res.status(500).json({ error: 'Failed to accept answer' })
   }
 })

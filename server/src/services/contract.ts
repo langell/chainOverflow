@@ -2,6 +2,7 @@ import { createPublicClient, createWalletClient, http, getContract, defineChain 
 import { baseSepolia } from 'viem/chains'
 import { internalAccount } from './wallet.js'
 import dotenv from 'dotenv'
+import { logger } from '../utils/logger.js'
 
 dotenv.config()
 
@@ -61,15 +62,15 @@ export const vaultContract = vaultAddress
  */
 export async function releaseBounty(questionId: string, winnerAddress: string) {
   if (!vaultContract) {
-    console.error('VAULT_ADDRESS not configured')
+    logger.error('VAULT_ADDRESS not configured')
     throw new Error('Vault contract not initialized')
   }
 
-  console.log(`Releasing bounty for question ${questionId} to ${winnerAddress}...`)
+  logger.info({ msg: 'Releasing bounty', questionId, winnerAddress })
 
   const hash = await vaultContract.write.releaseBounty([questionId, winnerAddress as `0x${string}`])
 
-  console.log(`Transaction submitted: ${hash}`)
+  logger.info({ msg: 'Transaction submitted', hash })
   return hash
 }
 
@@ -78,7 +79,7 @@ export async function releaseBounty(questionId: string, winnerAddress: string) {
  */
 export async function verifyPayment(txHash: string, expectedAmount: string) {
   try {
-    console.log(`Verifying payment for TX: ${txHash}...`)
+    logger.info({ msg: 'Verifying payment', txHash, expectedAmount })
 
     // Wait for the transaction to be mined (with 45s timeout to stay inside function limits)
     const receipt = await publicClient.waitForTransactionReceipt({
@@ -99,7 +100,11 @@ export async function verifyPayment(txHash: string, expectedAmount: string) {
 
     if (!isToVault && !isToInternal) {
       const msg = `Payment sent to ${tx.to}, but we expected ${vaultAddress || internalAccount.address}.`
-      console.warn(msg)
+      logger.warn({
+        msg: 'Invalid recipient address',
+        sentTo: tx.to,
+        expected: vaultAddress || internalAccount.address
+      })
       return { valid: false, reason: `Invalid recipient address. ${msg}` }
     }
 
@@ -110,10 +115,10 @@ export async function verifyPayment(txHash: string, expectedAmount: string) {
       }
     }
 
-    console.log('Payment verified successfully')
+    logger.info({ msg: 'Payment verified successfully', txHash })
     return { valid: true }
   } catch (error) {
-    console.error('Verification error:', error)
+    logger.error({ error, msg: 'Verification error', txHash })
     return {
       valid: false,
       reason:

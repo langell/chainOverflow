@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import { initDB } from './db.js'
 import apiRoutes from './routes.js'
 import { x402Middleware } from './middleware/x402.js'
+import { logger, logRequest } from './utils/logger.js'
 
 dotenv.config()
 
@@ -11,10 +12,11 @@ dotenv.config()
 export const app = express()
 const PORT = process.env.PORT || 3001
 
-console.log('Environment:', process.env.NODE_ENV || 'development')
+logger.info({ msg: 'Server starting...', env: process.env.NODE_ENV || 'development' })
 
 app.use(cors())
 app.use(express.json())
+app.use(logRequest)
 
 app.get('/api/ping', (_req: Request, res: Response) => {
   res.json({ status: 'alive', environment: process.env.NODE_ENV, vercel: !!process.env.VERCEL })
@@ -33,7 +35,7 @@ app.use(async (req, _res, next) => {
     await initDB()
     next()
   } catch (err) {
-    console.error('DATABASE_INIT_CRASH:', err)
+    logger.error({ err, msg: 'DATABASE_INIT_CRASH' })
     next(err)
   }
 })
@@ -46,22 +48,22 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   initDB()
     .then(() => {
       const server = app.listen(PORT, () => {
-        console.log(`Server running on http://localhost:${PORT}`)
+        logger.info(`Server running on http://localhost:${PORT}`)
       })
 
       server.on('error', (err: any) => {
-        console.error('SERVER ERROR:', err)
+        logger.error({ err, msg: 'SERVER ERROR' })
       })
     })
     .catch((err) => {
-      console.error('CRITICAL: Failed to init DB', err)
+      logger.error({ err, msg: 'CRITICAL: Failed to init DB' })
     })
 }
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+  logger.error({ promise, reason, msg: 'Unhandled Rejection' })
 })
 
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err)
+  logger.error({ err, msg: 'Uncaught Exception' })
 })

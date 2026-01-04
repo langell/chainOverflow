@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import { internalAddress } from '../services/wallet.js'
 import { verifyPayment } from '../services/contract.js'
+import { logger } from '../utils/logger.js'
 
 const VAULT_ADDRESS = process.env.VAULT_ADDRESS || ''
 
@@ -29,9 +30,7 @@ export const x402Middleware = () => {
     const [token, preimage] = credentials.split(':')
 
     // Debug logging for development
-    if (process.env.NODE_ENV !== 'test') {
-      console.log('x402: verifying credentials', { token, preimage })
-    }
+    logger.debug({ token, preimage, msg: 'x402: verifying credentials' })
 
     if (!preimage) return requestPayment(req, res)
 

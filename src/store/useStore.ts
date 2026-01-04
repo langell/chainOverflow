@@ -3,6 +3,7 @@ import { ethers } from 'ethers'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Question, Answer } from '../types'
 import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
+import { logger } from '../utils/logger'
 
 const API_BASE = '/api'
 
@@ -92,8 +93,9 @@ export const useStore = create<AppState>()(
           )
 
           set({ questions, answers, isLoading: false })
+          logger.info({ msg: 'Feed fetched', count: questions.length, sort })
         } catch (error) {
-          console.error('Failed to fetch feed:', error)
+          logger.error({ error, msg: 'Failed to fetch feed', sort })
           set({ isLoading: false })
         }
       },
@@ -139,8 +141,9 @@ export const useStore = create<AppState>()(
             answers: [...otherAnswers, ...questionAnswers],
             isLoading: false
           })
+          logger.info({ msg: 'Question fetched', id })
         } catch (error) {
-          console.error('Failed to fetch question:', error)
+          logger.error({ error, msg: 'Failed to fetch question', id })
           set({ isLoading: false })
         }
       },
@@ -167,8 +170,9 @@ export const useStore = create<AppState>()(
             .filter((q) => q.ipfsHash && matchingCIDs.includes(q.ipfsHash))
             .map((q) => q.id)
           set({ searchResults: matchingIds, isSearching: false })
+          logger.info({ msg: 'Search executed', query, results: matchingIds.length })
         } catch (error) {
-          console.error('Search failed', error)
+          logger.error({ error, msg: 'Search failed', query })
           set({ isSearching: false })
         }
       },
@@ -204,8 +208,9 @@ export const useStore = create<AppState>()(
           // 3. Refresh feed from DB
           await get().fetchFeed()
           set({ isModalOpen: false, isUploading: false })
+          logger.info({ msg: 'Question added', title: data.title })
         } catch (error) {
-          console.error('Add Question failed:', error)
+          logger.error({ error, msg: 'Add Question failed', data })
           set({ isUploading: false })
           alert(error instanceof Error ? error.message : 'Failed to add question')
         }
@@ -223,7 +228,7 @@ export const useStore = create<AppState>()(
 
         if (response.status === 402) {
           const data = await response.json()
-          console.log('L402 ETH Payment Required', data)
+          logger.info({ data, msg: 'L402 ETH Payment Required' })
 
           const { payTo, price, macaroon, vaultAddress, method } = data
 
@@ -240,9 +245,11 @@ export const useStore = create<AppState>()(
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
           const sender = accounts[0]
 
-          console.log(
-            `Requesting payment of ${price} Wei. Strategy: ${vaultAddress ? 'Smart Contract' : 'Direct Transfer'}`
-          )
+          logger.info({
+            msg: 'Requesting payment',
+            price,
+            strategy: vaultAddress ? 'Smart Contract' : 'Direct Transfer'
+          })
 
           try {
             let txHash: string
@@ -286,7 +293,7 @@ export const useStore = create<AppState>()(
               })
             }
 
-            console.log('Payment successful, TX Hash:', txHash)
+            logger.info({ msg: 'Payment successful', txHash })
 
             // 3. Retry with Authorization header using txHash as proof
             response = await fetch(`${API_BASE}${path}`, {
@@ -298,7 +305,7 @@ export const useStore = create<AppState>()(
               }
             })
           } catch (err) {
-            console.error('Payment failed or cancelled', err)
+            logger.error({ err, msg: 'Payment cycle failed' })
             throw new Error('Payment required to complete this action.')
           }
         }
@@ -316,8 +323,9 @@ export const useStore = create<AppState>()(
           try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
             set({ account: accounts[0] })
+            logger.info({ msg: 'Wallet connected', account: accounts[0] })
           } catch (error) {
-            console.error('User denied account access', error)
+            logger.error({ error, msg: 'User denied account access' })
           }
         } else {
           alert('Please install MetaMask or another Web3 wallet!')
@@ -361,8 +369,9 @@ export const useStore = create<AppState>()(
           })
 
           await get().fetchFeed()
+          logger.info({ msg: 'Answer added', questionId })
         } catch (error) {
-          console.error('Add Answer failed:', error)
+          logger.error({ error, msg: 'Add Answer failed', questionId })
           alert(error instanceof Error ? error.message : 'Failed to post answer')
         } finally {
           set({ isLoading: false })
@@ -386,8 +395,9 @@ export const useStore = create<AppState>()(
 
           // Refresh state
           await get().fetchFeed()
+          logger.info({ msg: 'Answer marked accepted', answerId })
         } catch (error) {
-          console.error('Accept Answer failed:', error)
+          logger.error({ error, msg: 'Accept Answer failed', answerId })
           alert('Failed to accept answer on-chain.')
         } finally {
           set({ isLoading: false })
