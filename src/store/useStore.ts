@@ -268,6 +268,12 @@ export const useStore = create<AppState>()(
                 : 'generic'
               const callData = iface.encodeFunctionData(method, [resourceId])
 
+              logger.info({
+                msg: 'Sending transaction to wallet',
+                to: vaultAddress,
+                value: price,
+                method
+              })
               txHash = await window.ethereum.request({
                 method: 'eth_sendTransaction',
                 params: [
@@ -281,6 +287,7 @@ export const useStore = create<AppState>()(
               })
             } else {
               // Direct Transfer Fallback
+              logger.info({ msg: 'Sending direct transfer to wallet', to: payTo, value: price })
               txHash = await window.ethereum.request({
                 method: 'eth_sendTransaction',
                 params: [
@@ -293,9 +300,10 @@ export const useStore = create<AppState>()(
               })
             }
 
-            logger.info({ msg: 'Payment successful', txHash })
+            logger.info({ msg: 'Transaction submitted by user', txHash })
 
             // 3. Retry with Authorization header using txHash as proof
+            logger.info({ msg: 'Retrying request with payment proof', txHash })
             response = await fetch(`${API_BASE}${path}`, {
               ...options,
               headers: {

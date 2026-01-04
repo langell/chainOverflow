@@ -81,10 +81,28 @@ export async function verifyPayment(txHash: string, expectedAmount: string) {
   try {
     logger.info({ msg: 'Verifying payment', txHash, expectedAmount })
 
+    // Add extra debugging: check current block height
+    const blockNumber = await publicClient.getBlockNumber().catch(() => null)
+    logger.info({ msg: 'Waiting for transaction receipt', txHash, currentBlock: blockNumber })
+
     // Wait for the transaction to be mined (with 45s timeout to stay inside function limits)
-    const receipt = await publicClient.waitForTransactionReceipt({
-      hash: txHash as `0x${string}`,
-      timeout: 45000
+    const receipt = await publicClient
+      .waitForTransactionReceipt({
+        hash: txHash as `0x${string}`,
+        timeout: 45000
+      })
+      .catch((err) => {
+        if (err.name === 'WaitForTransactionReceiptTimeoutError') {
+          logger.error({ msg: 'Transaction receipt wait timed out', txHash, timeout: '45s' })
+        }
+        throw err
+      })
+
+    logger.info({
+      msg: 'Transaction receipt received',
+      txHash,
+      status: receipt.status,
+      blockNumber: receipt.blockNumber
     })
 
     if (receipt.status !== 'success') {
