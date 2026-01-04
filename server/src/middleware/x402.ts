@@ -3,7 +3,7 @@ import { internalAddress } from '../services/wallet.js'
 import { verifyPayment } from '../services/contract.js'
 import { logger } from '../utils/logger.js'
 
-const VAULT_ADDRESS = process.env.VAULT_ADDRESS || ''
+const getVaultAddress = () => process.env.VAULT_ADDRESS || ''
 
 // Default price for operations (in Wei or token subunits)
 // For 0.0001 ETH, it's 100000000000000 Wei
@@ -64,7 +64,7 @@ const requestPayment = (req: Request, res: Response) => {
 
   logger.info({
     msg: 'L402 Payment Requested',
-    vault: VAULT_ADDRESS,
+    vault: getVaultAddress(),
     payTo: internalAddress,
     price: requiredAmount
   })
@@ -73,7 +73,7 @@ const requestPayment = (req: Request, res: Response) => {
     message: 'Payment Required (Smart Contract)',
     detail: `This endpoint requires a contract call to ${methodName} on Base.`,
     payTo: internalAddress,
-    vaultAddress: VAULT_ADDRESS,
+    vaultAddress: getVaultAddress(),
     method: methodName,
     price: requiredAmount,
     macaroon
