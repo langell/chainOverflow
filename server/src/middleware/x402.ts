@@ -16,7 +16,7 @@ const DEFAULT_PRICE = '100000000000000'
 export const x402Middleware = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     // Only protect write operations
-    const protectedPaths = ['/api/questions', '/api/answers']
+    const protectedPaths = ['/api/questions']
     if (!protectedPaths.includes(req.path)) {
       return next()
     }
