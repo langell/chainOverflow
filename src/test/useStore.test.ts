@@ -28,7 +28,7 @@ describe('Zustand Store', () => {
     })
     vi.stubGlobal('window', {
       ethereum: { request: mockRequest },
-      location: { reload: vi.fn() }
+      location: { reload: vi.fn(), hostname: 'localhost' }
     })
 
     // Mock global alert
