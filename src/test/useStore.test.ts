@@ -18,12 +18,19 @@ describe('Zustand Store', () => {
     localStorage.clear()
 
     // Mock window.ethereum
-    const mockRequest = vi.fn().mockImplementation(({ method }) => {
+    let currentChain = '0x7a69'
+    const mockRequest = vi.fn().mockImplementation(({ method, params }) => {
       if (method === 'eth_requestAccounts') return Promise.resolve(['0xTestAccount'])
       if (method === 'eth_sendTransaction') return Promise.resolve('0xMockTxHash')
-      if (method === 'eth_chainId') return Promise.resolve('0x7a69') // Hardhat default
-      if (method === 'wallet_switchEthereumChain') return Promise.resolve()
-      if (method === 'wallet_addEthereumChain') return Promise.resolve()
+      if (method === 'eth_chainId') return Promise.resolve(currentChain)
+      if (method === 'wallet_switchEthereumChain') {
+        currentChain = params[0].chainId
+        return Promise.resolve()
+      }
+      if (method === 'wallet_addEthereumChain') {
+        currentChain = params[0].chainId
+        return Promise.resolve()
+      }
       return Promise.resolve()
     })
     vi.stubGlobal('window', {
