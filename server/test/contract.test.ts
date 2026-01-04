@@ -19,6 +19,7 @@ describe('Contract Service', () => {
         ...actual,
         createPublicClient: vi.fn(() => ({
           waitForTransactionReceipt: vi.fn().mockResolvedValue({ status: 'success' }),
+          getBlockNumber: vi.fn().mockResolvedValue(BigInt(1000)),
           getTransaction: vi.fn().mockResolvedValue({
             to: '0x1234567890123456789012345678901234567890',
             value: BigInt(100),
