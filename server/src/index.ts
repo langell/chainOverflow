@@ -9,7 +9,8 @@ import { logger, logRequest } from './utils/logger.js'
 dotenv.config()
 
 // Export app for testing
-export const app = express()
+const app = express()
+export { app }
 const PORT = process.env.PORT || 3001
 
 logger.info({ msg: 'Server starting...', env: process.env.NODE_ENV || 'development' })
@@ -67,3 +68,5 @@ process.on('unhandledRejection', (reason, promise) => {
 process.on('uncaughtException', (err) => {
   logger.error({ err, msg: 'Uncaught Exception' })
 })
+
+export default app
