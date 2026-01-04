@@ -57,7 +57,7 @@ describe('QuestionModal', () => {
     fireEvent.change(screen.getByPlaceholderText('solidity gas security'), {
       target: { value: 'tag1 tag2' }
     })
-    fireEvent.change(screen.getByPlaceholderText('e.g. 0.1 ETH'), {
+    fireEvent.change(screen.getByPlaceholderText('0.1'), {
       target: { value: '0.5' }
     })
 
