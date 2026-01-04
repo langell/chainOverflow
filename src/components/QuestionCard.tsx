@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import type { Question } from '../types'
 import { getIPFSUrl } from '../services/ipfs'
 import { useStore } from '../store/useStore'
+import { formatBounty, formatDate, shortenAddress } from '../utils/format'
 
 interface QuestionCardProps {
   question: Question
@@ -29,10 +30,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
 
       <div className="question-content-wrapper">
         <div className="question-meta">
-          <span>By {question.author}</span>
+          <span>By {shortenAddress(question.author)}</span>
           <span>•</span>
-          <span>{question.timestamp}</span>
-          {question.bounty && <span className="bounty-badge">💎 {question.bounty} Bounty</span>}
+          <span>{formatDate(question.timestamp)}</span>
+          {question.bounty && (
+            <span className="bounty-badge">💎 {formatBounty(question.bounty)} ETH Bounty</span>
+          )}
         </div>
         <h3
           style={{ marginBottom: '1rem', cursor: 'pointer' }}

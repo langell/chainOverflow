@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import { useStore } from '../store/useStore'
 import Sidebar from '../components/Sidebar'
 import { getIPFSUrl } from '../services/ipfs'
+import { formatBounty, formatDate, shortenAddress } from '../utils/format'
 
 const QuestionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>()
@@ -106,11 +107,13 @@ const QuestionDetail: React.FC = () => {
             </div>
             <div style={{ flex: 1 }}>
               <div className="question-meta">
-                <span>By {question.author}</span>
+                <span>By {shortenAddress(question.author)}</span>
                 <span>•</span>
-                <span>{question.timestamp}</span>
+                <span>{formatDate(question.timestamp)}</span>
                 {question.bounty && (
-                  <span className="bounty-badge">💎 {question.bounty} Bounty</span>
+                  <span className="bounty-badge">
+                    💎 {formatBounty(question.bounty)} ETH Bounty
+                  </span>
                 )}
               </div>
               <h1 style={{ marginBottom: '1.5rem', fontSize: '1.8rem', lineHeight: '1.3' }}>
@@ -197,9 +200,9 @@ const QuestionDetail: React.FC = () => {
                 </div>
                 <div style={{ flex: 1 }}>
                   <div className="question-meta">
-                    <span>Answered by {answer.author}</span>
+                    <span>Answered by {shortenAddress(answer.author)}</span>
                     <span>•</span>
-                    <span>{answer.timestamp}</span>
+                    <span>{formatDate(answer.timestamp)}</span>
                   </div>
                   <div className="markdown-content">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer.content}</ReactMarkdown>
