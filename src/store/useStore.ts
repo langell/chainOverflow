@@ -6,6 +6,8 @@ import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
 import { logger } from '../utils/logger'
 
 const API_BASE = '/api'
+const BASE_SEPOLIA_CHAIN_ID = '0x14a34' // 84532
+const HARDHAT_CHAIN_ID = '0x7a69' // 31337
 
 interface AppState {
   questions: Question[]
@@ -244,6 +246,46 @@ export const useStore = create<AppState>()(
 
           const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
           const sender = accounts[0]
+
+          // --- NEW: Network Switching Logic ---
+          const isDev =
+            window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          const targetChainId = isDev ? HARDHAT_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID
+          const currentChainId = await window.ethereum.request({ method: 'eth_chainId' })
+
+          if (currentChainId !== targetChainId) {
+            logger.info({
+              msg: 'Requesting network switch',
+              from: currentChainId,
+              to: targetChainId
+            })
+            try {
+              await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: targetChainId }]
+              })
+            } catch (switchError: any) {
+              // This error code indicates that the chain has not been added to MetaMask.
+              if (switchError.code === 4902) {
+                logger.info({ msg: 'Adding Base Sepolia network to wallet' })
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [
+                    {
+                      chainId: BASE_SEPOLIA_CHAIN_ID,
+                      chainName: 'Base Sepolia',
+                      nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                      rpcUrls: ['https://sepolia.base.org'],
+                      blockExplorerUrls: ['https://sepolia.basescan.org']
+                    }
+                  ]
+                })
+              } else {
+                throw switchError
+              }
+            }
+          }
+          // -------------------------------------
 
           logger.info({
             msg: 'Requesting payment',
