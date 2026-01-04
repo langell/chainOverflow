@@ -78,12 +78,15 @@ export async function releaseBounty(questionId: string, winnerAddress: string) {
  */
 export async function verifyPayment(txHash: string, expectedAmount: string) {
   try {
-    const receipt = await publicClient.getTransactionReceipt({
+    console.log(`Verifying payment for TX: ${txHash}...`)
+
+    // Wait for the transaction to be mined (max 30s by default in viem)
+    const receipt = await publicClient.waitForTransactionReceipt({
       hash: txHash as `0x${string}`
     })
 
     if (receipt.status !== 'success') {
-      return { valid: false, reason: 'Transaction failed' }
+      return { valid: false, reason: 'Transaction failed on-chain' }
     }
 
     const tx = await publicClient.getTransaction({
@@ -94,6 +97,9 @@ export async function verifyPayment(txHash: string, expectedAmount: string) {
     const isToInternal = tx.to?.toLowerCase() === internalAccount.address.toLowerCase()
 
     if (!isToVault && !isToInternal) {
+      console.warn(
+        `Payment to unexpected address: ${tx.to}. Expected: ${vaultAddress} or ${internalAccount.address}`
+      )
       return { valid: false, reason: 'Invalid recipient address' }
     }
 
@@ -101,9 +107,10 @@ export async function verifyPayment(txHash: string, expectedAmount: string) {
       return { valid: false, reason: 'Insufficient payment amount' }
     }
 
+    console.log('Payment verified successfully')
     return { valid: true }
   } catch (error) {
     console.error('Verification error:', error)
-    return { valid: false, reason: 'Transaction not found or error during verification' }
+    return { valid: false, reason: 'Transaction indexer timeout or error' }
   }
 }
