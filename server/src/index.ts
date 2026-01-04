@@ -13,7 +13,11 @@ const app = express()
 export { app }
 const PORT = process.env.PORT || 3001
 
-logger.info({ msg: 'Server starting...', env: process.env.NODE_ENV || 'development' })
+logger.info({
+  msg: 'Server starting...',
+  env: process.env.NODE_ENV || 'development',
+  vault: process.env.VAULT_ADDRESS ? `${process.env.VAULT_ADDRESS.substring(0, 10)}...` : 'MISSING'
+})
 
 app.use(cors())
 app.use(express.json())
