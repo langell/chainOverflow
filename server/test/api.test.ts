@@ -170,14 +170,14 @@ describe('Server API', () => {
     })
   })
 
-  describe('POST /api/answers (Protected)', () => {
-    it('should return 402 without auth', async () => {
+  describe('POST /api/answers (Free)', () => {
+    it('should create answer without payment', async () => {
       const res = await request(app).post('/api/answers').send({ questionId: 1, content: 'Ans' })
-      expect(res.status).toBe(402)
+      expect(res.status).toBe(201)
     })
 
-    it('should create answer with valid auth', async () => {
-      const validPreimage = 'valid_preimage_longer_than_5'
+    it('should create answer with legacy auth (ignored)', async () => {
+      const validPreimage = 'valid_preimage'
       const res = await request(app)
         .post('/api/answers')
         .set('Authorization', `L402 token:${validPreimage}`)
