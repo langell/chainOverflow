@@ -249,40 +249,83 @@ export const useStore = create<AppState>()(
 
           // --- NEW: Network Switching Logic ---
           const isDev =
-            window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-          const targetChainId = isDev ? HARDHAT_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID
-          const currentChainId = await window.ethereum.request({ method: 'eth_chainId' })
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname.includes('gitpod.io') // Common dev environment
 
-          if (currentChainId !== targetChainId) {
+          const targetChainId = isDev ? HARDHAT_CHAIN_ID : BASE_SEPOLIA_CHAIN_ID
+
+          let currentChainId = await window.ethereum.request({ method: 'eth_chainId' })
+
+          // Normalize to lowercase hex for robust comparison
+          const normalizeId = (id: string | number) => {
+            if (typeof id === 'number') return '0x' + id.toString(16).toLowerCase()
+            if (typeof id === 'string') {
+              if (id.startsWith('0x')) return id.toLowerCase()
+              return '0x' + parseInt(id, 10).toString(16).toLowerCase()
+            }
+            return String(id).toLowerCase()
+          }
+
+          const normCurrent = normalizeId(currentChainId)
+          const normTarget = normalizeId(targetChainId)
+
+          logger.info({ msg: 'Checking network', current: normCurrent, target: normTarget, isDev })
+
+          if (normCurrent !== normTarget) {
             logger.info({
               msg: 'Requesting network switch',
-              from: currentChainId,
-              to: targetChainId
+              from: normCurrent,
+              to: normTarget
             })
             try {
               await window.ethereum.request({
                 method: 'wallet_switchEthereumChain',
-                params: [{ chainId: targetChainId }]
+                params: [{ chainId: normTarget }]
               })
             } catch (switchError: any) {
               // This error code indicates that the chain has not been added to MetaMask.
-              if (switchError.code === 4902) {
-                logger.info({ msg: 'Adding Base Sepolia network to wallet' })
-                await window.ethereum.request({
-                  method: 'wallet_addEthereumChain',
-                  params: [
-                    {
-                      chainId: BASE_SEPOLIA_CHAIN_ID,
-                      chainName: 'Base Sepolia',
-                      nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-                      rpcUrls: ['https://sepolia.base.org'],
-                      blockExplorerUrls: ['https://sepolia.basescan.org']
-                    }
-                  ]
-                })
+              if (switchError.code === 4902 || switchError.code === -32603) {
+                if (isDev) {
+                  logger.info({ msg: 'Adding Local Hardhat network to wallet' })
+                  await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [
+                      {
+                        chainId: HARDHAT_CHAIN_ID,
+                        chainName: 'Hardhat Local',
+                        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                        rpcUrls: ['http://127.0.0.1:8545'],
+                        blockExplorerUrls: []
+                      }
+                    ]
+                  })
+                } else {
+                  logger.info({ msg: 'Adding Base Sepolia network to wallet' })
+                  await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [
+                      {
+                        chainId: BASE_SEPOLIA_CHAIN_ID,
+                        chainName: 'Base Sepolia',
+                        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                        rpcUrls: ['https://sepolia.base.org'],
+                        blockExplorerUrls: ['https://sepolia.basescan.org']
+                      }
+                    ]
+                  })
+                }
               } else {
                 throw switchError
               }
+            }
+
+            // Re-verify chain ID after switch/add
+            const finalChainId = await window.ethereum.request({ method: 'eth_chainId' })
+            if (normalizeId(finalChainId) !== normTarget) {
+              throw new Error(
+                `Failed to switch to the correct network. Expected ${normTarget}, but still on ${normalizeId(finalChainId)}`
+              )
             }
           }
           // -------------------------------------
