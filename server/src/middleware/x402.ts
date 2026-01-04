@@ -42,7 +42,10 @@ export const x402Middleware = () => {
     }
 
     // Real on-chain verification
-    const { valid, reason } = await verifyPayment(preimage, DEFAULT_PRICE)
+    const bounty = req.body?.bounty ? String(req.body.bounty) : DEFAULT_PRICE
+    const requiredAmount = BigInt(bounty) > BigInt(DEFAULT_PRICE) ? bounty : DEFAULT_PRICE
+
+    const { valid, reason } = await verifyPayment(preimage, requiredAmount)
     if (valid) return next()
 
     return res.status(402).json({ error: reason || 'Invalid payment proof' })
@@ -54,6 +57,10 @@ const requestPayment = (req: Request, res: Response) => {
   const isQuestion = req.path.includes('questions')
   const methodName = isQuestion ? 'payForQuestion' : 'payFee'
 
+  // If bounty is specified in body, we use it as the price
+  const bounty = req.body?.bounty ? String(req.body.bounty) : DEFAULT_PRICE
+  const requiredAmount = BigInt(bounty) > BigInt(DEFAULT_PRICE) ? bounty : DEFAULT_PRICE
+
   res.set('WWW-Authenticate', `L402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
   return res.status(402).json({
     message: 'Payment Required (Smart Contract)',
@@ -61,7 +68,7 @@ const requestPayment = (req: Request, res: Response) => {
     payTo: internalAddress,
     vaultAddress: VAULT_ADDRESS,
     method: methodName,
-    price: DEFAULT_PRICE,
+    price: requiredAmount,
     macaroon
   })
 }

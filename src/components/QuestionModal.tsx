@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { ethers } from 'ethers'
 import { useStore } from '../store/useStore'
 
 const QuestionModal: React.FC = () => {
@@ -19,7 +20,23 @@ const QuestionModal: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await addQuestion(formData)
+
+    // Default fee 0.0001 ETH in Wei
+    const DEFAULT_FEE = '100000000000000'
+    let bountyInWei = DEFAULT_FEE
+
+    try {
+      if (formData.bounty) {
+        const parsed = ethers.parseEther(formData.bounty)
+        // Ensure it's at least the default fee
+        bountyInWei = parsed > BigInt(DEFAULT_FEE) ? parsed.toString() : DEFAULT_FEE
+      }
+    } catch (_err) {
+      alert('Invalid bounty amount. Please enter a valid number (e.g. 0.05)')
+      return
+    }
+
+    await addQuestion({ ...formData, bounty: bountyInWei })
     setFormData({ title: '', tags: '', bounty: '', content: '' })
   }
 
@@ -82,6 +99,26 @@ const QuestionModal: React.FC = () => {
               placeholder="e.g. 0.1 ETH"
               disabled={isUploading}
             />
+            {formData.bounty && !isNaN(parseFloat(formData.bounty)) && (
+              <p
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--text-muted)',
+                  marginTop: '0.25rem',
+                  fontFamily: 'monospace'
+                }}
+              >
+                Equivalent to:{' '}
+                {(() => {
+                  try {
+                    return ethers.parseEther(formData.bounty).toString()
+                  } catch {
+                    return 'Invalid amount'
+                  }
+                })()}{' '}
+                Wei
+              </p>
+            )}
           </div>
           <div className="form-group">
             <div
