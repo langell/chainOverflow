@@ -74,7 +74,7 @@ describe('QuestionModal', () => {
   it('shows uploading state and disables button', () => {
     mountWithState({ isUploading: true })
 
-    const button = screen.getByRole('button', { name: /Uploading to IPFS.../i })
+    const button = screen.getByRole('button', { name: /Posting to Chain.../i })
     expect(button).toBeInTheDocument()
     expect(button).toBeDisabled()
 
