@@ -201,7 +201,7 @@ const QuestionModal: React.FC = () => {
                     animation: 'spin 1s linear infinite'
                   }}
                 ></span>
-                Uploading to IPFS...
+                Posting to Chain...
               </>
             ) : (
               'Post to Chain'

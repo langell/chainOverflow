@@ -106,15 +106,24 @@ const QuestionDetail: React.FC = () => {
               </button>
             </div>
             <div style={{ flex: 1 }}>
-              <div className="question-meta">
+              <div
+                className="question-meta"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                  marginBottom: '0.5rem'
+                }}
+              >
                 <span>By {shortenAddress(question.author)}</span>
-                <span>•</span>
-                <span>{formatDate(question.timestamp)}</span>
-                {question.bounty && (
-                  <span className="bounty-badge">
-                    💎 {formatBounty(question.bounty)} ETH Bounty
-                  </span>
-                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  {question.bounty && (
+                    <span className="bounty-badge">💎 {formatBounty(question.bounty)} ETH</span>
+                  )}
+                  <span>•</span>
+                  <span>{formatDate(question.timestamp)}</span>
+                </div>
               </div>
               <h1 style={{ marginBottom: '1.5rem', fontSize: '1.8rem', lineHeight: '1.3' }}>
                 {question.title}
@@ -199,9 +208,17 @@ const QuestionDetail: React.FC = () => {
                   </button>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div className="question-meta">
+                  <div
+                    className="question-meta"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      width: '100%',
+                      marginBottom: '0.5rem'
+                    }}
+                  >
                     <span>Answered by {shortenAddress(answer.author)}</span>
-                    <span>•</span>
                     <span>{formatDate(answer.timestamp)}</span>
                   </div>
                   <div className="markdown-content">

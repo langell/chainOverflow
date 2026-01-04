@@ -29,13 +29,23 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
       </div>
 
       <div className="question-content-wrapper">
-        <div className="question-meta">
+        <div
+          className="question-meta"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%'
+          }}
+        >
           <span>By {shortenAddress(question.author)}</span>
-          <span>•</span>
-          <span>{formatDate(question.timestamp)}</span>
-          {question.bounty && (
-            <span className="bounty-badge">💎 {formatBounty(question.bounty)} ETH Bounty</span>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {question.bounty && (
+              <span className="bounty-badge">💎 {formatBounty(question.bounty)} ETH</span>
+            )}
+            <span>•</span>
+            <span>{formatDate(question.timestamp)}</span>
+          </div>
         </div>
         <h3
           style={{ marginBottom: '1rem', cursor: 'pointer' }}
