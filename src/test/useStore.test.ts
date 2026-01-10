@@ -414,5 +414,11 @@ describe('Zustand Store', () => {
 
       vi.unstubAllGlobals()
     })
+    it('should disconnect wallet successfully', () => {
+      useStore.setState({ account: '0xOld' })
+      const { disconnectWallet } = useStore.getState()
+      disconnectWallet()
+      expect(useStore.getState().account).toBe(null)
+    })
   })
 })

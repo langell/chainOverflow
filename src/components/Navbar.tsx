@@ -39,19 +39,32 @@ const Navbar: React.FC = () => {
         <button className="btn-secondary" onClick={() => setIsModalOpen(true)}>
           Ask Question
         </button>
-        <button
-          className="btn-primary"
-          onClick={connectWallet}
-          style={
-            account
-              ? { background: 'rgba(139, 92, 246, 0.2)', border: '1px solid var(--accent-violet)' }
-              : {}
-          }
-        >
-          {account
-            ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}`
-            : 'Connect Wallet'}
-        </button>
+        {account ? (
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              className="btn-primary"
+              style={{
+                background: 'rgba(139, 92, 246, 0.2)',
+                border: '1px solid var(--accent-violet)',
+                cursor: 'default'
+              }}
+            >
+              {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={() => useStore.getState().disconnectWallet()}
+              title="Disconnect Wallet"
+              style={{ padding: '0.75rem' }}
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <button className="btn-primary" onClick={connectWallet}>
+            Connect Wallet
+          </button>
+        )}
       </div>
     </nav>
   )

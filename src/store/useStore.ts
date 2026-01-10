@@ -35,6 +35,7 @@ interface AppState {
   }) => Promise<void>
   voteQuestion: (id: number, delta: number) => void
   connectWallet: () => Promise<void>
+  disconnectWallet: () => void
   seedLargeData: (count: number) => Promise<void>
 
   // Answer Actions
@@ -436,6 +437,11 @@ export const useStore = create<AppState>()(
         } else {
           alert('Please install MetaMask or another Web3 wallet!')
         }
+      },
+
+      disconnectWallet: () => {
+        set({ account: null })
+        logger.info({ msg: 'Wallet disconnected' })
       },
 
       seedLargeData: async (count) => {
