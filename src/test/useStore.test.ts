@@ -344,6 +344,7 @@ describe('Zustand Store', () => {
 
     // Setup state
     useStore.setState({
+      account: 'tester',
       answers: [
         {
           id: aId,

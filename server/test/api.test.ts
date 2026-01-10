@@ -187,4 +187,50 @@ describe('Server API', () => {
       expect(res.body.id).toBeDefined()
     })
   })
+
+  describe('POST /api/answers/:id/accept', () => {
+    it('should allow asker to accept answer', async () => {
+      const db = getDB()
+      const q = await db.run('INSERT INTO questions (title, content, author) VALUES (?, ?, ?)', [
+        'Q',
+        'C',
+        'Asker'
+      ])
+      const a = await db.run(
+        'INSERT INTO answers (question_id, content, author) VALUES (?, ?, ?)',
+        [q.lastID, 'A', 'Winner']
+      )
+
+      const res = await request(app)
+        .post(`/api/answers/${a.lastID}/accept`)
+        .send({ asker: 'Asker' })
+
+      expect(res.status).toBe(200)
+      expect(res.body.message).toContain('Answer accepted')
+    })
+
+    it('should reject if not the asker', async () => {
+      const db = getDB()
+      const q = await db.run('INSERT INTO questions (title, content, author) VALUES (?, ?, ?)', [
+        'Q',
+        'C',
+        'Asker'
+      ])
+      const a = await db.run(
+        'INSERT INTO answers (question_id, content, author) VALUES (?, ?, ?)',
+        [q.lastID, 'A', 'Winner']
+      )
+
+      const res = await request(app)
+        .post(`/api/answers/${a.lastID}/accept`)
+        .send({ asker: 'Hacker' })
+
+      expect(res.status).toBe(403)
+    })
+
+    it('should return 404 for non-existent answer', async () => {
+      const res = await request(app).post('/api/answers/999999/accept').send({ asker: 'Anybody' })
+      expect(res.status).toBe(404)
+    })
+  })
 })

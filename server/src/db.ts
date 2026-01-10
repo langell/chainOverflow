@@ -123,6 +123,10 @@ class MockDatabase implements IDatabase {
       const id = typeof params[0] === 'string' ? parseInt(params[0]) : params[0]
       return this.questions.find((item) => item.id == id) || null
     }
+    if (q.includes('from answers where id = ?')) {
+      const id = typeof params[0] === 'string' ? parseInt(params[0]) : params[0]
+      return this.answers.find((a) => a.id == id) || null
+    }
     return this.questions[0] || null
   }
 
@@ -138,34 +142,77 @@ class MockDatabase implements IDatabase {
     }
     if (q.includes('insert into questions')) {
       this.lastId++
-      const newQ = {
+      const colsPart = q.match(/\((.*?)\)/)?.[1] || ''
+      const cols = colsPart.split(',').map((c) => c.trim())
+
+      const newQ: any = {
         id: this.lastId,
-        title: params[0],
-        content: params[1],
-        tags: params[2] || '',
-        author: params[3] || '',
-        bounty: params[4] || '0',
-        ipfsHash: params[5] || 'mock-ipfs',
+        title: '',
+        content: '',
+        tags: '',
+        author: '',
+        bounty: '0',
+        ipfsHash: 'mock-ipfs',
         votes: 0,
         timestamp: new Date().toISOString(),
         answers: []
       }
+
+      if (cols.length > 0 && params.length === cols.length) {
+        cols.forEach((col, i) => {
+          if (col === 'tags' && Array.isArray(params[i])) {
+            newQ[col] = params[i].join(',')
+          } else {
+            newQ[col] = params[i]
+          }
+        })
+      } else {
+        newQ.title = params[0]
+        newQ.content = params[1]
+        newQ.tags = params[2] || ''
+        newQ.author = params[3] || ''
+        newQ.bounty = params[4] || '0'
+        newQ.ipfsHash = params[5] || 'mock-ipfs'
+      }
+
       this.questions.push(newQ)
       return { lastID: this.lastId }
     }
     if (q.includes('insert into answers')) {
       this.lastId++
-      this.answers.push({
+      const colsPart = q.match(/\((.*?)\)/)?.[1] || ''
+      const cols = colsPart.split(',').map((c) => c.trim())
+
+      const newA: any = {
         id: this.lastId,
-        question_id: params[0],
-        content: params[1],
-        author: params[2],
-        ipfsHash: params[3] || 'mock-ipfs',
+        question_id: 0,
+        content: '',
+        author: '',
+        ipfsHash: 'mock-ipfs',
         votes: 0,
         is_accepted: false,
         timestamp: new Date().toISOString()
-      })
+      }
+
+      if (cols.length > 0 && params.length === cols.length) {
+        cols.forEach((col, i) => {
+          newA[col] = params[i]
+        })
+      } else {
+        newA.question_id = params[0]
+        newA.content = params[1]
+        newA.author = params[2]
+        newA.ipfsHash = params[3] || 'mock-ipfs'
+      }
+
+      this.answers.push(newA)
       return { lastID: this.lastId }
+    }
+    if (q.includes('update answers set is_accepted = true')) {
+      const id = typeof params[0] === 'string' ? parseInt(params[0]) : params[0]
+      const answer = this.answers.find((a) => a.id == id)
+      if (answer) answer.is_accepted = true
+      return {}
     }
     return { lastID: ++this.lastId }
   }
