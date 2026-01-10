@@ -238,7 +238,7 @@ const QuestionDetail: React.FC = () => {
                           disabled={isLoading}
                           style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
                         >
-                          {isLoading ? 'Accepting...' : '✓ Accept Balance'}
+                          {isLoading ? 'Accepting...' : '✓ Accept Answer'}
                         </button>
                       </div>
                     )}
