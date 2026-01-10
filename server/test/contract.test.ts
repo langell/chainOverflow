@@ -31,7 +31,8 @@ describe('Contract Service', () => {
         })),
         getContract: vi.fn(() => ({
           write: {
-            releaseBounty: vi.fn().mockResolvedValue('0xtxhash')
+            releaseBounty: vi.fn().mockResolvedValue('0xtxhash'),
+            payoutReward: vi.fn().mockResolvedValue('0xrewardhash')
           }
         })),
         http: vi.fn()
@@ -68,6 +69,16 @@ describe('Contract Service', () => {
         '0x1234567890123456789012345678901234567890'
       )
       expect(hash).toBe('0xtxhash')
+    })
+  })
+
+  describe('payoutReward', () => {
+    it('should call payoutReward on the contract', async () => {
+      const hash = await contractService.payoutReward(
+        '0x1234567890123456789012345678901234567890',
+        '1000'
+      )
+      expect(hash).toBe('0xrewardhash')
     })
   })
 })

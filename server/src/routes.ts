@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express'
 import { getDB, seedDB } from './db.js'
-import { releaseBounty } from './services/contract.js'
+import { releaseBounty, payoutReward } from './services/contract.js'
 import { logger } from './utils/logger.js'
 
 const router = express.Router()
@@ -288,6 +288,23 @@ router.post('/answers/:id/accept', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error({ error, msg: 'ACCEPT_ANSWER_ERROR', id: req.params.id })
     res.status(500).json({ error: 'Failed to accept answer' })
+  }
+})
+
+// POST /rewards (Manual Payout)
+// TODO: Protect this with admin middleware in production
+router.post('/rewards', async (req: Request, res: Response) => {
+  try {
+    const { winner, amount } = req.body
+    if (!winner || !amount) {
+      return res.status(400).json({ error: 'Missing winner or amount' })
+    }
+
+    const txHash = await payoutReward(winner, amount)
+    res.json({ message: 'Reward payout triggered', txHash })
+  } catch (error) {
+    logger.error({ error, msg: 'REWARD_PAYOUT_ERROR', body: req.body })
+    res.status(500).json({ error: 'Failed to payout reward' })
   }
 })
 

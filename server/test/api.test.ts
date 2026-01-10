@@ -1,10 +1,15 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect, beforeAll, vi } from 'vitest'
 import request from 'supertest'
 import { app } from '../src/index'
 import { initDB, getDB } from '../src/db'
 
 describe('Server API', () => {
   beforeAll(async () => {
+    vi.mock('../src/services/contract', () => ({
+      releaseBounty: vi.fn().mockResolvedValue('0xmocktxhash'),
+      verifyPayment: vi.fn().mockResolvedValue({ valid: true }),
+      payoutReward: vi.fn().mockResolvedValue('0xmockrewardhash')
+    }))
     await initDB()
   })
 
@@ -237,6 +242,23 @@ describe('Server API', () => {
     it('should return 404 for non-existent answer', async () => {
       const res = await request(app).post('/api/answers/999999/accept').send({ asker: 'Anybody' })
       expect(res.status).toBe(404)
+    })
+  })
+
+  describe('POST /api/rewards', () => {
+    it('should payout reward to valid address', async () => {
+      const res = await request(app)
+        .post('/api/rewards')
+        .send({ winner: '0x1234567890123456789012345678901234567890', amount: '1000' })
+
+      expect(res.status).toBe(200)
+      expect(res.body.message).toContain('Reward payout triggered')
+      expect(res.body.txHash).toBeDefined()
+    })
+
+    it('should fail if missing fields', async () => {
+      const res = await request(app).post('/api/rewards').send({ amount: '1000' })
+      expect(res.status).toBe(400)
     })
   })
 })

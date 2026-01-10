@@ -27,6 +27,16 @@ const VAULT_ABI = [
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function'
+  },
+  {
+    inputs: [
+      { name: 'winner', type: 'address' },
+      { name: 'amount', type: 'uint256' }
+    ],
+    name: 'payoutReward',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
   }
 ] as const
 
@@ -72,9 +82,32 @@ export async function releaseBounty(questionId: string, winnerAddress: string) {
 
   logger.info({ msg: 'Releasing bounty', questionId, winnerAddress })
 
-  const hash = await vaultContract.write.releaseBounty([questionId, winnerAddress as `0x${string}`])
+  const hash = await (vaultContract.write as any).releaseBounty([
+    questionId,
+    winnerAddress as `0x${string}`
+  ])
 
   logger.info({ msg: 'Transaction submitted', hash })
+  return hash
+}
+
+/**
+ * Payout a reward from the vault's protocol fees
+ */
+export async function payoutReward(winnerAddress: string, amountWei: string) {
+  if (!vaultContract) {
+    logger.error('VAULT_ADDRESS not configured')
+    throw new Error('Vault contract not initialized')
+  }
+
+  logger.info({ msg: 'Paying reward from vault fees', winnerAddress, amount: amountWei })
+
+  const hash = await (vaultContract.write as any).payoutReward([
+    winnerAddress as `0x${string}`,
+    BigInt(amountWei)
+  ])
+
+  logger.info({ msg: 'Reward transaction submitted', hash })
   return hash
 }
 

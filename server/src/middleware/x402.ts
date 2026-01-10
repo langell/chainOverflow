@@ -35,16 +35,8 @@ export const x402Middleware = () => {
 
     if (!preimage) return requestPayment(req, res)
 
-    // Bypass real verification in test environment or for special mock proof
-    if (process.env.NODE_ENV === 'test' || preimage === 'mock_proof') {
-      if (preimage && preimage.length > 5) return next()
-      return res.status(402).json({ error: 'Invalid payment proof' })
-    }
-
-    // Real on-chain verification
+    // Robust parsing for required amount (Do this before bypass to ensure logic is exercised)
     const bounty = req.body?.bounty ? String(req.body.bounty) : DEFAULT_PRICE
-
-    // Robust parsing for required amount
     let bountyBigInt: bigint
     try {
       const bStr = bounty.split(' ')[0]
@@ -60,6 +52,13 @@ export const x402Middleware = () => {
     const defaultBigInt = BigInt(DEFAULT_PRICE)
     const requiredAmount = (bountyBigInt > defaultBigInt ? bountyBigInt : defaultBigInt).toString()
 
+    // Bypass real verification in test environment or for special mock proof
+    if (process.env.NODE_ENV === 'test' || preimage === 'mock_proof') {
+      if (preimage && preimage.length > 5) return next()
+      return res.status(402).json({ error: 'Invalid payment proof' })
+    }
+
+    // Real on-chain verification
     const { valid, reason } = await verifyPayment(preimage, requiredAmount)
     if (valid) return next()
 

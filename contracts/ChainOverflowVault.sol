@@ -62,11 +62,13 @@ contract ChainOverflowVault is Initializable, UUPSUpgradeable, OwnableUpgradeabl
 
     /**
      * @dev Release a bounty to the winning answerer.
+     * Can be called by the owner or the original asker.
      */
-    function releaseBounty(string memory questionId, address payable winner) external onlyOwner {
+    function releaseBounty(string memory questionId, address payable winner) external {
         Bounty storage bounty = bounties[questionId];
         require(bounty.amount > 0, "No bounty found");
         require(!bounty.released, "Bounty already released");
+        require(msg.sender == owner() || msg.sender == bounty.asker, "Not authorized");
 
         bounty.released = true;
         uint256 amount = bounty.amount;
@@ -75,6 +77,15 @@ contract ChainOverflowVault is Initializable, UUPSUpgradeable, OwnableUpgradeabl
         require(success, "Transfer failed");
 
         emit BountyReleased(questionId, winner, amount);
+    }
+
+    /**
+     * @dev Pay a reward from the general contract balance (e.g. protocol fees).
+     */
+    function payoutReward(address payable winner, uint256 amount) external onlyOwner {
+        require(address(this).balance >= amount, "Insufficient balance in vault");
+        (bool success, ) = winner.call{value: amount}("");
+        require(success, "Transfer failed");
     }
 
     /**
