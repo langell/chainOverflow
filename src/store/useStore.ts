@@ -363,7 +363,7 @@ export const useStore = create<AppState>()(
               // Use a dummy ID if we don't have the final one yet,
               // or handle it based on path. For /questions, we might need the IPFS hash or similar.
               const resourceId = options.body
-                ? JSON.parse(options.body as string).title || 'generic'
+                ? JSON.parse(options.body as string).ipfsHash || 'generic'
                 : 'generic'
               const callData = iface.encodeFunctionData(method, [resourceId])
 

@@ -184,12 +184,8 @@ router.get('/search', async (req: Request, res: Response) => {
 // POST /questions (Paid)
 router.post('/questions', async (req: Request, res: Response) => {
   try {
-    const { title, content, tags, author, bounty } = req.body
+    const { title, content, tags, author, bounty, ipfsHash } = req.body
     const db = getDB()
-
-    // In real app: Upload to IPFS here (server-side Pinata)
-    // const ipfsHash = await uploadToPinata(content)
-    const ipfsHash = 'QmServerMockHash' + Date.now()
 
     const result = await db.run(
       `
@@ -269,13 +265,14 @@ router.post('/answers/:id/accept', async (req: Request, res: Response) => {
     await db.run(`UPDATE answers SET is_accepted = TRUE WHERE id = ?`, [id])
 
     // 3. Trigger smart contract payout
-    // question.id is used as the questionId in the contract
+    // Use ipfsHash as the questionId in the contract
     let txHash = null
     try {
-      txHash = await releaseBounty(question.id.toString(), answer.author)
+      txHash = await releaseBounty(question.ipfsHash, answer.author)
       logger.info({
         msg: 'Bounty released',
         questionId: question.id,
+        ipfsHash: question.ipfsHash,
         winner: answer.author,
         txHash
       })

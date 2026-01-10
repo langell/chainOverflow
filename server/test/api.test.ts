@@ -162,7 +162,13 @@ describe('Server API', () => {
       const res = await request(app)
         .post('/api/questions')
         .set('Authorization', `L402 token:${validPreimage}`)
-        .send({ title: 'Paid Question', content: 'Paid Content', tags: 'paid', author: 'RichUser' })
+        .send({
+          title: 'Paid Question',
+          content: 'Paid Content',
+          tags: 'paid',
+          author: 'RichUser',
+          ipfsHash: 'mock-ipfs'
+        })
 
       expect(res.status).toBe(201)
       expect(res.body.id).toBeDefined()
