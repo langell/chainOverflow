@@ -1,7 +1,35 @@
 import { describe, it, expect } from 'vitest'
-import { formatBounty, shortenAddress, formatDate } from '../utils/format'
+import { formatBounty, shortenAddress, formatDate, parseBountyToWei } from '../utils/format'
 
 describe('format utils', () => {
+  describe('parseBountyToWei', () => {
+    it('should parse ETH string to Wei BigInt', () => {
+      // Clean integers are treated as Wei
+      expect(parseBountyToWei('1')).toBe(1n)
+      // Decimals are treated as ETH
+      expect(parseBountyToWei('0.1')).toBe(100000000000000000n)
+    })
+
+    it('should handle strings with " ETH" suffix', () => {
+      expect(parseBountyToWei('0.001 ETH')).toBe(1000000000000000n)
+      expect(parseBountyToWei('1 ETH')).toBe(1000000000000000000n) // Explicit ETH suffix
+    })
+
+    it('should handle clean integer strings as Wei', () => {
+      expect(parseBountyToWei('1000')).toBe(1000n)
+    })
+
+    it('should return 0n for invalid or empty inputs', () => {
+      expect(parseBountyToWei('')).toBe(0n)
+      expect(parseBountyToWei(undefined)).toBe(0n)
+      expect(parseBountyToWei('invalid')).toBe(0n)
+    })
+
+    it('should handle previously failing case of 0.001 ETH', () => {
+      // This was the specific user issue
+      expect(parseBountyToWei('0.001 ETH')).toBe(1000000000000000n)
+    })
+  })
   describe('formatBounty', () => {
     it('should format Wei to ETH string', () => {
       expect(formatBounty('100000000000000000')).toBe('0.1')

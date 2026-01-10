@@ -7,12 +7,16 @@ export const parseBountyToWei = (val: string | number | undefined | null): bigin
   if (!val) return 0n
   try {
     const s = val.toString().trim()
-    // Handle "0.001 ETH" or "0.001"
-    const clean = s.split(' ')[0]
-    if (clean.includes('.')) {
+    const lower = s.toLowerCase()
+
+    // If it mentions "eth" or has a decimal point, treat as ETH denominations
+    if (lower.includes('eth') || s.includes('.')) {
+      const clean = lower.replace('eth', '').trim()
       return ethers.parseEther(clean)
     }
-    return BigInt(clean.replace(/[^0-9]/g, '') || '0')
+
+    // Otherwise treat as Wei (clean integer)
+    return BigInt(s.replace(/[^0-9]/g, '') || '0')
   } catch (_e) {
     return 0n
   }
