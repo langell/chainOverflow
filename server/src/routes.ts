@@ -265,14 +265,15 @@ router.post('/answers/:id/accept', async (req: Request, res: Response) => {
     await db.run(`UPDATE answers SET is_accepted = TRUE WHERE id = ?`, [id])
 
     // 3. Trigger smart contract payout
-    // Use ipfsHash as the questionId in the contract
+    // Use ipfsHash as the questionId in the contract (Postgres might return it as ipfshash)
+    const questionIpfsHash = question.ipfsHash || (question as any).ipfshash
     let txHash = null
     try {
-      txHash = await releaseBounty(question.ipfsHash, answer.author)
+      txHash = await releaseBounty(questionIpfsHash, answer.author)
       logger.info({
         msg: 'Bounty released',
         questionId: question.id,
-        ipfsHash: question.ipfsHash,
+        ipfsHash: questionIpfsHash,
         winner: answer.author,
         txHash
       })

@@ -79,7 +79,7 @@ export const useStore = create<AppState>()(
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
-            ipfsHash: q.ipfsHash,
+            ipfsHash: q.ipfsHash || q.ipfshash,
             answers: q.answers ? q.answers.length : 0
           }))
 
@@ -120,7 +120,7 @@ export const useStore = create<AppState>()(
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
-            ipfsHash: q.ipfsHash,
+            ipfsHash: q.ipfsHash || q.ipfshash,
             answers: q.answers ? q.answers.length : 0
           }
 
