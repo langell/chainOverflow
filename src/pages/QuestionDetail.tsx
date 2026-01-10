@@ -224,6 +224,24 @@ const QuestionDetail: React.FC = () => {
                   <div className="markdown-content">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer.content}</ReactMarkdown>
                   </div>
+
+                  {/* Accept Button Logic */}
+                  {!answer.isAccepted &&
+                    !answers.some((a) => a.isAccepted) &&
+                    account?.toLowerCase() === question.author?.toLowerCase() && (
+                      <div style={{ marginTop: '1rem' }}>
+                        <button
+                          className="btn-secondary"
+                          onClick={() =>
+                            useStore.getState().markAnswerAccepted(numericId, answer.id)
+                          }
+                          disabled={isLoading}
+                          style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+                        >
+                          {isLoading ? 'Accepting...' : '✓ Accept Balance'}
+                        </button>
+                      </div>
+                    )}
                 </div>
               </div>
             </div>

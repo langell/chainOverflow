@@ -245,17 +245,28 @@ router.post('/answers', async (req: Request, res: Response) => {
 router.post('/answers/:id/accept', async (req: Request, res: Response) => {
   try {
     const { id } = req.params
+    const { asker } = req.body
     const db = getDB()
 
-    // 1. Mark as accepted in DB
-    await db.run(`UPDATE answers SET is_accepted = 1 WHERE id = ?`, [id])
-
-    // 2. Get details for on-chain payout
+    // 1. Get details first
     const answer = await db.get(`SELECT * FROM answers WHERE id = ?`, [id])
     if (!answer) return res.status(404).json({ error: 'Answer not found' })
 
     const question = await db.get(`SELECT * FROM questions WHERE id = ?`, [answer.question_id])
     if (!question) return res.status(404).json({ error: 'Question not found' })
+
+    // Security Check: Only the asker can accept
+    if (!asker || question.author.toLowerCase() !== asker.toLowerCase()) {
+      return res.status(403).json({ error: 'Only the question author can accept answers' })
+    }
+
+    // Check if already accepted
+    if (answer.is_accepted) {
+      return res.status(400).json({ error: 'Answer already accepted' })
+    }
+
+    // 2. Mark as accepted in DB
+    await db.run(`UPDATE answers SET is_accepted = TRUE WHERE id = ?`, [id])
 
     // 3. Trigger smart contract payout
     // question.id is used as the questionId in the contract

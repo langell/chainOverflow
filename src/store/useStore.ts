@@ -493,10 +493,20 @@ export const useStore = create<AppState>()(
       },
 
       markAnswerAccepted: async (_questionId, answerId) => {
+        const { account } = get()
+        if (!account) {
+          alert('Please connect your wallet to accept an answer.')
+          return
+        }
+
         set({ isLoading: true })
         try {
           await fetch(`${API_BASE}/answers/${answerId}/accept`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ asker: account })
           })
 
           // Refresh state
