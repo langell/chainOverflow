@@ -38,7 +38,7 @@ export const formatBounty = (wei: string | number): string => {
       maximumFractionDigits: 6
     })
   } catch (_e) {
-    return s.replace(/[^0-9.]/g, '')
+    return s
   }
 }
 
