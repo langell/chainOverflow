@@ -14,6 +14,8 @@
     "dev": "vite",
     "dev:server": "npm --prefix server run dev",
     "dev:node": "hardhat node",
+    "kill-ports": "lsof -ti:3001,8545,5173 | xargs kill -9 || true",
+    "predev:all": "npm run kill-ports",
     "dev:all": "npx concurrently -k -p \"[{name}]\" -n \"chain,server,web\" -c \"magenta,cyan,green\" \"npm run dev:node\" \"npm run dev:server\" \"npm run dev\"",
     "db:seed": "npm --prefix server run seed",
     "setup": "npm install && npm --prefix server install",

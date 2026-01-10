@@ -5,12 +5,30 @@ import { formatBounty, formatDate } from '../utils/format'
 const Sidebar: React.FC = () => {
   const questions = useStore((state) => state.questions)
 
+  // Helper to safely parse BigInt from strings that might contain junk (like " ETH")
+  const safeBigInt = (val: string | undefined | null): bigint => {
+    if (!val) return 0n
+    // Remove " ETH" or other non-numeric suffix and spaces
+    const clean = val
+      .toString()
+      .split(' ')[0]
+      .replace(/[^0-9]/g, '')
+    try {
+      return BigInt(clean || '0')
+    } catch {
+      return 0n
+    }
+  }
+
   // Filter questions with bounties, sort by bounty descending, and take top 5
   const hotBounties = [...questions]
-    .filter((q) => q.bounty && BigInt(q.bounty) > 0n)
+    .filter((q) => {
+      if (!q.bounty) return false
+      return safeBigInt(q.bounty) > 0n
+    })
     .sort((a, b) => {
-      const bountyA = BigInt(a.bounty || '0')
-      const bountyB = BigInt(b.bounty || '0')
+      const bountyA = safeBigInt(a.bounty)
+      const bountyB = safeBigInt(b.bounty)
       return bountyB > bountyA ? 1 : bountyB < bountyA ? -1 : 0
     })
     .slice(0, 5)

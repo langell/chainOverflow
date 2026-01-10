@@ -7,7 +7,7 @@
   "scripts": {
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "dev": "nodemon src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "debug": "node --inspect -r ts-node/register src/index.ts",
     "kill-port": "lsof -ti:3001 | xargs kill -9 || true",
     "seed": "ts-node src/seed.ts",
@@ -41,6 +41,7 @@
     "nodemon": "^3.1.11",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   }
