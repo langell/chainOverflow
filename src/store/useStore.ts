@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Question, Answer } from '../types'
 import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
 import { logger } from '../utils/logger'
+import { parseBountyToWei } from '../utils/format'
 
 const API_BASE = '/api'
 const BASE_SEPOLIA_CHAIN_ID = '0x14a34' // 84532
@@ -379,7 +380,7 @@ export const useStore = create<AppState>()(
                   {
                     from: sender,
                     to: vaultAddress,
-                    value: BigInt(price).toString(16),
+                    value: parseBountyToWei(price).toString(16),
                     data: callData
                   }
                 ]
@@ -393,7 +394,7 @@ export const useStore = create<AppState>()(
                   {
                     from: sender,
                     to: payTo,
-                    value: BigInt(price).toString(16)
+                    value: parseBountyToWei(price).toString(16)
                   }
                 ]
               })

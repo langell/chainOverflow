@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
+import { parseEther } from 'viem'
 import { internalAddress } from '../services/wallet.js'
 import { verifyPayment } from '../services/contract.js'
 import { logger } from '../utils/logger.js'
@@ -42,7 +43,22 @@ export const x402Middleware = () => {
 
     // Real on-chain verification
     const bounty = req.body?.bounty ? String(req.body.bounty) : DEFAULT_PRICE
-    const requiredAmount = BigInt(bounty) > BigInt(DEFAULT_PRICE) ? bounty : DEFAULT_PRICE
+
+    // Robust parsing for required amount
+    let bountyBigInt: bigint
+    try {
+      const bStr = bounty.split(' ')[0]
+      if (bStr.includes('.')) {
+        bountyBigInt = parseEther(bStr)
+      } else {
+        bountyBigInt = BigInt(bStr.replace(/[^0-9]/g, '') || '0')
+      }
+    } catch {
+      bountyBigInt = BigInt(DEFAULT_PRICE)
+    }
+
+    const defaultBigInt = BigInt(DEFAULT_PRICE)
+    const requiredAmount = (bountyBigInt > defaultBigInt ? bountyBigInt : defaultBigInt).toString()
 
     const { valid, reason } = await verifyPayment(preimage, requiredAmount)
     if (valid) return next()
@@ -58,7 +74,21 @@ const requestPayment = (req: Request, res: Response) => {
 
   // If bounty is specified in body, we use it as the price
   const bounty = req.body?.bounty ? String(req.body.bounty) : DEFAULT_PRICE
-  const requiredAmount = BigInt(bounty) > BigInt(DEFAULT_PRICE) ? bounty : DEFAULT_PRICE
+
+  let bountyBigInt: bigint
+  try {
+    const bStr = bounty.split(' ')[0]
+    if (bStr.includes('.')) {
+      bountyBigInt = parseEther(bStr)
+    } else {
+      bountyBigInt = BigInt(bStr.replace(/[^0-9]/g, '') || '0')
+    }
+  } catch {
+    bountyBigInt = BigInt(DEFAULT_PRICE)
+  }
+
+  const defaultBigInt = BigInt(DEFAULT_PRICE)
+  const requiredAmount = (bountyBigInt > defaultBigInt ? bountyBigInt : defaultBigInt).toString()
 
   res.set('WWW-Authenticate', `L402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
 

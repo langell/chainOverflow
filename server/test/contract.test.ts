@@ -63,7 +63,10 @@ describe('Contract Service', () => {
 
   describe('releaseBounty', () => {
     it('should call releaseBounty on the contract', async () => {
-      const hash = await contractService.releaseBounty('q1', '0xwinner')
+      const hash = await contractService.releaseBounty(
+        'q1',
+        '0x1234567890123456789012345678901234567890'
+      )
       expect(hash).toBe('0xtxhash')
     })
   })

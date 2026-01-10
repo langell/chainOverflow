@@ -31,9 +31,13 @@ const VAULT_ABI = [
 ] as const
 
 const vaultAddress = process.env.VAULT_ADDRESS as `0x${string}`
-// Use local hardhat if we are in dev and have a vault address
-const chain = process.env.NODE_ENV === 'development' ? hardhat : baseSepolia
-const transportUrl = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8545' : undefined
+const CHAIN_ID =
+  process.env.CHAIN_ID || (process.env.NODE_ENV === 'development' ? '31337' : '84532')
+
+// Use local hardhat if CHAIN_ID is 31337, otherwise use baseSepolia
+const chain = CHAIN_ID === '31337' ? hardhat : baseSepolia
+const transportUrl =
+  process.env.RPC_URL || (CHAIN_ID === '31337' ? 'http://127.0.0.1:8545' : undefined)
 
 export const publicClient = createPublicClient({
   chain: chain,

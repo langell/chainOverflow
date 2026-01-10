@@ -1,19 +1,44 @@
 import { ethers } from 'ethers'
 
 /**
+ * Safely parse a bounty string (Wei or ETH) into a BigInt (Wei)
+ */
+export const parseBountyToWei = (val: string | number | undefined | null): bigint => {
+  if (!val) return 0n
+  try {
+    const s = val.toString().trim()
+    // Handle "0.001 ETH" or "0.001"
+    const clean = s.split(' ')[0]
+    if (clean.includes('.')) {
+      return ethers.parseEther(clean)
+    }
+    return BigInt(clean.replace(/[^0-9]/g, '') || '0')
+  } catch (_e) {
+    return 0n
+  }
+}
+
+/**
  * Format Wei amount to ETH with fixed decimals
  */
 export const formatBounty = (wei: string | number): string => {
   if (!wei) return '0'
+  const s = wei.toString().trim()
+
+  // If it already looks like ETH (has a dot or ends with ETH)
+  if (s.includes('.') || s.toLowerCase().includes('eth')) {
+    return s.split(' ')[0]
+  }
+
   try {
-    const eth = ethers.formatEther(wei.toString())
+    const eth = ethers.formatEther(s)
     // Remove trailing zeros and unnecessary decimal point
     return parseFloat(eth).toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 6
     })
   } catch (_e) {
-    return wei.toString()
+    return s.replace(/[^0-9.]/g, '')
   }
 }
 

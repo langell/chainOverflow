@@ -26,9 +26,17 @@ VAULT_ADDRESS=0xaC88334Ac4d40E351E3114774ff249d1966835a8
 # Vercel Postgres (External Resource)
 POSTGRES_URL=postgres://...
 ...
+
+# Blockchain (External Resource)
+CHAIN_ID=84532
 ```
 
-## 3. Launching the App
+## 3. Blockchain Networking
+
+By default, the UI and Server will try to use a local Hardhat node.
+
+- **If you use MetaMask on Base Sepolia**: You **must** set `CHAIN_ID=84532` in `server/.env`.
+- **If you use a local Hardhat fork**: You can leave it as `31337`.
 
 Run the following command in the root directory:
 
