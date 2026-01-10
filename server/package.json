@@ -8,7 +8,7 @@
     "test": "vitest",
     "coverage": "vitest run --coverage",
     "dev": "tsx watch src/index.ts",
-    "debug": "node --inspect -r ts-node/register src/index.ts",
+    "debug": "node --inspect --import tsx src/index.ts",
     "kill-port": "lsof -ti:3001 | xargs kill -9 || true",
     "seed": "ts-node src/seed.ts",
     "build": "tsc"

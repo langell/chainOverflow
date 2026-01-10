@@ -80,7 +80,12 @@ export async function releaseBounty(questionId: string, winnerAddress: string) {
     throw new Error('Vault contract not initialized')
   }
 
-  logger.info({ msg: 'Releasing bounty', questionId, winnerAddress })
+  logger.info({
+    msg: 'Releasing bounty',
+    questionId,
+    winnerAddress,
+    signer: internalAccount.address
+  })
 
   const hash = await (vaultContract.write as any).releaseBounty([
     questionId,
