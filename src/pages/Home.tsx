@@ -72,14 +72,7 @@ const Home: React.FC = () => {
       <Hero />
       <main className="question-grid">
         <section className="feed">
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '2rem'
-            }}
-          >
+          <div className="feed-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <h2>
                 {searchQuery
@@ -106,7 +99,7 @@ const Home: React.FC = () => {
                 ></span>
               )}
             </div>
-            <div className="nav-links" style={{ fontSize: '0.8rem' }}>
+            <div className="nav-links feed-nav" style={{ fontSize: '0.8rem' }}>
               <Link
                 to="/?filter=newest"
                 style={{ color: currentSort === 'newest' ? 'var(--text-main)' : 'inherit' }}

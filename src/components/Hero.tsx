@@ -2,14 +2,13 @@ import React from 'react'
 
 const Hero: React.FC = () => {
   return (
-    <header className="hero">
-      <h1 style={{ fontSize: '4rem', textAlign: 'center', marginBottom: '1rem' }}>
+    <header className="hero" style={{ textAlign: 'center', padding: '4rem 0' }}>
+      <h1>
         The Knowledge Engine of <br />
         <span className="gradient-text">Web3 Development</span>
       </h1>
       <p
         style={{
-          textAlign: 'center',
           color: 'var(--text-muted)',
           fontSize: '1.25rem',
           maxWidth: '600px',

@@ -32,10 +32,7 @@ const Leaderboard: React.FC = () => {
     <>
       <div style={{ paddingTop: '80px', minHeight: '100vh', paddingBottom: '4rem' }}>
         <div className="container">
-          <h1
-            className="gradient-text"
-            style={{ fontSize: '2.5rem', marginBottom: '2rem', textAlign: 'center' }}
-          >
+          <h1 className="gradient-text" style={{ marginBottom: '2rem', textAlign: 'center' }}>
             Community Leaderboard
           </h1>
 
