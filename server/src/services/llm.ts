@@ -32,20 +32,22 @@ const ensureAIUsers = async () => {
 export const triggerAIAnswers = async (questionId: number, title: string, content: string) => {
   await ensureAIUsers()
 
-  // We process each AI independently
-  for (const ai of AI_CONFIG) {
+  const tasks = AI_CONFIG.map(async (ai) => {
     const apiKey = process.env[ai.envKey]
     if (!apiKey) {
       logger.info({ msg: `Skipping AI answer: ${ai.name} key missing` })
-      continue
+      return
     }
 
-    // Fire and forget individual AI requests
     logger.debug({ msg: `Firing AI request`, ai: ai.name, questionId })
-    getAIAnswer(ai, questionId, title, content).catch((err) => {
+    try {
+      await getAIAnswer(ai, questionId, title, content)
+    } catch (err) {
       logger.error({ err, msg: `AI process failed for ${ai.name}`, questionId })
-    })
-  }
+    }
+  })
+
+  return Promise.all(tasks)
 }
 
 async function getAIAnswer(

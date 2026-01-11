@@ -48,6 +48,17 @@ router.get('/debug-db', async (_req: Request, res: Response) => {
   }
 })
 
+// Debug AI configuration
+router.get('/debug-ai', async (_req: Request, res: Response) => {
+  res.json({
+    openai: !!process.env.OPENAI_API_KEY,
+    anthropic: !!process.env.ANTHROPIC_API_KEY,
+    google: !!process.env.GOOGLE_API_KEY,
+    env: process.env.NODE_ENV,
+    vercel: !!process.env.VERCEL
+  })
+})
+
 // Seed database
 router.get('/seed', async (req: Request, res: Response) => {
   try {
@@ -226,14 +237,12 @@ router.post('/questions', async (req: Request, res: Response) => {
 
     logger.info({ msg: 'Question created', id: result.lastID, author, bounty })
 
-    // Automatically trigger AI answers (async, do not await)
+    // Automatically trigger AI answers (Awaited for stability in serverless environments like Vercel)
     try {
       const { triggerAIAnswers } = await import('./services/llm.js')
-      triggerAIAnswers(result.lastID, title, content).catch((err) => {
-        logger.error({ err, msg: 'Initial AI answer trigger failed', questionId: result.lastID })
-      })
-    } catch (importErr) {
-      logger.error({ err: importErr, msg: 'Failed to import LLM service' })
+      await triggerAIAnswers(result.lastID, title, content)
+    } catch (triggerErr) {
+      logger.error({ err: triggerErr, msg: 'AI answer trigger failed', questionId: result.lastID })
     }
 
     res.status(201).json({
