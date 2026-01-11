@@ -94,7 +94,7 @@ const QuestionDetail: React.FC = () => {
       <section className="feed">
         {/* Question Header */}
         <div className="card" style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <div className="flex-container">
             <div className="vote-controls">
               <button className="btn-vote" onClick={() => handleVoteQuestion(1)}>
                 ▲
@@ -176,7 +176,7 @@ const QuestionDetail: React.FC = () => {
                   ✓ Accepted Solution
                 </div>
               )}
-              <div style={{ display: 'flex', gap: '1.5rem' }}>
+              <div className="flex-container">
                 <div className="vote-controls">
                   <button className="btn-vote" onClick={() => handleVoteAnswer(answer.id, 1)}>
                     ▲

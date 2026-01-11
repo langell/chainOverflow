@@ -16,7 +16,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
   const navigate = useNavigate()
 
   return (
-    <div className="card question-card">
+    <div className="card question-card flex-container">
       <div className="vote-controls">
         <button className="btn-vote" onClick={() => voteQuestion(question.id, 1)}>
           ▲

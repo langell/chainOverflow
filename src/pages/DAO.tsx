@@ -4,7 +4,7 @@ const DAO: React.FC = () => {
   return (
     <div style={{ padding: '4rem 0', textAlign: 'center' }}>
       <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '3rem' }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>
+        <h1 style={{ marginBottom: '1.5rem' }}>
           <span className="gradient-text">DAO Governance</span>
         </h1>
 
