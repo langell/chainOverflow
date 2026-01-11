@@ -4,7 +4,8 @@ const Hero: React.FC = () => {
   return (
     <header className="hero" style={{ textAlign: 'center', padding: '1.5rem 0' }}>
       <h1>
-        The Knowledge Engine of <span className="gradient-text">Web3 Development</span>
+        The Knowledge Engine of <br />
+        <span className="gradient-text">Web3 Development</span>
       </h1>
       <p
         style={{
