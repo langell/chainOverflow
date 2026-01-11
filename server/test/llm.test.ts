@@ -114,4 +114,54 @@ describe('LLM Service', () => {
     // Only Claude, Gemini and xAI should have answered
     expect(answers.length).toBe(3)
   })
+
+  it('should use default answer if API call fails (Quota Exceeded)', async () => {
+    const db = getDB()
+    const qResult = await db.run(
+      'INSERT INTO questions (title, content, author) VALUES (?, ?, ?)',
+      ['Quota Test', 'Help', 'user1']
+    )
+    const questionId = qResult.lastID
+
+    // Mock failure for OpenAI
+    mockFetch.mockImplementation((url) => {
+      if (url.includes('openai')) {
+        return Promise.resolve({
+          ok: false,
+          status: 429,
+          json: () => Promise.resolve({ error: { code: 'insufficient_quota' } })
+        })
+      }
+      // Mock success for others
+      if (url.includes('anthropic')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ content: [{ text: 'Claude Answer' }] })
+        })
+      }
+      if (url.includes('googleapis')) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({ candidates: [{ content: { parts: [{ text: 'Gemini Answer' }] } }] })
+        })
+      }
+      if (url.includes('x.ai')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ choices: [{ message: { content: 'xAI Answer' } }] })
+        })
+      }
+      return Promise.reject('Unknown URL')
+    })
+
+    await triggerAIAnswers(questionId, 'Quota Test', 'Help')
+    await new Promise((r) => setTimeout(r, 100))
+
+    const answers = await db.all('SELECT * FROM answers WHERE question_id = ?', [questionId])
+    expect(answers.length).toBe(4)
+
+    const chatGptAnswer = answers.find((a) => a.author === '0x0chatgpt')
+    expect(chatGptAnswer.content).toBe('Default Answer for ChatGPT')
+  })
 })
