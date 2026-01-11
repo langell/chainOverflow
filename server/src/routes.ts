@@ -226,6 +226,16 @@ router.post('/questions', async (req: Request, res: Response) => {
 
     logger.info({ msg: 'Question created', id: result.lastID, author, bounty })
 
+    // Automatically trigger AI answers (async, do not await)
+    try {
+      const { triggerAIAnswers } = await import('./services/llm.js')
+      triggerAIAnswers(result.lastID, title, content).catch((err) => {
+        logger.error({ err, msg: 'Initial AI answer trigger failed', questionId: result.lastID })
+      })
+    } catch (importErr) {
+      logger.error({ err: importErr, msg: 'Failed to import LLM service' })
+    }
+
     res.status(201).json({
       id: result.lastID,
       message: 'Question created successfully'

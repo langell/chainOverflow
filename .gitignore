@@ -31,4 +31,8 @@ cache/
 typechain-types/
 .openzeppelin/
 *.sqlite
+# Environment files
 .env
+.env.*
+**/.env
+**/.env.*
