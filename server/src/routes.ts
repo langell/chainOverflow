@@ -437,10 +437,15 @@ router.post('/users', async (req: Request, res: Response) => {
 
     const db = getDB()
 
+    // Check if handle is already taken by another address
+    const existingUser = await db.get('SELECT * FROM users WHERE handle = ?', [handle])
+    if (existingUser && existingUser.address.toLowerCase() !== address.toLowerCase()) {
+      return res.status(409).json({ error: 'Handle already taken' })
+    }
+
     // Simple upsert by deleting first (mock/sqlite friendly for this setup)
     // In production postgres, we'd use ON CONFLICT DO UPDATE
     // But since we have a mock DB that is simplistic, let's keep it robust for both
-    // However, our MockDB handles 'INSERT INTO users' with upsert logic
 
     // For real DB (postgres), let's use standard INSERT ON CONFLICT
     let query = `

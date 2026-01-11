@@ -149,6 +149,9 @@ class MockDatabase implements IDatabase {
     if (q.includes('from users where address = ?')) {
       return this.users.find((u) => u.address.toLowerCase() === params[0].toLowerCase()) || null
     }
+    if (q.includes('from users where handle = ?')) {
+      return this.users.find((u) => u.handle.toLowerCase() === params[0].toLowerCase()) || null
+    }
     return this.questions[0] || null
   }
 
@@ -241,7 +244,14 @@ class MockDatabase implements IDatabase {
       const address = params[0]
       const handle = params[1]
 
-      // Upsert simulation
+      // Check uniqueness of handle
+      const existingHandleUser = this.users.find(
+        (u) => u.handle.toLowerCase() === handle.toLowerCase() && u.address !== address
+      )
+      if (existingHandleUser) {
+        throw new Error('unique constraint failed: users.handle')
+      }
+
       const existingIndex = this.users.findIndex((u) => u.address === address)
       if (existingIndex >= 0) {
         this.users[existingIndex].handle = handle
