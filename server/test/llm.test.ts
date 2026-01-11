@@ -19,6 +19,7 @@ describe('LLM Service', () => {
     process.env.OPENAI_API_KEY = 'test-key'
     process.env.ANTHROPIC_API_KEY = 'test-key'
     process.env.GOOGLE_API_KEY = 'test-key'
+    process.env.XAI_API_KEY = 'test-key'
   })
 
   it('should fetch answers from all configured LLMs and save them', async () => {
@@ -50,6 +51,12 @@ describe('LLM Service', () => {
             Promise.resolve({ candidates: [{ content: { parts: [{ text: 'Gemini Answer' }] } }] })
         })
       }
+      if (url.includes('x.ai')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ choices: [{ message: { content: 'xAI Answer' } }] })
+        })
+      }
       return Promise.reject('Unknown URL')
     })
 
@@ -64,18 +71,20 @@ describe('LLM Service', () => {
 
     const answers = await db.all('SELECT * FROM answers WHERE question_id = ?', [questionId])
 
-    // We expect 3 answers
-    expect(answers.length).toBe(3)
+    // We expect 4 answers
+    expect(answers.length).toBe(4)
 
     const contents = answers.map((a) => a.content)
     expect(contents).toContain('ChatGPT Answer')
     expect(contents).toContain('Claude Answer')
     expect(contents).toContain('Gemini Answer')
+    expect(contents).toContain('xAI Answer')
 
     const authors = answers.map((a) => a.author)
     expect(authors).toContain('0x0chatgpt')
     expect(authors).toContain('0x0claude')
     expect(authors).toContain('0x0gemini')
+    expect(authors).toContain('0x0xai')
   })
 
   it('should skip AI if API key is missing', async () => {
@@ -102,7 +111,7 @@ describe('LLM Service', () => {
     await new Promise((r) => setTimeout(r, 100))
 
     const answers = await db.all('SELECT * FROM answers WHERE question_id = ?', [questionId])
-    // Only Claude and Gemini should have answered
-    expect(answers.length).toBe(2)
+    // Only Claude, Gemini and xAI should have answered
+    expect(answers.length).toBe(3)
   })
 })

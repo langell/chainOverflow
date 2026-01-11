@@ -54,6 +54,7 @@ router.get('/debug-ai', async (_req: Request, res: Response) => {
     openai: !!process.env.OPENAI_API_KEY,
     anthropic: !!process.env.ANTHROPIC_API_KEY,
     google: !!process.env.GOOGLE_API_KEY,
+    xai: !!process.env.XAI_API_KEY,
     env: process.env.NODE_ENV,
     vercel: !!process.env.VERCEL
   })
