@@ -85,10 +85,27 @@ describe('Navbar', () => {
     expect(mockDisconnectWallet).toHaveBeenCalled()
   })
 
-  it('calls setIsModalOpen when button is clicked', () => {
+  it('does not show Ask Question button when logged out', () => {
     ;(useStore as any).mockImplementation((selector: any) =>
       selector({
         account: null,
+        connectWallet: mockConnectWallet,
+        setIsModalOpen: mockSetIsModalOpen
+      })
+    )
+
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    )
+    expect(screen.queryByText('Ask Question')).toBeNull()
+  })
+
+  it('calls setIsModalOpen when Ask Question is clicked and logged in', () => {
+    ;(useStore as any).mockImplementation((selector: any) =>
+      selector({
+        account: '0x123',
         connectWallet: mockConnectWallet,
         setIsModalOpen: mockSetIsModalOpen
       })

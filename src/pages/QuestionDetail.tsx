@@ -12,7 +12,6 @@ const QuestionDetail: React.FC = () => {
 
   const questions = useStore((state) => state.questions)
   const allAnswers = useStore((state) => state.answers)
-  const voteQuestion = useStore((state) => state.voteQuestion)
   const voteAnswer = useStore((state) => state.voteAnswer)
   const addAnswer = useStore((state) => state.addAnswer)
   const isUploading = useStore((state) => state.isUploading)
@@ -73,10 +72,6 @@ const QuestionDetail: React.FC = () => {
     )
   }
 
-  const handleVoteQuestion = (delta: number) => {
-    voteQuestion(numericId, delta)
-  }
-
   const handleVoteAnswer = (answerId: number, delta: number) => {
     voteAnswer(answerId, delta)
   }
@@ -95,15 +90,6 @@ const QuestionDetail: React.FC = () => {
         {/* Question Header */}
         <div className="card" style={{ marginBottom: '2rem' }}>
           <div className="flex-container">
-            <div className="vote-controls">
-              <button className="btn-vote" onClick={() => handleVoteQuestion(1)}>
-                ▲
-              </button>
-              <span className="vote-count">{question.votes}</span>
-              <button className="btn-vote" onClick={() => handleVoteQuestion(-1)}>
-                ▼
-              </button>
-            </div>
             <div style={{ flex: 1 }}>
               <div
                 className="question-meta"

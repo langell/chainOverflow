@@ -129,32 +129,6 @@ describe('Zustand Store', () => {
     expect(state.isUploading).toBe(false)
   })
 
-  it('should handle votes', () => {
-    const { voteQuestion } = useStore.getState()
-    // Add a dummy question directly to state for speed
-    const dummyId = 999
-    useStore.setState({
-      questions: [
-        {
-          id: dummyId,
-          title: 'Voter',
-          content: '...',
-          tags: [],
-          author: 'abc',
-          votes: 10,
-          answers: 0,
-          timestamp: 'now'
-        }
-      ]
-    })
-
-    voteQuestion(dummyId, 1)
-    expect(useStore.getState().questions[0].votes).toBe(11)
-
-    voteQuestion(dummyId, -1)
-    expect(useStore.getState().questions[0].votes).toBe(10)
-  })
-
   it('should execute search and update results', async () => {
     const { executeSearch } = useStore.getState()
 

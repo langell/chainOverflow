@@ -10,7 +10,6 @@ vi.mock('../store/useStore', () => ({
 }))
 
 describe('QuestionCard', () => {
-  const mockVoteQuestion = vi.fn()
   const mockQuestion = {
     id: 1,
     title: 'How to use Markdown?',
@@ -25,11 +24,7 @@ describe('QuestionCard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default mock implementation
-    ;(useStore as any).mockImplementation((selector: any) =>
-      selector({
-        voteQuestion: mockVoteQuestion
-      })
-    )
+    ;(useStore as any).mockImplementation((selector: any) => selector({}))
   })
 
   it('renders title and tags correctly', () => {
@@ -70,17 +65,6 @@ describe('QuestionCard', () => {
 
     fireEvent.click(readMoreBtn)
     expect(screen.getByText('Show Less')).toBeInTheDocument()
-  })
-
-  it('calls voteQuestion when upvote is clicked', () => {
-    render(
-      <MemoryRouter>
-        <QuestionCard question={mockQuestion} />
-      </MemoryRouter>
-    )
-    const upvoteBtn = screen.getByText('▲')
-    fireEvent.click(upvoteBtn)
-    expect(mockVoteQuestion).toHaveBeenCalledWith(1, 1)
   })
 
   it('displays handle when available', () => {
