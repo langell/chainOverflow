@@ -1,63 +1,68 @@
+
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <title>Code coverage report for server/src/db.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
     <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style type="text/css">
-      .coverage-summary .sorter {
-        background-image: url(../../sort-arrow-sprite.png);
-      }
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
     </style>
-  </head>
-
-  <body>
-    <div class="wrapper">
-      <div class="pad1">
-        <h1>
-          <a href="../../index.html">All files</a> / <a href="index.html">server/src</a> db.ts
-        </h1>
-        <div class="clearfix">
-          <div class="fl pad1y space-right2">
-            <span class="strong">46.34% </span>
-            <span class="quiet">Statements</span>
-            <span class="fraction">57/123</span>
-          </div>
-
-          <div class="fl pad1y space-right2">
-            <span class="strong">65.57% </span>
-            <span class="quiet">Branches</span>
-            <span class="fraction">40/61</span>
-          </div>
-
-          <div class="fl pad1y space-right2">
-            <span class="strong">54.54% </span>
-            <span class="quiet">Functions</span>
-            <span class="fraction">12/22</span>
-          </div>
-
-          <div class="fl pad1y space-right2">
-            <span class="strong">45.21% </span>
-            <span class="quiet">Lines</span>
-            <span class="fraction">52/115</span>
-          </div>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">server/src</a> db.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">49.71% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>87/175</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">54.36% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>56/103</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">62.06% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>18/29</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">48.12% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>77/160</span>
+            </div>
+        
+            
         </div>
         <p class="quiet">
-          Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>,
-          <em>p</em> or <em>k</em> for the previous block.
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
         </p>
         <template id="filterTemplate">
-          <div class="quiet">
-            Filter:
-            <input type="search" id="fileSearch" />
-          </div>
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
         </template>
-      </div>
-      <div class="status-line low"></div>
-      <pre><table class="coverage">
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
 <a name='L3'></a><a href='#L3'>3</a>
@@ -352,7 +357,89 @@
 <a name='L292'></a><a href='#L292'>292</a>
 <a name='L293'></a><a href='#L293'>293</a>
 <a name='L294'></a><a href='#L294'>294</a>
-<a name='L295'></a><a href='#L295'>295</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a>
+<a name='L313'></a><a href='#L313'>313</a>
+<a name='L314'></a><a href='#L314'>314</a>
+<a name='L315'></a><a href='#L315'>315</a>
+<a name='L316'></a><a href='#L316'>316</a>
+<a name='L317'></a><a href='#L317'>317</a>
+<a name='L318'></a><a href='#L318'>318</a>
+<a name='L319'></a><a href='#L319'>319</a>
+<a name='L320'></a><a href='#L320'>320</a>
+<a name='L321'></a><a href='#L321'>321</a>
+<a name='L322'></a><a href='#L322'>322</a>
+<a name='L323'></a><a href='#L323'>323</a>
+<a name='L324'></a><a href='#L324'>324</a>
+<a name='L325'></a><a href='#L325'>325</a>
+<a name='L326'></a><a href='#L326'>326</a>
+<a name='L327'></a><a href='#L327'>327</a>
+<a name='L328'></a><a href='#L328'>328</a>
+<a name='L329'></a><a href='#L329'>329</a>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a>
+<a name='L337'></a><a href='#L337'>337</a>
+<a name='L338'></a><a href='#L338'>338</a>
+<a name='L339'></a><a href='#L339'>339</a>
+<a name='L340'></a><a href='#L340'>340</a>
+<a name='L341'></a><a href='#L341'>341</a>
+<a name='L342'></a><a href='#L342'>342</a>
+<a name='L343'></a><a href='#L343'>343</a>
+<a name='L344'></a><a href='#L344'>344</a>
+<a name='L345'></a><a href='#L345'>345</a>
+<a name='L346'></a><a href='#L346'>346</a>
+<a name='L347'></a><a href='#L347'>347</a>
+<a name='L348'></a><a href='#L348'>348</a>
+<a name='L349'></a><a href='#L349'>349</a>
+<a name='L350'></a><a href='#L350'>350</a>
+<a name='L351'></a><a href='#L351'>351</a>
+<a name='L352'></a><a href='#L352'>352</a>
+<a name='L353'></a><a href='#L353'>353</a>
+<a name='L354'></a><a href='#L354'>354</a>
+<a name='L355'></a><a href='#L355'>355</a>
+<a name='L356'></a><a href='#L356'>356</a>
+<a name='L357'></a><a href='#L357'>357</a>
+<a name='L358'></a><a href='#L358'>358</a>
+<a name='L359'></a><a href='#L359'>359</a>
+<a name='L360'></a><a href='#L360'>360</a>
+<a name='L361'></a><a href='#L361'>361</a>
+<a name='L362'></a><a href='#L362'>362</a>
+<a name='L363'></a><a href='#L363'>363</a>
+<a name='L364'></a><a href='#L364'>364</a>
+<a name='L365'></a><a href='#L365'>365</a>
+<a name='L366'></a><a href='#L366'>366</a>
+<a name='L367'></a><a href='#L367'>367</a>
+<a name='L368'></a><a href='#L368'>368</a>
+<a name='L369'></a><a href='#L369'>369</a>
+<a name='L370'></a><a href='#L370'>370</a>
+<a name='L371'></a><a href='#L371'>371</a>
+<a name='L372'></a><a href='#L372'>372</a>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -392,6 +479,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -434,97 +524,170 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">15x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">11x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">19x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">42x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">36x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -534,7 +697,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-yes">21x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -577,6 +740,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -643,8 +812,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">20x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { db as pool } from '@vercel/postgres'
 &nbsp;
@@ -685,7 +854,10 @@ class PostgresWrapper implements IDatabase {
 &nbsp;
   async <span class="fstat-no" title="function not covered" >run(q</span>uery: string, params: any[] = <span class="branch-0 cbranch-no" title="branch not covered" >[]) {</span>
     let pgQuery = <span class="cstat-no" title="statement not covered" >this.toPostgres(query)</span>
-<span class="cstat-no" title="statement not covered" >    if (pgQuery.trim().toLowerCase().startsWith('insert')) {</span>
+<span class="cstat-no" title="statement not covered" >    if (</span>
+      pgQuery.trim().toLowerCase().startsWith('insert') &amp;&amp;
+      !pgQuery.toLowerCase().includes('returning')
+    ) {
 <span class="cstat-no" title="statement not covered" >      pgQuery += ' RETURNING id'</span>
     }
     const client = <span class="cstat-no" title="statement not covered" >await pool.connect()</span>
@@ -727,6 +899,7 @@ class PostgresWrapper implements IDatabase {
 class MockDatabase implements IDatabase {
   private questions: any[] = []
   private answers: any[] = []
+  private users: any[] = []
   private lastId = 0
 &nbsp;
   async all(query: string, params: any[] = []) {
@@ -736,13 +909,17 @@ class MockDatabase implements IDatabase {
       return this.questions.filter((item) =&gt; item.title.toLowerCase().includes(term))
     }
 &nbsp;
+    if (q.includes('select * from users')) {
+      return this.users
+    }
+&nbsp;
     if (q.includes('from questions')) {
       // Basic simulation of HAVING COUNT(a.id) = 0
       if (q.includes('having count(a.id) = 0')) {
-        return this.questions.filter(q =&gt; {
-          const hasAnswers = this.answers.some(a =&gt; a.question_id === q.id);
-          return !hasAnswers;
-        });
+        return this.questions.filter((q) =&gt; {
+          const hasAnswers = this.answers.some((a) =&gt; a.question_id === q.id)
+          return !hasAnswers
+        })
       }
       return this.questions
     }
@@ -750,7 +927,7 @@ class MockDatabase implements IDatabase {
     <span class="missing-if-branch" title="else path not taken" >E</span>if (q.includes('from answers')) {
       if (q.includes('where question_id in')) {
         // Simple mock: assume questionIds are passed
-        return this.answers.filter(a =&gt; params.includes(a.question_id));
+        return this.answers.filter((a) =&gt; params.includes(a.question_id))
       }
       return this.answers
     }
@@ -761,19 +938,22 @@ class MockDatabase implements IDatabase {
     const q = query.toLowerCase()
     if (q.includes('from questions where id = ?')) {
       return this.questions.find(
-        (item) =&gt; item.id == (typeof params[0] === 'string' ? parseInt(params[0]) : <span class="branch-1 cbranch-no" title="branch not covered" >params[0])</span>
+        (item) =&gt; item.id == (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])
       )
     }
     if (q.includes("from questions where title = 'single q'")) {
       return this.questions.find((item) =&gt; item.title === 'Single Q')
     }
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (q.includes('from questions where title = ?')) {
-<span class="cstat-no" title="statement not covered" >      return this.questions.find(<span class="fstat-no" title="function not covered" >(i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >item.title == params[0])</span></span>
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (q.includes('from questions where id = ?')) {
+      const id = <span class="cstat-no" title="statement not covered" >typeof params[0] === 'string' ? parseInt(params[0]) : params[0]</span>
+<span class="cstat-no" title="statement not covered" >      return this.questions.find(<span class="fstat-no" title="function not covered" >(i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >item.id == id)</span> || null</span>
     }
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (q.includes('from answers where id = ?')) {
-<span class="cstat-no" title="statement not covered" >      return this.answers.find(</span>
-<span class="fstat-no" title="function not covered" >        (i</span>tem) =&gt; <span class="cstat-no" title="statement not covered" >item.id == (typeof params[0] === 'string' ? parseInt(params[0]) : params[0])</span>
-      )
+    if (q.includes('from answers where id = ?')) {
+      const id = typeof params[0] === 'string' ? parseInt(params[0]) : <span class="branch-1 cbranch-no" title="branch not covered" >params[0]</span>
+      return this.answers.find((a) =&gt; a.id == id) || null
+    }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (q.includes('from users where address = ?')) {
+<span class="cstat-no" title="statement not covered" >      return this.users.find(<span class="fstat-no" title="function not covered" >(u</span>) =&gt; <span class="cstat-no" title="statement not covered" >u.address.toLowerCase() === params[0].toLowerCase())</span> || null</span>
     }
     return this.questions[0] || <span class="branch-1 cbranch-no" title="branch not covered" >null</span>
   }
@@ -788,36 +968,101 @@ class MockDatabase implements IDatabase {
       this.answers = []
       return {}
     }
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (q.includes('delete from users')) {
+<span class="cstat-no" title="statement not covered" >      this.users = []</span>
+<span class="cstat-no" title="statement not covered" >      return {}</span>
+    }
+&nbsp;
     if (q.includes('insert into questions')) {
       this.lastId++
-      const newQ = {
+      const colsPart = q.match(/\((.*?)\)/)?.[1] || <span class="branch-1 cbranch-no" title="branch not covered" >''</span>
+      const cols = colsPart.split(',').map((c) =&gt; c.trim())
+&nbsp;
+      const newQ: any = {
         id: this.lastId,
-        title: params[0],
-        content: params[1],
-        tags: params[2] || <span class="branch-1 cbranch-no" title="branch not covered" >'',</span>
-        author: params[3] || '',
-        bounty: params[4] || '0',
-        ipfsHash: params[5] || 'mock-ipfs',
+        title: '',
+        content: '',
+        tags: '',
+        author: '',
+        bounty: '0',
+        ipfsHash: 'mock-ipfs',
         votes: 0,
         timestamp: new Date().toISOString(),
         answers: []
       }
+&nbsp;
+      if (cols.length &gt; 0 &amp;&amp; params.length === cols.length) {
+        cols.forEach((col, i) =&gt; {
+          <span class="missing-if-branch" title="if path not taken" >I</span>if (col === 'tags' &amp;&amp; Array.isArray(params[i])) {
+<span class="cstat-no" title="statement not covered" >            newQ[col] = params[i].join(',')</span>
+          } else {
+            newQ[col] = params[i]
+          }
+        })
+      } else <span class="missing-if-branch" title="else path not taken" >E</span>{
+<span class="cstat-no" title="statement not covered" >        newQ.title = params[0]</span>
+<span class="cstat-no" title="statement not covered" >        newQ.content = params[1]</span>
+<span class="cstat-no" title="statement not covered" >        newQ.tags = params[2] || ''</span>
+<span class="cstat-no" title="statement not covered" >        newQ.author = params[3] || ''</span>
+<span class="cstat-no" title="statement not covered" >        newQ.bounty = params[4] || '0'</span>
+<span class="cstat-no" title="statement not covered" >        newQ.ipfsHash = params[5] || 'mock-ipfs'</span>
+      }
+&nbsp;
       this.questions.push(newQ)
       return { lastID: this.lastId }
     }
-    <span class="missing-if-branch" title="else path not taken" >E</span>if (q.includes('insert into answers')) {
+    if (q.includes('insert into answers')) {
       this.lastId++
-      this.answers.push({
+      const colsPart = q.match(/\((.*?)\)/)?.[1] || <span class="branch-1 cbranch-no" title="branch not covered" >''</span>
+      const cols = colsPart.split(',').map((c) =&gt; c.trim())
+&nbsp;
+      const newA: any = {
         id: this.lastId,
-        question_id: params[0],
-        content: params[1],
-        author: params[2],
-        ipfsHash: params[3] || 'mock-ipfs',
+        question_id: 0,
+        content: '',
+        author: '',
+        ipfsHash: 'mock-ipfs',
         votes: 0,
         is_accepted: false,
         timestamp: new Date().toISOString()
-      })
+      }
+&nbsp;
+      if (cols.length &gt; 0 &amp;&amp; params.length === cols.length) {
+        cols.forEach((col, i) =&gt; {
+          newA[col] = params[i]
+        })
+      } else <span class="missing-if-branch" title="else path not taken" >E</span>{
+<span class="cstat-no" title="statement not covered" >        newA.question_id = params[0]</span>
+<span class="cstat-no" title="statement not covered" >        newA.content = params[1]</span>
+<span class="cstat-no" title="statement not covered" >        newA.author = params[2]</span>
+<span class="cstat-no" title="statement not covered" >        newA.ipfsHash = params[3] || 'mock-ipfs'</span>
+      }
+&nbsp;
+      this.answers.push(newA)
       return { lastID: this.lastId }
+    }
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (q.includes('insert into users')) {
+      // Very specific mock for: INSERT INTO users (address, handle) VALUES (?, ?)
+      // OR INSERT INTO users (address, handle) VALUES (?, ?) ON CONFLICT ...
+      const address = <span class="cstat-no" title="statement not covered" >params[0]</span>
+      const handle = <span class="cstat-no" title="statement not covered" >params[1]</span>
+&nbsp;
+      // Upsert simulation
+      const existingIndex = <span class="cstat-no" title="statement not covered" >this.users.findIndex(<span class="fstat-no" title="function not covered" >(u</span>) =&gt; <span class="cstat-no" title="statement not covered" >u.address === address)</span></span>
+<span class="cstat-no" title="statement not covered" >      if (existingIndex &gt;= 0) {</span>
+<span class="cstat-no" title="statement not covered" >        this.users[existingIndex].handle = handle</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        this.users.push({ address, handle, created_at: new Date().toISOString() })</span>
+      }
+<span class="cstat-no" title="statement not covered" >      return {}</span>
+    }
+&nbsp;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (q.includes('update answers set is_accepted = true')) {
+      const id = typeof params[0] === 'string' ? parseInt(params[0]) : <span class="branch-1 cbranch-no" title="branch not covered" >params[0]</span>
+      const answer = this.answers.find((a) =&gt; a.id == id)
+      <span class="missing-if-branch" title="else path not taken" >E</span>if (answer) answer.is_accepted = true
+      return {}
     }
 <span class="cstat-no" title="statement not covered" >    return { lastID: ++this.lastId }</span>
   }
@@ -868,6 +1113,12 @@ export const initDB = async () =&gt; {
         amount INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         is_paid BOOLEAN DEFAULT FALSE
+      );
+&nbsp;
+      CREATE TABLE IF NOT EXISTS users (
+        address TEXT PRIMARY KEY,
+        handle TEXT UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `)
   } catch (err) {
@@ -942,22 +1193,21 @@ export const getDB = () =&gt; {
 }
 &nbsp;</pre></td></tr></table></pre>
 
-      <div class="push"></div>
-      <!-- for sticky footer -->
-    </div>
-    <!-- /wrapper -->
-    <div class="footer quiet pad2 space-top1 center small">
-      Code coverage generated by
-      <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-      at 2026-01-04T15:35:33.560Z
-    </div>
-    <script src="../../prettify.js"></script>
-    <script>
-      window.onload = function () {
-        prettyPrint()
-      }
-    </script>
-    <script src="../../sorter.js"></script>
-    <script src="../../block-navigation.js"></script>
-  </body>
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-01-11T16:06:47.547Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
 </html>
+    

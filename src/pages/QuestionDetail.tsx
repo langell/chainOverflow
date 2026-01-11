@@ -116,7 +116,9 @@ const QuestionDetail: React.FC = () => {
                   marginBottom: '0.5rem'
                 }}
               >
-                <span>By {shortenAddress(question.author)}</span>
+                <span>
+                  By {question.handle ? question.handle : shortenAddress(question.author)}
+                </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   {question.bounty && (
                     <span className="bounty-badge">💎 {formatBounty(question.bounty)} ETH</span>
@@ -218,7 +220,9 @@ const QuestionDetail: React.FC = () => {
                       marginBottom: '0.5rem'
                     }}
                   >
-                    <span>Answered by {shortenAddress(answer.author)}</span>
+                    <span>
+                      Answered by {answer.handle ? answer.handle : shortenAddress(answer.author)}
+                    </span>
                     <span>{formatDate(answer.timestamp)}</span>
                   </div>
                   <div className="markdown-content">

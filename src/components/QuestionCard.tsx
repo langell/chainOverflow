@@ -38,7 +38,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
             width: '100%'
           }}
         >
-          <span>By {shortenAddress(question.author)}</span>
+          <span>By {question.handle ? question.handle : shortenAddress(question.author)}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             {question.bounty && (
               <span className="bounty-badge">💎 {formatBounty(question.bounty)} ETH</span>

@@ -4,6 +4,7 @@ export interface Question {
   content: string
   tags: string[]
   author: string
+  handle?: string
   votes: number
   answers: number
   bounty?: string
@@ -16,6 +17,7 @@ export interface Answer {
   questionId: number
   content: string
   author: string
+  handle?: string
   votes: number
   timestamp: string
   isAccepted?: boolean

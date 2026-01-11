@@ -112,10 +112,25 @@ router.get('/feed', async (req: Request, res: Response) => {
       questionIds
     )
 
-    // 3. Nest answers within questions
+    // 3. Get all users for mapping
+    const allUsers = await db.all('SELECT * FROM users')
+    const userHandleMap = new Map<string, string>()
+    allUsers.forEach((u) => {
+      if (u.address && u.handle) {
+        userHandleMap.set(u.address.toLowerCase(), u.handle)
+      }
+    })
+
+    // 4. Nest answers within questions and attach handles
     const feed = questions.map((q) => ({
       ...q,
-      answers: answers.filter((a) => a.question_id === q.id)
+      handle: userHandleMap.get(q.author.toLowerCase()),
+      answers: answers
+        .filter((a) => a.question_id === q.id)
+        .map((a) => ({
+          ...a,
+          handle: userHandleMap.get(a.author.toLowerCase())
+        }))
     }))
 
     res.json(feed)
@@ -146,9 +161,22 @@ router.get('/questions/:id', async (req: Request, res: Response) => {
       [id]
     )
 
+    // Map authors to handles
+    const allUsers = await db.all('SELECT * FROM users')
+    const userHandleMap = new Map<string, string>()
+    allUsers.forEach((u) => {
+      if (u.address && u.handle) {
+        userHandleMap.set(u.address.toLowerCase(), u.handle)
+      }
+    })
+
     res.json({
       ...question,
-      answers
+      handle: userHandleMap.get(question.author.toLowerCase()),
+      answers: answers.map((a: any) => ({
+        ...a,
+        handle: userHandleMap.get(a.author.toLowerCase())
+      }))
     })
   } catch (error) {
     logger.error({ error, msg: 'QUESTION_ID_ERROR', id: req.params.id })
