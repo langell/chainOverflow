@@ -14,7 +14,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
   const navigate = useNavigate()
 
   return (
-    <div className="card question-card flex-container">
+    <div className="card question-card">
       <div className="question-content-wrapper">
         <div
           className="question-meta"
@@ -35,7 +35,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
           </div>
         </div>
         <h3
-          style={{ marginBottom: '1rem', cursor: 'pointer' }}
+          style={{ marginBottom: '0.5rem', cursor: 'pointer', fontSize: '1.25rem' }}
           onClick={() => navigate(`/question/${question.id}`)}
         >
           {question.title}
@@ -49,7 +49,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
           <button
             className="btn-text-link"
             onClick={() => setIsExpanded(!isExpanded)}
-            style={{ marginBottom: '1rem', display: 'block' }}
+            style={{ marginBottom: '0.5rem', display: 'block', fontSize: '0.85rem' }}
           >
             {isExpanded ? 'Show Less' : 'Read More...'}
           </button>
@@ -65,7 +65,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
             </div>
           </div>
           <div
-            style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}
+            style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}
           >
             <Link
               to={`/question/${question.id}`}
