@@ -41,6 +41,7 @@ export const triggerAIAnswers = async (questionId: number, title: string, conten
     }
 
     // Fire and forget individual AI requests
+    logger.debug({ msg: `Firing AI request`, ai: ai.name, questionId })
     getAIAnswer(ai, questionId, title, content).catch((err) => {
       logger.error({ err, msg: `AI process failed for ${ai.name}`, questionId })
     })
@@ -54,6 +55,7 @@ async function getAIAnswer(
   content: string
 ) {
   let answer: string | null = null
+  logger.info({ msg: `Getting AI answer from ${ai.name}`, ai: ai.name, questionId })
 
   try {
     if (ai.name === 'ChatGPT') {
@@ -104,8 +106,12 @@ async function callChatGPT(apiKey: string, title: string, content: string): Prom
     })
 
     const data = await response.json()
+    if (!response.ok) {
+      console.error('ChatGPT API Error Response:', JSON.stringify(data))
+    }
     return data.choices?.[0]?.message?.content || null
   } catch (error) {
+    console.error('ChatGPT Fetch Error:', error)
     logger.error({ error, msg: 'ChatGPT API Error' })
     return null
   }
@@ -133,8 +139,12 @@ async function callClaude(apiKey: string, title: string, content: string): Promi
     })
 
     const data = await response.json()
+    if (!response.ok) {
+      console.error('Claude API Error Response:', JSON.stringify(data))
+    }
     return data.content?.[0]?.text || null
   } catch (error) {
+    console.error('Claude Fetch Error:', error)
     logger.error({ error, msg: 'Claude API Error' })
     return null
   }
@@ -142,7 +152,7 @@ async function callClaude(apiKey: string, title: string, content: string): Promi
 
 async function callGemini(apiKey: string, title: string, content: string): Promise<string | null> {
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -165,8 +175,12 @@ async function callGemini(apiKey: string, title: string, content: string): Promi
     })
 
     const data = await response.json()
+    if (!response.ok) {
+      console.error('Gemini API Error Response:', JSON.stringify(data))
+    }
     return data.candidates?.[0]?.content?.parts?.[0]?.text || null
   } catch (error) {
+    console.error('Gemini Fetch Error:', error)
     logger.error({ error, msg: 'Gemini API Error' })
     return null
   }
