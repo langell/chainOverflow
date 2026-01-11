@@ -9,7 +9,6 @@ export interface Question {
   answers: number
   bounty?: string
   timestamp: string
-  ipfsHash?: string
 }
 
 export interface Answer {

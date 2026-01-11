@@ -2,7 +2,6 @@ import { create } from 'zustand'
 import { ethers } from 'ethers'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import type { Question, Answer } from '../types'
-import { uploadToIPFS, searchIPFSIndexer } from '../services/ipfs'
 import { logger } from '../utils/logger'
 import { parseBountyToWei } from '../utils/format'
 
@@ -141,7 +140,6 @@ export const useStore = create<AppState>()(
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
-            ipfsHash: q.ipfsHash || q.ipfshash,
             answers: q.answers ? q.answers.length : 0
           }))
 
@@ -184,7 +182,6 @@ export const useStore = create<AppState>()(
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
-            ipfsHash: q.ipfsHash || q.ipfshash,
             answers: q.answers ? q.answers.length : 0
           }
 
@@ -232,11 +229,9 @@ export const useStore = create<AppState>()(
       executeSearch: async (query) => {
         set({ isSearching: true })
         try {
-          const matchingCIDs = await searchIPFSIndexer(query)
-          const { questions } = get()
-          const matchingIds = questions
-            .filter((q) => q.ipfsHash && matchingCIDs.includes(q.ipfsHash))
-            .map((q) => q.id)
+          const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`)
+          const results = await response.json()
+          const matchingIds = results.map((q: any) => q.id)
           set({ searchResults: matchingIds, isSearching: false })
           logger.info({ msg: 'Search executed', query, results: matchingIds.length })
         } catch (error) {
@@ -257,10 +252,7 @@ export const useStore = create<AppState>()(
         const { account } = get()
         set({ isUploading: true })
         try {
-          // 1. Upload to IPFS (Simulated/Mock)
-          const ipfsHash = await uploadToIPFS(data.content)
-
-          // 2. Post to Backend with Payment Handling
+          // Post to Backend with Payment Handling
           await get().requestWithPayment('/questions', {
             method: 'POST',
             body: JSON.stringify({
@@ -268,12 +260,11 @@ export const useStore = create<AppState>()(
               content: data.content,
               tags: data.tags,
               author: account || 'anonymous',
-              bounty: data.bounty,
-              ipfsHash
+              bounty: data.bounty
             })
           })
 
-          // 3. Refresh feed from DB
+          // Refresh feed from DB
           await get().fetchFeed()
           set({ isModalOpen: false, isUploading: false })
           logger.info({ msg: 'Question added', title: data.title })
@@ -426,9 +417,9 @@ export const useStore = create<AppState>()(
               ])
 
               // Use a dummy ID if we don't have the final one yet,
-              // or handle it based on path. For /questions, we might need the IPFS hash or similar.
+              // or handle it based on path.
               const resourceId = options.body
-                ? JSON.parse(options.body as string).ipfsHash || 'generic'
+                ? JSON.parse(options.body as string).title || 'generic'
                 : 'generic'
               const callData = iface.encodeFunctionData(method, [resourceId])
 
@@ -516,7 +507,6 @@ export const useStore = create<AppState>()(
         for (let i = 0; i < count; i++) {
           const topic = ['DeFi', 'NFT', 'DAO', 'Bridge', 'L2', 'ZK'][Math.floor(Math.random() * 6)]
           const content = `Massive data sample #${i}: Discussing the future of ${topic} protocols.`
-          const cid = await uploadToIPFS(content)
           newQuestions.push({
             id: Date.now() + i,
             title: `${topic} scaling research paper #${i}`,
@@ -525,8 +515,7 @@ export const useStore = create<AppState>()(
             author: `researcher_${i}.eth`,
             votes: Math.floor(Math.random() * 100),
             answers: 0,
-            timestamp: `${Math.floor(Math.random() * 24)}h ago`,
-            ipfsHash: cid
+            timestamp: `${Math.floor(Math.random() * 24)}h ago`
           })
         }
         set({ questions: [...newQuestions, ...questions] })

@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { Question } from '../types'
-import { getIPFSUrl } from '../services/ipfs'
 import { useStore } from '../store/useStore'
 import { formatBounty, formatDate, shortenAddress } from '../utils/format'
 
@@ -88,37 +87,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
             </Link>
           </div>
         </div>
-
-        {question.ipfsHash && (
-          <div
-            style={{
-              marginTop: '1.5rem',
-              paddingTop: '1rem',
-              borderTop: '1px solid var(--border-glass)',
-              fontSize: '0.75rem',
-              color: 'var(--text-muted)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-          >
-            <span>
-              Content CID:{' '}
-              <code style={{ color: 'var(--accent-cyan)' }}>
-                {question.ipfsHash.substring(0, 10)}...
-              </code>
-            </span>
-            <a
-              href={getIPFSUrl(question.ipfsHash)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="gradient-text"
-              style={{ fontWeight: 600, textDecoration: 'none' }}
-            >
-              View on IPFS ↗
-            </a>
-          </div>
-        )}
       </div>
     </div>
   )

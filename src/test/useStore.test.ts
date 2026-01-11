@@ -1,13 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useStore } from '../store/useStore'
 
-// Mock the IPFS service to avoid network/latency in store tests
-vi.mock('../services/ipfs', () => ({
-  uploadToIPFS: vi.fn().mockResolvedValue('QmTest123'),
-  searchIPFSIndexer: vi.fn().mockResolvedValue(['QmTest123']),
-  getIPFSUrl: vi.fn().mockReturnValue('https://ipfs.io/ipfs/QmTest123')
-}))
-
 // Mock global fetch
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
@@ -53,7 +46,7 @@ describe('Zustand Store', () => {
         return Promise.resolve({
           ok: true,
           status: 201,
-          json: () => Promise.resolve({ id: 123, ipfsHash: 'QmTest123' })
+          json: () => Promise.resolve({ id: 123 })
         })
       }
       return Promise.resolve({ ok: true, json: () => Promise.resolve({}) })
@@ -109,8 +102,7 @@ describe('Zustand Store', () => {
                 author: 'tester',
                 votes: 0,
                 bounty: '1 ETH',
-                timestamp: 'now',
-                ipfsHash: 'QmTest123'
+                timestamp: 'now'
               }
             ])
         })
@@ -118,7 +110,7 @@ describe('Zustand Store', () => {
       return Promise.resolve({
         ok: true,
         status: 201,
-        json: () => Promise.resolve({ id: 123, ipfsHash: 'QmTest123' })
+        json: () => Promise.resolve({ id: 123 })
       })
     })
 
@@ -134,7 +126,6 @@ describe('Zustand Store', () => {
     const state = useStore.getState()
     expect(state.questions.length).toBe(1)
     expect(state.questions[0].title).toBe('Test Title')
-    expect(state.questions[0].ipfsHash).toBe('QmTest123')
     expect(state.isUploading).toBe(false)
   })
 
@@ -167,7 +158,7 @@ describe('Zustand Store', () => {
   it('should execute search and update results', async () => {
     const { executeSearch } = useStore.getState()
 
-    // Setup state with a question matching the mock hash
+    // Setup state
     useStore.setState({
       questions: [
         {
@@ -178,15 +169,21 @@ describe('Zustand Store', () => {
           author: 'me',
           votes: 0,
           answers: 0,
-          timestamp: 'now',
-          ipfsHash: 'QmTest123'
+          timestamp: 'now'
         }
       ]
+    })
+
+    // Mock search API response
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve([{ id: 1 }])
     })
 
     await executeSearch('query')
 
     expect(useStore.getState().searchResults).toEqual([1])
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/search?q=query'))
   })
 
   it('should seed large data', async () => {
@@ -222,7 +219,7 @@ describe('Zustand Store', () => {
         return Promise.resolve({
           status: 201,
           ok: true,
-          json: () => Promise.resolve({ id: 123, ipfsHash: 'QmTest' })
+          json: () => Promise.resolve({ id: 123 })
         })
       }
       return Promise.resolve({ ok: true, json: () => Promise.resolve([]) })

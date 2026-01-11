@@ -212,23 +212,22 @@ router.get('/search', async (req: Request, res: Response) => {
 // POST /questions (Paid)
 router.post('/questions', async (req: Request, res: Response) => {
   try {
-    const { title, content, tags, author, bounty, ipfsHash } = req.body
+    const { title, content, tags, author, bounty } = req.body
     const db = getDB()
 
     const result = await db.run(
       `
-            INSERT INTO questions (title, content, tags, author, bounty, ipfsHash)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO questions (title, content, tags, author, bounty)
+            VALUES (?, ?, ?, ?, ?)
         `,
-      [title, content, tags, author, bounty, ipfsHash]
+      [title, content, tags, author, bounty]
     )
 
     logger.info({ msg: 'Question created', id: result.lastID, author, bounty })
 
     res.status(201).json({
       id: result.lastID,
-      message: 'Question created successfully',
-      ipfsHash
+      message: 'Question created successfully'
     })
   } catch (error) {
     logger.error({ error, msg: 'CREATE_QUESTION_ERROR', body: req.body })
@@ -242,22 +241,19 @@ router.post('/answers', async (req: Request, res: Response) => {
     const { questionId, content, author } = req.body
     const db = getDB()
 
-    const ipfsHash = 'QmServerAnswerHash' + Date.now()
-
     const result = await db.run(
       `
-            INSERT INTO answers (question_id, content, author, ipfsHash)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO answers (question_id, content, author)
+            VALUES (?, ?, ?)
         `,
-      [questionId, content, author, ipfsHash]
+      [questionId, content, author]
     )
 
     logger.info({ msg: 'Answer posted', id: result.lastID, questionId, author })
 
     res.status(201).json({
       id: result.lastID,
-      message: 'Answer posted successfully',
-      ipfsHash
+      message: 'Answer posted successfully'
     })
   } catch (error) {
     logger.error({ error, msg: 'CREATE_ANSWER_ERROR', body: req.body })
@@ -293,15 +289,14 @@ router.post('/answers/:id/accept', async (req: Request, res: Response) => {
     await db.run(`UPDATE answers SET is_accepted = TRUE WHERE id = ?`, [id])
 
     // 3. Trigger smart contract payout
-    // Use ipfsHash as the questionId in the contract (Postgres might return it as ipfshash)
-    const questionIpfsHash = question.ipfsHash || (question as any).ipfshash
+    // Use question.id as the questionId in the contract
+    const contractQuestionId = question.id.toString()
     let txHash = null
     try {
-      txHash = await releaseBounty(questionIpfsHash, answer.author)
+      txHash = await releaseBounty(contractQuestionId, answer.author)
       logger.info({
         msg: 'Bounty released',
         questionId: question.id,
-        ipfsHash: questionIpfsHash,
         winner: answer.author,
         txHash
       })

@@ -177,7 +177,6 @@ describe('Server API', () => {
 
       expect(res.status).toBe(201)
       expect(res.body.id).toBeDefined()
-      expect(res.body.ipfsHash).toBeDefined()
     })
   })
 

@@ -19,8 +19,7 @@ describe('QuestionCard', () => {
     author: 'tester.eth',
     votes: 10,
     answers: 2,
-    timestamp: '1h ago',
-    ipfsHash: 'QmHash123'
+    timestamp: '1h ago'
   }
 
   beforeEach(() => {

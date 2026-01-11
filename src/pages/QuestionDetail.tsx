@@ -4,7 +4,6 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useStore } from '../store/useStore'
 import Sidebar from '../components/Sidebar'
-import { getIPFSUrl } from '../services/ipfs'
 import { formatBounty, formatDate, shortenAddress } from '../utils/format'
 
 const QuestionDetail: React.FC = () => {
@@ -144,28 +143,6 @@ const QuestionDetail: React.FC = () => {
                   </span>
                 ))}
               </div>
-
-              {question.ipfsHash && (
-                <div
-                  style={{
-                    marginTop: '1.5rem',
-                    paddingTop: '1rem',
-                    borderTop: '1px solid var(--border-glass)',
-                    fontSize: '0.8rem',
-                    color: 'var(--text-muted)'
-                  }}
-                >
-                  IPFS CID:{' '}
-                  <a
-                    href={getIPFSUrl(question.ipfsHash)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-text-link"
-                  >
-                    {question.ipfsHash}
-                  </a>
-                </div>
-              )}
             </div>
           </div>
         </div>

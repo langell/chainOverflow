@@ -168,7 +168,6 @@ class MockDatabase implements IDatabase {
         tags: '',
         author: '',
         bounty: '0',
-        ipfsHash: 'mock-ipfs',
         votes: 0,
         timestamp: new Date().toISOString(),
         answers: []
@@ -188,7 +187,7 @@ class MockDatabase implements IDatabase {
         newQ.tags = params[2] || ''
         newQ.author = params[3] || ''
         newQ.bounty = params[4] || '0'
-        newQ.ipfsHash = params[5] || 'mock-ipfs'
+        newQ.bounty = params[4] || '0'
       }
 
       this.questions.push(newQ)
@@ -204,7 +203,6 @@ class MockDatabase implements IDatabase {
         question_id: 0,
         content: '',
         author: '',
-        ipfsHash: 'mock-ipfs',
         votes: 0,
         is_accepted: false,
         timestamp: new Date().toISOString()
@@ -218,7 +216,8 @@ class MockDatabase implements IDatabase {
         newA.question_id = params[0]
         newA.content = params[1]
         newA.author = params[2]
-        newA.ipfsHash = params[3] || 'mock-ipfs'
+        newA.content = params[1]
+        newA.author = params[2]
       }
 
       this.answers.push(newA)
@@ -274,7 +273,6 @@ export const initDB = async () => {
         content TEXT NOT NULL,
         tags TEXT,
         author TEXT,
-        ipfsHash TEXT,
         bounty TEXT,
         votes INTEGER DEFAULT 0,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -285,7 +283,6 @@ export const initDB = async () => {
         question_id INTEGER REFERENCES questions(id),
         content TEXT NOT NULL,
         author TEXT,
-        ipfsHash TEXT,
         votes INTEGER DEFAULT 0,
         is_accepted BOOLEAN DEFAULT FALSE,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -330,29 +327,27 @@ export const seedDB = async (force: boolean = false) => {
     console.log('Seeding database started...')
 
     const q1 = await client.query(
-      `INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      `INSERT INTO questions (title, content, tags, author, bounty) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
       [
         'How to implement L402 in Express?',
         'I am trying to add payment-required headers to my API. Any examples?',
         'l402,express,bitcoin',
         '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-        '100000000000000',
-        'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco'
+        '100000000000000'
       ]
     )
     console.log('Seed: Inserted Q1, ID:', q1.rows[0].id)
 
     const q2 = await client.query(
-      `INSERT INTO questions (title, content, tags, author, bounty, ipfsHash) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      `INSERT INTO questions (title, content, tags, author, bounty) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
       [
         'Vercel Postgres vs SQLite for serverless?',
         'Why does SQLite crash on Vercel but work locally?',
         'vercel,postgres,sqlite',
         '0x4db2460Bdec9A87EE212001A848D080C0B080808',
-        '50000000000000',
-        'QmYwAPJzvT97TjRAnz8MhC5Mhy15TJJFFG3oXW4G4yXkKA'
+        '50000000000000'
       ]
     )
     console.log('Seed: Inserted Q2, ID:', q2.rows[0].id)
