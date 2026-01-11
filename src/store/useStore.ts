@@ -34,7 +34,6 @@ interface AppState {
     bounty: string
     content: string
   }) => Promise<void>
-  voteQuestion: (id: number, delta: number) => void
   connectWallet: () => Promise<void>
   disconnectWallet: () => void
   seedLargeData: (count: number) => Promise<void>
@@ -238,14 +237,6 @@ export const useStore = create<AppState>()(
           logger.error({ error, msg: 'Search failed', query })
           set({ isSearching: false })
         }
-      },
-
-      voteQuestion: (id, delta) => {
-        const { questions } = get()
-        const updatedQuestions = questions.map((q) =>
-          q.id === id ? { ...q, votes: q.votes + delta } : q
-        )
-        set({ questions: updatedQuestions })
       },
 
       addQuestion: async (data) => {

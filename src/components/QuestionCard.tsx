@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { Question } from '../types'
-import { useStore } from '../store/useStore'
 import { formatBounty, formatDate, shortenAddress } from '../utils/format'
 
 interface QuestionCardProps {
@@ -12,21 +11,10 @@ interface QuestionCardProps {
 
 const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
   const [isExpanded, setIsExpanded] = useState(false)
-  const voteQuestion = useStore((state) => state.voteQuestion)
   const navigate = useNavigate()
 
   return (
     <div className="card question-card flex-container">
-      <div className="vote-controls">
-        <button className="btn-vote" onClick={() => voteQuestion(question.id, 1)}>
-          ▲
-        </button>
-        <span className="vote-count">{question.votes}</span>
-        <button className="btn-vote" onClick={() => voteQuestion(question.id, -1)}>
-          ▼
-        </button>
-      </div>
-
       <div className="question-content-wrapper">
         <div
           className="question-meta"

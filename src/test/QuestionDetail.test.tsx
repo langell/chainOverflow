@@ -17,7 +17,6 @@ vi.mock('../components/Sidebar', () => ({
 describe('QuestionDetail Page', () => {
   const mockFetchQuestion = vi.fn()
   const mockAddAnswer = vi.fn()
-  const mockVoteQuestion = vi.fn()
   const mockVoteAnswer = vi.fn()
 
   beforeEach(() => {
@@ -43,7 +42,6 @@ describe('QuestionDetail Page', () => {
         fetchQuestion: mockFetchQuestion,
         isUploading: false,
         account: null,
-        voteQuestion: mockVoteQuestion,
         voteAnswer: mockVoteAnswer,
         addAnswer: mockAddAnswer
       })
@@ -85,7 +83,6 @@ describe('QuestionDetail Page', () => {
         fetchQuestion: mockFetchQuestion,
         isUploading: false,
         account: '0xabc',
-        voteQuestion: mockVoteQuestion,
         voteAnswer: mockVoteAnswer,
         addAnswer: mockAddAnswer
       })
