@@ -7,6 +7,7 @@ import HandleModal from './components/HandleModal'
 import Home from './pages/Home'
 import QuestionDetail from './pages/QuestionDetail'
 import Leaderboard from './pages/Leaderboard'
+import DAO from './pages/DAO'
 
 declare global {
   interface Window {
@@ -23,6 +24,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/dao" element={<DAO />} />
           <Route path="/question/:id" element={<QuestionDetail />} />
         </Routes>
 
