@@ -40,7 +40,7 @@ export const triggerAIAnswers = async (questionId: number, title: string, conten
       return
     }
 
-    logger.debug({ msg: `Firing AI request`, ai: ai.name, questionId })
+    logger.info({ msg: `Firing AI request`, ai: ai.name, questionId })
     try {
       await getAIAnswer(ai, questionId, title, content)
     } catch (err) {
@@ -86,6 +86,9 @@ async function getAIAnswer(
 }
 
 async function callChatGPT(apiKey: string, title: string, content: string): Promise<string | null> {
+  const prompt = `Question: ${title}\n\nDescription: ${content}`
+  logger.info({ msg: 'ChatGPT Request', model: 'gpt-4o-mini', prompt })
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -103,7 +106,7 @@ async function callChatGPT(apiKey: string, title: string, content: string): Prom
           },
           {
             role: 'user',
-            content: `Question: ${title}\n\nDescription: ${content}`
+            content: prompt
           }
         ],
         max_tokens: 1000
@@ -111,8 +114,11 @@ async function callChatGPT(apiKey: string, title: string, content: string): Prom
     })
 
     const data = await response.json()
+    logger.info({ msg: 'ChatGPT Response', status: response.status, data })
+
     if (!response.ok) {
       console.error('ChatGPT API Error Response:', JSON.stringify(data))
+      return null
     }
     return data.choices?.[0]?.message?.content || null
   } catch (error) {
@@ -123,6 +129,9 @@ async function callChatGPT(apiKey: string, title: string, content: string): Prom
 }
 
 async function callClaude(apiKey: string, title: string, content: string): Promise<string | null> {
+  const prompt = `You are a technical expert on ChainOverflow. Please answer this question concisely and accurately using Markdown.\n\nQuestion: ${title}\n\nDescription: ${content}`
+  logger.info({ msg: 'Claude Request', model: 'claude-3-haiku-20240307', prompt })
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -137,15 +146,18 @@ async function callClaude(apiKey: string, title: string, content: string): Promi
         messages: [
           {
             role: 'user',
-            content: `You are a technical expert on ChainOverflow. Please answer this question concisely and accurately using Markdown.\n\nQuestion: ${title}\n\nDescription: ${content}`
+            content: prompt
           }
         ]
       })
     })
 
     const data = await response.json()
+    logger.info({ msg: 'Claude Response', status: response.status, data })
+
     if (!response.ok) {
       console.error('Claude API Error Response:', JSON.stringify(data))
+      return null
     }
     return data.content?.[0]?.text || null
   } catch (error) {
@@ -156,6 +168,9 @@ async function callClaude(apiKey: string, title: string, content: string): Promi
 }
 
 async function callGemini(apiKey: string, title: string, content: string): Promise<string | null> {
+  const prompt = `You are a technical expert on ChainOverflow. Please answer this question concisely and accurately using Markdown.\n\nQuestion: ${title}\n\nDescription: ${content}`
+  logger.info({ msg: 'Gemini Request', model: 'gemini-2.0-flash', prompt })
+
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`
     const response = await fetch(url, {
@@ -168,7 +183,7 @@ async function callGemini(apiKey: string, title: string, content: string): Promi
           {
             parts: [
               {
-                text: `You are a technical expert on ChainOverflow. Please answer this question concisely and accurately using Markdown.\n\nQuestion: ${title}\n\nDescription: ${content}`
+                text: prompt
               }
             ]
           }
@@ -180,8 +195,11 @@ async function callGemini(apiKey: string, title: string, content: string): Promi
     })
 
     const data = await response.json()
+    logger.info({ msg: 'Gemini Response', status: response.status, data })
+
     if (!response.ok) {
       console.error('Gemini API Error Response:', JSON.stringify(data))
+      return null
     }
     return data.candidates?.[0]?.content?.parts?.[0]?.text || null
   } catch (error) {
@@ -191,6 +209,9 @@ async function callGemini(apiKey: string, title: string, content: string): Promi
   }
 }
 async function callXAI(apiKey: string, title: string, content: string): Promise<string | null> {
+  const prompt = `Question: ${title}\n\nDescription: ${content}`
+  logger.info({ msg: 'xAI Request', model: 'grok-beta', prompt })
+
   try {
     const response = await fetch('https://api.x.ai/v1/chat/completions', {
       method: 'POST',
@@ -208,7 +229,7 @@ async function callXAI(apiKey: string, title: string, content: string): Promise<
           },
           {
             role: 'user',
-            content: `Question: ${title}\n\nDescription: ${content}`
+            content: prompt
           }
         ],
         max_tokens: 1000
@@ -216,8 +237,11 @@ async function callXAI(apiKey: string, title: string, content: string): Promise<
     })
 
     const data = await response.json()
+    logger.info({ msg: 'xAI Response', status: response.status, data })
+
     if (!response.ok) {
       console.error('xAI API Error Response:', JSON.stringify(data))
+      return null
     }
     return data.choices?.[0]?.message?.content || null
   } catch (error) {
