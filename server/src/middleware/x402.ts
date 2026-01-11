@@ -18,9 +18,17 @@ export const x402Middleware = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     // Only protect write operations
     const protectedPaths = ['/api/questions']
-    if (!protectedPaths.includes(req.path)) {
+    if (!protectedPaths.includes(req.path) || req.method === 'OPTIONS') {
       return next()
     }
+
+    // Debug: Log the incoming bounty
+    logger.info({
+      path: req.path,
+      method: req.method,
+      bodyBounty: req.body?.bounty,
+      msg: 'x402: incoming request'
+    })
 
     const authHeader = req.headers['authorization']
     if (!authHeader) return requestPayment(req, res)
@@ -77,7 +85,8 @@ const requestPayment = (req: Request, res: Response) => {
   let bountyBigInt: bigint
   try {
     const bStr = bounty.split(' ')[0]
-    if (bStr.includes('.')) {
+    // If it has a dot OR is a small integer (likely ETH, not Wei)
+    if (bStr.includes('.') || (bStr.length < 10 && !isNaN(Number(bStr)))) {
       bountyBigInt = parseEther(bStr)
     } else {
       bountyBigInt = BigInt(bStr.replace(/[^0-9]/g, '') || '0')
@@ -88,6 +97,13 @@ const requestPayment = (req: Request, res: Response) => {
 
   const defaultBigInt = BigInt(DEFAULT_PRICE)
   const requiredAmount = (bountyBigInt > defaultBigInt ? bountyBigInt : defaultBigInt).toString()
+
+  logger.info({
+    msg: 'L402 Payment Calculated',
+    inputBounty: req.body?.bounty,
+    bountyBigInt: bountyBigInt.toString(),
+    requiredAmount
+  })
 
   res.set('WWW-Authenticate', `L402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
 
