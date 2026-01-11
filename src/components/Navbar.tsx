@@ -51,15 +51,17 @@ const Navbar: React.FC = () => {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-          <button
-            className="btn-secondary ask-btn"
-            onClick={() => {
-              setIsModalOpen(true)
-              setIsMobileMenuOpen(false)
-            }}
-          >
-            Ask Question
-          </button>
+          {account && (
+            <button
+              className="btn-secondary ask-btn"
+              onClick={() => {
+                setIsModalOpen(true)
+                setIsMobileMenuOpen(false)
+              }}
+            >
+              Ask Question
+            </button>
+          )}
 
           <div style={{ position: 'relative' }}>
             {account ? (
