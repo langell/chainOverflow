@@ -95,7 +95,7 @@ h3 {
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .nav-links a {
@@ -113,8 +113,8 @@ h3 {
 /* Search Box */
 .search-container {
   flex: 1;
-  max-width: 500px;
-  margin: 0 2rem;
+  max-width: 380px;
+  margin: 0 1.5rem;
 }
 
 .search-wrapper {
