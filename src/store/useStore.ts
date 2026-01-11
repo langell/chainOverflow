@@ -137,6 +137,7 @@ export const useStore = create<AppState>()(
             content: q.content,
             tags: typeof q.tags === 'string' ? q.tags.split(',').filter(Boolean) : q.tags || [],
             author: q.author,
+            handle: q.handle,
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
@@ -150,6 +151,7 @@ export const useStore = create<AppState>()(
               questionId: a.question_id,
               content: a.content,
               author: a.author,
+              handle: a.handle,
               votes: a.votes,
               timestamp: a.timestamp,
               isAccepted: Boolean(a.is_accepted)
@@ -178,6 +180,7 @@ export const useStore = create<AppState>()(
             content: q.content,
             tags: typeof q.tags === 'string' ? q.tags.split(',').filter(Boolean) : q.tags || [],
             author: q.author,
+            handle: q.handle,
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
@@ -190,6 +193,7 @@ export const useStore = create<AppState>()(
             questionId: a.question_id,
             content: a.content,
             author: a.author,
+            handle: a.handle,
             votes: a.votes,
             timestamp: a.timestamp,
             isAccepted: Boolean(a.is_accepted)

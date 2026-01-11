@@ -83,4 +83,29 @@ describe('QuestionCard', () => {
     fireEvent.click(upvoteBtn)
     expect(mockVoteQuestion).toHaveBeenCalledWith(1, 1)
   })
+
+  it('displays handle when available', () => {
+    const questionWithHandle = { ...mockQuestion, handle: 'cool_dev' }
+    render(
+      <MemoryRouter>
+        <QuestionCard question={questionWithHandle} />
+      </MemoryRouter>
+    )
+    expect(screen.getByText('By cool_dev')).toBeInTheDocument()
+  })
+
+  it('displays shortened address when handle is missing', () => {
+    const questionNoHandle = {
+      ...mockQuestion,
+      author: '0x1234567890abcdef1234567890abcdef12345678',
+      handle: undefined
+    }
+    render(
+      <MemoryRouter>
+        <QuestionCard question={questionNoHandle} />
+      </MemoryRouter>
+    )
+    // 0x1234...5678
+    expect(screen.getByText('By 0x1234...5678')).toBeInTheDocument()
+  })
 })
