@@ -32,7 +32,7 @@ describe('Navbar', () => {
         <Navbar />
       </MemoryRouter>
     )
-    expect(screen.getByText('Connect Wallet')).toBeInTheDocument()
+    expect(screen.getByText('Connect')).toBeInTheDocument()
   })
 
   it('renders correctly with account connected', () => {
@@ -117,7 +117,7 @@ describe('Navbar', () => {
         <Navbar />
       </MemoryRouter>
     )
-    fireEvent.click(screen.getByText('Connect Wallet'))
+    fireEvent.click(screen.getByText('Connect'))
     expect(mockConnectWallet).toHaveBeenCalled()
   })
 })
