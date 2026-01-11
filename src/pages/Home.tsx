@@ -60,6 +60,7 @@ const Home: React.FC = () => {
       const matchesLocal =
         q.title.toLowerCase().includes(query) ||
         q.author.toLowerCase().includes(query) ||
+        (q.handle && q.handle.toLowerCase().includes(query)) ||
         q.tags.some((tag) => tag.toLowerCase().includes(query))
       const matchesDeep = searchResults?.includes(q.id)
       return matchesLocal || matchesDeep

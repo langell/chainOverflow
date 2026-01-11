@@ -122,6 +122,27 @@ describe('Server API', () => {
       expect(res.body.length).toBeGreaterThan(0)
       expect(res.body[0].title).toBe('Test Search')
     })
+
+    it('should return results when searching by user handle', async () => {
+      const db = getDB()
+      // Insert user
+      await db.run('INSERT INTO users (address, handle) VALUES (?, ?)', [
+        '0xHandleSearcher',
+        'TargetHandle'
+      ])
+
+      // Insert question by that user
+      await db.run('INSERT INTO questions (title, content, author) VALUES (?, ?, ?)', [
+        'Question by Handle',
+        'Content',
+        '0xHandleSearcher'
+      ])
+
+      const res = await request(app).get('/api/search?q=TargetHandle')
+      expect(res.status).toBe(200)
+      expect(res.body.length).toBeGreaterThan(0)
+      expect(res.body[0].title).toBe('Question by Handle')
+    })
   })
 
   describe('POST /api/questions (Protected)', () => {

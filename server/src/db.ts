@@ -87,9 +87,20 @@ class MockDatabase implements IDatabase {
 
   async all(query: string, params: any[] = []) {
     const q = query.toLowerCase()
-    if (q.includes('where title like')) {
+    if (q.includes('left join users') || q.includes('where title like')) {
       const term = params[0].replace(/%/g, '').toLowerCase()
-      return this.questions.filter((item) => item.title.toLowerCase().includes(term))
+      return this.questions.filter((item) => {
+        const titleMatch = item.title.toLowerCase().includes(term)
+        const contentMatch = item.content.toLowerCase().includes(term)
+
+        // Simulate LEFT JOIN users
+        const user = this.users.find(
+          (u) => u.address.toLowerCase() === (item.author || '').toLowerCase()
+        )
+        const handleMatch = user && user.handle && user.handle.toLowerCase().includes(term)
+
+        return titleMatch || contentMatch || handleMatch
+      })
     }
 
     if (q.includes('select * from users')) {

@@ -193,14 +193,15 @@ router.get('/search', async (req: Request, res: Response) => {
     const db = getDB()
     const query = `%${q}%`
 
-    // Simple LIKE search
+    // Search title, content, or author handle
     const results = await db.all(
       `
-            SELECT * FROM questions 
-            WHERE title LIKE ? OR content LIKE ?
-            ORDER BY votes DESC
+            SELECT q.* FROM questions q
+            LEFT JOIN users u ON LOWER(q.author) = LOWER(u.address)
+            WHERE q.title LIKE ? OR q.content LIKE ? OR u.handle LIKE ?
+            ORDER BY q.votes DESC
         `,
-      [query, query]
+      [query, query, query]
     )
 
     res.json(results)
