@@ -426,7 +426,7 @@ export const useStore = create<AppState>()(
                   {
                     from: sender,
                     to: vaultAddress,
-                    value: parseBountyToWei(price).toString(16),
+                    value: '0x' + parseBountyToWei(price).toString(16),
                     data: callData
                   }
                 ]
@@ -440,7 +440,7 @@ export const useStore = create<AppState>()(
                   {
                     from: sender,
                     to: payTo,
-                    value: parseBountyToWei(price).toString(16)
+                    value: '0x' + parseBountyToWei(price).toString(16)
                   }
                 ]
               })

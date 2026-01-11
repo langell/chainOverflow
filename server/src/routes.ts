@@ -48,6 +48,18 @@ router.get('/debug-db', async (_req: Request, res: Response) => {
   }
 })
 
+// Debug AI configuration
+router.get('/debug-ai', async (_req: Request, res: Response) => {
+  res.json({
+    openai: !!process.env.OPENAI_API_KEY,
+    anthropic: !!process.env.ANTHROPIC_API_KEY,
+    google: !!process.env.GOOGLE_API_KEY,
+    xai: !!process.env.XAI_API_KEY,
+    env: process.env.NODE_ENV,
+    vercel: !!process.env.VERCEL
+  })
+})
+
 // Seed database
 router.get('/seed', async (req: Request, res: Response) => {
   try {
@@ -226,14 +238,12 @@ router.post('/questions', async (req: Request, res: Response) => {
 
     logger.info({ msg: 'Question created', id: result.lastID, author, bounty })
 
-    // Automatically trigger AI answers (async, do not await)
+    // Automatically trigger AI answers (Awaited for stability in serverless environments like Vercel)
     try {
       const { triggerAIAnswers } = await import('./services/llm.js')
-      triggerAIAnswers(result.lastID, title, content).catch((err) => {
-        logger.error({ err, msg: 'Initial AI answer trigger failed', questionId: result.lastID })
-      })
-    } catch (importErr) {
-      logger.error({ err: importErr, msg: 'Failed to import LLM service' })
+      await triggerAIAnswers(result.lastID, title, content)
+    } catch (triggerErr) {
+      logger.error({ err: triggerErr, msg: 'AI answer trigger failed', questionId: result.lastID })
     }
 
     res.status(201).json({
@@ -300,25 +310,23 @@ router.post('/answers/:id/accept', async (req: Request, res: Response) => {
     await db.run(`UPDATE answers SET is_accepted = TRUE WHERE id = ?`, [id])
 
     // 3. Trigger smart contract payout
-    // Use question.id as the questionId in the contract
-    const contractQuestionId = question.id.toString()
-    let txHash = null
+    // Release the bounty on-chain (using title as key to match how it was paid in useStore.ts)
     try {
-      txHash = await releaseBounty(contractQuestionId, answer.author)
+      const txHash = await releaseBounty(question.title, answer.author)
       logger.info({
         msg: 'Bounty released',
         questionId: question.id,
         winner: answer.author,
         txHash
       })
+      res.json({
+        message: 'Answer accepted and bounty release triggered',
+        txHash
+      })
     } catch (contractError) {
       logger.error({ err: contractError, msg: 'Failed to release bounty on-chain' })
+      res.status(500).json({ error: 'Failed to release bounty on-chain' })
     }
-
-    res.json({
-      message: 'Answer accepted and bounty release triggered',
-      txHash
-    })
   } catch (error) {
     logger.error({ error, msg: 'ACCEPT_ANSWER_ERROR', id: req.params.id })
     res.status(500).json({ error: 'Failed to accept answer' })

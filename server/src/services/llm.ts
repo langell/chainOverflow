@@ -4,7 +4,8 @@ import { logger } from '../utils/logger.js'
 const AI_CONFIG = [
   { name: 'ChatGPT', address: '0x0ChatGPT', envKey: 'OPENAI_API_KEY' },
   { name: 'Claude', address: '0x0Claude', envKey: 'ANTHROPIC_API_KEY' },
-  { name: 'Gemini', address: '0x0Gemini', envKey: 'GOOGLE_API_KEY' }
+  { name: 'Gemini', address: '0x0Gemini', envKey: 'GOOGLE_API_KEY' },
+  { name: 'xAI', address: '0x0xAI', envKey: 'XAI_API_KEY' }
 ]
 
 /**
@@ -32,20 +33,22 @@ const ensureAIUsers = async () => {
 export const triggerAIAnswers = async (questionId: number, title: string, content: string) => {
   await ensureAIUsers()
 
-  // We process each AI independently
-  for (const ai of AI_CONFIG) {
+  const tasks = AI_CONFIG.map(async (ai) => {
     const apiKey = process.env[ai.envKey]
     if (!apiKey) {
       logger.info({ msg: `Skipping AI answer: ${ai.name} key missing` })
-      continue
+      return
     }
 
-    // Fire and forget individual AI requests
     logger.debug({ msg: `Firing AI request`, ai: ai.name, questionId })
-    getAIAnswer(ai, questionId, title, content).catch((err) => {
+    try {
+      await getAIAnswer(ai, questionId, title, content)
+    } catch (err) {
       logger.error({ err, msg: `AI process failed for ${ai.name}`, questionId })
-    })
-  }
+    }
+  })
+
+  return Promise.all(tasks)
 }
 
 async function getAIAnswer(
@@ -64,6 +67,8 @@ async function getAIAnswer(
       answer = await callClaude(process.env[ai.envKey]!, title, content)
     } else if (ai.name === 'Gemini') {
       answer = await callGemini(process.env[ai.envKey]!, title, content)
+    } else if (ai.name === 'xAI') {
+      answer = await callXAI(process.env[ai.envKey]!, title, content)
     }
 
     if (answer) {
@@ -182,6 +187,42 @@ async function callGemini(apiKey: string, title: string, content: string): Promi
   } catch (error) {
     console.error('Gemini Fetch Error:', error)
     logger.error({ error, msg: 'Gemini API Error' })
+    return null
+  }
+}
+async function callXAI(apiKey: string, title: string, content: string): Promise<string | null> {
+  try {
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'grok-beta',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a helpful expert developer on ChainOverflow, a decentralized Q&A platform. Provide a technical, accurate, and concise answer to the following question. Use Markdown.'
+          },
+          {
+            role: 'user',
+            content: `Question: ${title}\n\nDescription: ${content}`
+          }
+        ],
+        max_tokens: 1000
+      })
+    })
+
+    const data = await response.json()
+    if (!response.ok) {
+      console.error('xAI API Error Response:', JSON.stringify(data))
+    }
+    return data.choices?.[0]?.message?.content || null
+  } catch (error) {
+    console.error('xAI Fetch Error:', error)
+    logger.error({ error, msg: 'xAI API Error' })
     return null
   }
 }
