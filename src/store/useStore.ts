@@ -14,6 +14,7 @@ interface AppState {
   questions: Question[]
   answers: Answer[] // New: Store answers
   account: string | null
+  handle: string | null
   isModalOpen: boolean
   isUploading: boolean
   searchQuery: string
@@ -39,6 +40,10 @@ interface AppState {
   disconnectWallet: () => void
   seedLargeData: (count: number) => Promise<void>
 
+  // User Actions
+  fetchUser: (address: string) => Promise<void>
+  updateUser: (handle: string) => Promise<void>
+
   // Answer Actions
   addAnswer: (questionId: number, content: string) => Promise<void>
   voteAnswer: (id: number, delta: number) => void
@@ -56,12 +61,62 @@ export const useStore = create<AppState>()(
       questions: [],
       answers: [],
       account: null,
+      handle: null,
       isModalOpen: false,
       isUploading: false,
       searchQuery: '',
       isSearching: false,
       searchResults: null,
       isLoading: false,
+
+      // ... (fetchFeed implementation remains same, skipping for space) ...
+      // If you are implementing a large block, include the existing surrounding code if needed or just splice carefully
+      // But here we need to insert the new methods below seedLargeData or similar location
+      // Let's implement fetchUser and updateUser first, then update connectWallet/disconnectWallet in separate chunks or same if contiguous
+
+      // Let's do it all in one replace block for the initial state initialization first
+
+      fetchUser: async (address: string) => {
+        try {
+          const res = await fetch(`${API_BASE}/users/${address}`)
+          if (res.ok) {
+            const user = await res.json()
+            set({ handle: user.handle })
+          } else {
+            set({ handle: null })
+          }
+        } catch {
+          // User might not exist yet, which is fine
+          logger.info({ msg: 'User handle not found', address })
+          set({ handle: null })
+        }
+      },
+
+      updateUser: async (handle: string) => {
+        const { account } = get()
+        if (!account) return
+
+        try {
+          const res = await fetch(`${API_BASE}/users`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: account, handle })
+          })
+
+          if (!res.ok) {
+            const err = await res.json()
+            throw new Error(err.error || 'Failed to update handle')
+          }
+
+          set({ handle })
+          logger.info({ msg: 'User handle updated', handle })
+        } catch (error) {
+          logger.error({ error, msg: 'Update user failed' })
+          throw error
+        }
+      },
+
+      // ... existing fetchFeed ...
 
       fetchFeed: async (sort?: string) => {
         set({ isLoading: true })
@@ -431,6 +486,7 @@ export const useStore = create<AppState>()(
           try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
             set({ account: accounts[0] })
+            await get().fetchUser(accounts[0])
             logger.info({ msg: 'Wallet connected', account: accounts[0] })
           } catch (error) {
             logger.error({ error, msg: 'User denied account access' })
@@ -441,7 +497,7 @@ export const useStore = create<AppState>()(
       },
 
       disconnectWallet: () => {
-        set({ account: null })
+        set({ account: null, handle: null })
         logger.info({ msg: 'Wallet disconnected' })
       },
 

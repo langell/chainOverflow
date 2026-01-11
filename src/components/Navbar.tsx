@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Wallet, LogOut, ChevronDown, User } from 'lucide-react'
 import { useStore } from '../store/useStore'
@@ -6,14 +6,42 @@ import { shortenAddress } from '../utils/format'
 
 const Navbar: React.FC = () => {
   const account = useStore((state) => state.account)
+  const handle = useStore((state) => state.handle)
   const connectWallet = useStore((state) => state.connectWallet)
   const disconnectWallet = useStore((state) => state.disconnectWallet)
   const setIsModalOpen = useStore((state) => state.setIsModalOpen)
+  const updateUser = useStore((state) => state.updateUser)
   const searchQuery = useStore((state) => state.searchQuery)
   const setSearchQuery = useStore((state) => state.setSearchQuery)
   const isSearching = useStore((state) => state.isSearching)
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  // Prompt for handle if new user
+  useEffect(() => {
+    if (account && handle === null) {
+      // Simple prompt for now - could be a modal
+      // Check if we just connected (simple check: if we have account but no handle logic ran)
+      // However, fetchUser runs on connect. If it returns null, handle is null.
+      // So we should prompt.
+      // Use a small timeout to ensure fetchUser completed? No, fetchUser is awaited in connectWallet.
+
+      // Use a customized confirm/prompt interactions to not be annoying on every reload?
+      // We can check if we already asked in session storage or just ask once.
+      const hasAsked = sessionStorage.getItem(`asked_handle_${account}`)
+      if (!hasAsked) {
+        setTimeout(() => {
+          const newHandle = window.prompt(
+            'Welcome! Please enter a username/handle for the leaderboard:'
+          )
+          if (newHandle) {
+            updateUser(newHandle).catch((err) => alert(err.message))
+          }
+          sessionStorage.setItem(`asked_handle_${account}`, 'true')
+        }, 500)
+      }
+    }
+  }, [account, handle, updateUser])
 
   return (
     <nav className="navbar">
@@ -71,7 +99,9 @@ const Navbar: React.FC = () => {
               >
                 <User size={14} color="white" />
               </div>
-              <span style={{ fontSize: '0.9rem' }}>{shortenAddress(account)}</span>
+              <span style={{ fontSize: '0.9rem' }}>
+                {handle ? handle : shortenAddress(account)}
+              </span>
               <ChevronDown size={14} style={{ opacity: 0.7 }} />
             </button>
           ) : (

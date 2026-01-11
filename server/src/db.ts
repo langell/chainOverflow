@@ -79,6 +79,7 @@ class PostgresWrapper implements IDatabase {
 class MockDatabase implements IDatabase {
   private questions: any[] = []
   private answers: any[] = []
+  private users: any[] = []
   private lastId = 0
 
   async all(query: string, params: any[] = []) {
@@ -86,6 +87,10 @@ class MockDatabase implements IDatabase {
     if (q.includes('where title like')) {
       const term = params[0].replace(/%/g, '').toLowerCase()
       return this.questions.filter((item) => item.title.toLowerCase().includes(term))
+    }
+
+    if (q.includes('select * from users')) {
+      return this.users
     }
 
     if (q.includes('from questions')) {
@@ -127,6 +132,9 @@ class MockDatabase implements IDatabase {
       const id = typeof params[0] === 'string' ? parseInt(params[0]) : params[0]
       return this.answers.find((a) => a.id == id) || null
     }
+    if (q.includes('from users where address = ?')) {
+      return this.users.find((u) => u.address.toLowerCase() === params[0].toLowerCase()) || null
+    }
     return this.questions[0] || null
   }
 
@@ -140,6 +148,11 @@ class MockDatabase implements IDatabase {
       this.answers = []
       return {}
     }
+    if (q.includes('delete from users')) {
+      this.users = []
+      return {}
+    }
+
     if (q.includes('insert into questions')) {
       this.lastId++
       const colsPart = q.match(/\((.*?)\)/)?.[1] || ''
@@ -208,6 +221,23 @@ class MockDatabase implements IDatabase {
       this.answers.push(newA)
       return { lastID: this.lastId }
     }
+
+    if (q.includes('insert into users')) {
+      // Very specific mock for: INSERT INTO users (address, handle) VALUES (?, ?)
+      // OR INSERT INTO users (address, handle) VALUES (?, ?) ON CONFLICT ...
+      const address = params[0]
+      const handle = params[1]
+
+      // Upsert simulation
+      const existingIndex = this.users.findIndex((u) => u.address === address)
+      if (existingIndex >= 0) {
+        this.users[existingIndex].handle = handle
+      } else {
+        this.users.push({ address, handle, created_at: new Date().toISOString() })
+      }
+      return {}
+    }
+
     if (q.includes('update answers set is_accepted = true')) {
       const id = typeof params[0] === 'string' ? parseInt(params[0]) : params[0]
       const answer = this.answers.find((a) => a.id == id)
@@ -263,6 +293,12 @@ export const initDB = async () => {
         amount INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         is_paid BOOLEAN DEFAULT FALSE
+      );
+
+      CREATE TABLE IF NOT EXISTS users (
+        address TEXT PRIMARY KEY,
+        handle TEXT UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `)
   } catch (err) {

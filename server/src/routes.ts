@@ -300,6 +300,14 @@ router.get('/leaderboard', async (_req: Request, res: Response) => {
     // In production with real SQL, a JOIN would be more efficient, but this ensures test compatibility
     const allAnswers = await db.all('SELECT * FROM answers')
     const allQuestions = await db.all('SELECT * FROM questions')
+    const allUsers = await db.all('SELECT * FROM users')
+
+    const userHandleMap = new Map<string, string>()
+    allUsers.forEach((u) => {
+      if (u.address && u.handle) {
+        userHandleMap.set(u.address.toLowerCase(), u.handle)
+      }
+    })
 
     const questionBounties = new Map<number, string>()
     allQuestions.forEach((q) => {
@@ -314,12 +322,12 @@ router.get('/leaderboard', async (_req: Request, res: Response) => {
 
       if (!isAccepted) continue
 
-      const author = a.author
-      if (!stats[author]) {
-        stats[author] = { accepted: 0, earned: 0n }
+      const address = a.author
+      if (!stats[address]) {
+        stats[address] = { accepted: 0, earned: 0n }
       }
 
-      stats[author].accepted += 1
+      stats[address].accepted += 1
 
       const bountyStr = questionBounties.get(a.question_id)
       if (bountyStr) {
@@ -327,7 +335,7 @@ router.get('/leaderboard', async (_req: Request, res: Response) => {
           const cleanBounty = bountyStr.toString().split(' ')[0]
           // Simple heuristic: if it contains '.', it's likely ETH, otherwise Wei
           const val = cleanBounty.includes('.') ? 0n : BigInt(cleanBounty)
-          stats[author].earned += val
+          stats[address].earned += val
         } catch (_e) {
           // ignore parsing error
         }
@@ -335,16 +343,19 @@ router.get('/leaderboard', async (_req: Request, res: Response) => {
     }
 
     // Convert to arrays and sort
-    const allUsers = Object.entries(stats).map(([author, data]) => ({
-      author,
-      accepted: data.accepted,
-      earned: data.earned.toString() // return as string for JSON
-    }))
+    const allUsersStats = Object.entries(stats).map(([address, data]) => {
+      const handle = userHandleMap.get(address.toLowerCase())
+      return {
+        author: handle || address, // Use handle if available, else address
+        accepted: data.accepted,
+        earned: data.earned.toString()
+      }
+    })
 
-    const topSolvers = [...allUsers].sort((a, b) => b.accepted - a.accepted).slice(0, 10)
+    const topSolvers = [...allUsersStats].sort((a, b) => b.accepted - a.accepted).slice(0, 10)
 
     // Sort by earned amount (BigInt comparison)
-    const topEarners = [...allUsers]
+    const topEarners = [...allUsersStats]
       .sort((a, b) => {
         const valA = BigInt(a.earned)
         const valB = BigInt(b.earned)
@@ -373,6 +384,66 @@ router.post('/rewards', async (req: Request, res: Response) => {
   } catch (error) {
     logger.error({ error, msg: 'REWARD_PAYOUT_ERROR', body: req.body })
     res.status(500).json({ error: 'Failed to payout reward' })
+  }
+})
+
+// GET /users/:address
+router.get('/users/:address', async (req: Request, res: Response) => {
+  try {
+    const { address } = req.params
+    const db = getDB()
+    const user = await db.get('SELECT * FROM users WHERE address = ?', [address])
+
+    if (!user) return res.status(404).json({ error: 'User not found' })
+    res.json(user)
+  } catch (error) {
+    logger.error({ error, msg: 'GET_USER_ERROR' })
+    res.status(500).json({ error: 'Failed to fetch user' })
+  }
+})
+
+// POST /users
+router.post('/users', async (req: Request, res: Response) => {
+  try {
+    const { address, handle } = req.body
+
+    if (!address || !handle) {
+      return res.status(400).json({ error: 'Address and handle are required' })
+    }
+
+    const db = getDB()
+
+    // Simple upsert by deleting first (mock/sqlite friendly for this setup)
+    // In production postgres, we'd use ON CONFLICT DO UPDATE
+    // But since we have a mock DB that is simplistic, let's keep it robust for both
+    // However, our MockDB handles 'INSERT INTO users' with upsert logic
+
+    // For real DB (postgres), let's use standard INSERT ON CONFLICT
+    let query = `
+      INSERT INTO users (address, handle) 
+      VALUES (?, ?)
+      ON CONFLICT (address) DO UPDATE SET handle = EXCLUDED.handle
+    `
+
+    // Adjust for basic SQLite (no ON CONFLICT in standard INSERT syntax used by some simple drivers unless explicitly supported,
+    // but Vercel Postgres supports it).
+    // BUT our MockDatabase 'run' handles "INSERT INTO users" with specific upsert logic for testing.
+
+    try {
+      await db.run(query, [address, handle])
+    } catch (err: any) {
+      // If it's a unique constraint violation on HANDLE (different address has this handle)
+      if (err.message && err.message.includes('unique')) {
+        return res.status(409).json({ error: 'Handle already taken' })
+      }
+      // Fallback for mocked environment if needed, or rethrow
+      throw err
+    }
+
+    res.json({ message: 'User updated', address, handle })
+  } catch (error) {
+    logger.error({ error, msg: 'UPDATE_USER_ERROR' })
+    res.status(500).json({ error: 'Failed to update user' })
   }
 })
 
