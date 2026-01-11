@@ -340,4 +340,25 @@ describe('Server API', () => {
       expect(topEarners[1].earned).toBe('50')
     })
   })
+
+  describe('POST /users', () => {
+    it('should create new user', async () => {
+      const res = await request(app)
+        .post('/api/users')
+        .send({ address: '0xNewUser', handle: 'Newb' })
+      expect(res.status).toBe(200)
+    })
+
+    it('should reject duplicate handle', async () => {
+      const db = getDB()
+      await db.run('INSERT INTO users (address, handle) VALUES (?, ?)', ['0xFirst', 'UniqueHandle'])
+
+      const res = await request(app)
+        .post('/api/users')
+        .send({ address: '0xSecond', handle: 'UniqueHandle' })
+
+      expect(res.status).toBe(409)
+      expect(res.body.error).toContain('Handle already taken')
+    })
+  })
 })
