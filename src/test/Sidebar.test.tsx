@@ -73,4 +73,48 @@ describe('Sidebar', () => {
     render(<Sidebar />)
     expect(screen.getByText('No active bounties')).toBeDefined()
   })
+
+  it('hides questions that have been solved', () => {
+    useStore.setState({
+      questions: [
+        {
+          id: 10,
+          title: 'Solved Question',
+          content: '...',
+          tags: [],
+          author: 'u1',
+          votes: 0,
+          answers: 1,
+          bounty: '1', // 1 Wei
+          timestamp: new Date().toISOString()
+        },
+        {
+          id: 11,
+          title: 'Unsolved Question',
+          content: '...',
+          tags: [],
+          author: 'u2',
+          votes: 0,
+          answers: 0,
+          bounty: '1',
+          timestamp: new Date().toISOString()
+        }
+      ],
+      answers: [
+        {
+          id: 101,
+          questionId: 10,
+          content: 'Answer',
+          author: 'u3',
+          votes: 5,
+          timestamp: new Date().toISOString(),
+          isAccepted: true
+        }
+      ]
+    })
+
+    render(<Sidebar />)
+    expect(screen.queryByText('Solved Question')).toBeNull()
+    expect(screen.getByText('Unsolved Question')).toBeDefined()
+  })
 })

@@ -17,6 +17,7 @@
     "kill-ports": "lsof -ti:3001,8545,5173 | xargs kill -9 || true",
     "predev:all": "npm run kill-ports",
     "dev:all": "npx concurrently -k -p \"[{name}]\" -n \"chain,server,web\" -c \"magenta,cyan,green\" \"npm run dev:node\" \"npm run dev:server\" \"npm run dev\"",
+    "debug:all": "npx concurrently -k -p \"[{name}]\" -n \"chain,server,web\" -c \"magenta,cyan,green\" \"npm run dev:node\" \"npm --prefix server run debug\" \"npm run dev\"",
     "db:seed": "npm --prefix server run seed",
     "setup": "npm install && npm --prefix server install",
     "compile": "hardhat compile",
@@ -63,7 +64,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "typescript": "~5.9.3",
-    "vite": "^7.2.4",
+    "vite": "^5.4.21",
     "vitest": "^4.0.16",
     "vitest-browser-react": "^2.0.2"
   },

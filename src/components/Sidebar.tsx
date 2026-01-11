@@ -4,12 +4,17 @@ import { formatBounty, formatDate, parseBountyToWei } from '../utils/format'
 
 const Sidebar: React.FC = () => {
   const questions = useStore((state) => state.questions)
+  const answers = useStore((state) => state.answers)
 
-  // Filter questions with bounties, sort by bounty descending, and take top 5
+  // Filter questions with bounties, sort by bounty descending, exclude solved ones, and take top 5
   const hotBounties = [...questions]
     .filter((q) => {
       if (!q.bounty) return false
-      return parseBountyToWei(q.bounty) > 0n
+      if (parseBountyToWei(q.bounty) <= 0n) return false
+
+      // Check if question is already solved
+      const isSolved = answers.some((a) => a.questionId === q.id && a.isAccepted)
+      return !isSolved
     })
     .sort((a, b) => {
       const bountyA = parseBountyToWei(a.bounty)

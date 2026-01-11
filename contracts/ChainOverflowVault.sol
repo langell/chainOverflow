@@ -4,6 +4,7 @@ pragma solidity ^0.8.22;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "hardhat/console.sol";
 
 /**
  * @title ChainOverflowVault
@@ -34,12 +35,14 @@ contract ChainOverflowVault is Initializable, UUPSUpgradeable, OwnableUpgradeabl
         __Ownable_init(msg.sender);
         __UUPSUpgradeable_init();
         protocolFee = 100000000000000; // 0.0001 ETH default
+        console.log("Vault initialized with owner:", msg.sender);
     }
 
     /**
      * @dev Process a payment for asking a question and setting a bounty.
      */
     function payForQuestion(string memory questionId) external payable {
+        console.log("payForQuestion called. ID:", questionId, "Value:", msg.value);
         require(msg.value > 0, "Payment must be greater than 0");
         require(bounties[questionId].asker == address(0), "Question ID already exists");
 
@@ -56,6 +59,7 @@ contract ChainOverflowVault is Initializable, UUPSUpgradeable, OwnableUpgradeabl
      * @dev Simple payment for other services (e.g., posting an answer fee).
      */
     function payFee(string memory resourceId) external payable {
+        console.log("payFee called checking fee:", protocolFee);
         require(msg.value >= protocolFee, "Insufficient fee");
         emit PaymentReceived(msg.sender, resourceId, msg.value);
     }
@@ -68,6 +72,12 @@ contract ChainOverflowVault is Initializable, UUPSUpgradeable, OwnableUpgradeabl
         Bounty storage bounty = bounties[questionId];
         require(bounty.amount > 0, "No bounty found");
         require(!bounty.released, "Bounty already released");
+        
+        console.log("releaseBounty called by:", msg.sender);
+        console.log("Authorized asker:", bounty.asker);
+        console.log("Authorized owner:", owner());
+        console.log("Winner to be paid:", winner);
+
         require(msg.sender == owner() || msg.sender == bounty.asker, "Not authorized");
 
         bounty.released = true;
