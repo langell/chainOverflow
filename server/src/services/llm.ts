@@ -70,18 +70,26 @@ async function getAIAnswer(
     } else if (ai.name === 'xAI') {
       answer = await callXAI(process.env[ai.envKey]!, title, content)
     }
-
-    if (answer) {
-      const db = getDB()
-      await db.run('INSERT INTO answers (question_id, content, author) VALUES (?, ?, ?)', [
-        questionId,
-        answer,
-        ai.address.toLowerCase()
-      ])
-      logger.info({ msg: `AI Answer posted`, ai: ai.name, questionId })
-    }
   } catch (error) {
     logger.error({ error, msg: `API call failed for ${ai.name}`, questionId })
+  }
+
+  // Fallback if API failed, timed out, or hit quota limits
+  if (!answer) {
+    answer = `Default Answer for ${ai.name}`
+    logger.info({ msg: `Using fallback answer for ${ai.name}`, ai: ai.name, questionId })
+  }
+
+  try {
+    const db = getDB()
+    await db.run('INSERT INTO answers (question_id, content, author) VALUES (?, ?, ?)', [
+      questionId,
+      answer,
+      ai.address.toLowerCase()
+    ])
+    logger.info({ msg: `AI Answer posted`, ai: ai.name, questionId })
+  } catch (error) {
+    logger.error({ error, msg: `Failed to save AI answer to database for ${ai.name}`, questionId })
   }
 }
 
