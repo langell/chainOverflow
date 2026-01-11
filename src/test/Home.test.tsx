@@ -122,4 +122,49 @@ describe('Home Page', () => {
     expect(screen.getByText('Match')).toBeInTheDocument()
     expect(screen.queryByText('Other')).not.toBeInTheDocument()
   })
+
+  it('filters questions by bounties', () => {
+    ;(useStore as any).mockImplementation((selector: any) =>
+      selector({
+        questions: [
+          {
+            id: 1,
+            title: 'Paid Question',
+            content: '...',
+            tags: [],
+            author: 'A1',
+            votes: 0,
+            answers: 0,
+            bounty: '1', // 1 Wei
+            timestamp: 'now'
+          },
+          {
+            id: 2,
+            title: 'Free Question',
+            content: '...',
+            tags: [],
+            author: 'A1',
+            votes: 0,
+            answers: 0,
+            bounty: '0',
+            timestamp: 'now'
+          }
+        ],
+        isLoading: false,
+        fetchFeed: mockFetchFeed,
+        searchQuery: '',
+        searchResults: null
+      })
+    )
+
+    render(
+      <MemoryRouter initialEntries={['/?filter=bounties']}>
+        <Home />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('Bounty Hunts')).toBeInTheDocument()
+    expect(screen.getByText('Paid Question')).toBeInTheDocument()
+    expect(screen.queryByText('Free Question')).not.toBeInTheDocument()
+  })
 })

@@ -36,9 +36,9 @@ const Navbar: React.FC = () => {
         </div>
       </div>
       <div className="nav-links">
-        <a href="#">Explore</a>
-        <a href="#">Bounties</a>
-        <a href="#">DAO</a>
+        <Link to="/leaderboard">Leaderboard</Link>
+        <Link to="/?filter=bounties">Bounties</Link>
+        <Link to="/dao">DAO</Link>
       </div>
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <button className="btn-secondary" onClick={() => setIsModalOpen(true)}>

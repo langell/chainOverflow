@@ -261,4 +261,63 @@ describe('Server API', () => {
       expect(res.status).toBe(400)
     })
   })
+
+  describe('GET /api/leaderboard', () => {
+    it('should return correct stats for solvers and earners', async () => {
+      const db = getDB()
+      await db.run('DELETE FROM questions')
+      await db.run('DELETE FROM answers')
+
+      // 1. Setup Questions with Bounties
+      // MockDB doesn't support multi-row insert parsing well, so we do one by one
+      await db.run(
+        `INSERT INTO questions (id, title, content, author, bounty) VALUES (?, ?, ?, ?, ?)`,
+        [1, 'Q1', 'C', 'Asker', '100']
+      )
+      await db.run(
+        `INSERT INTO questions (id, title, content, author, bounty) VALUES (?, ?, ?, ?, ?)`,
+        [2, 'Q2', 'C', 'Asker', '200']
+      )
+      await db.run(
+        `INSERT INTO questions (id, title, content, author, bounty) VALUES (?, ?, ?, ?, ?)`,
+        [3, 'Q3', 'C', 'Asker', '50']
+      )
+
+      // 2. Setup Answers (Accepted)
+      await db.run(
+        `INSERT INTO answers (question_id, content, author, is_accepted) VALUES (?, ?, ?, ?)`,
+        [1, 'Ans1', 'UserA', 1]
+      )
+      await db.run(
+        `INSERT INTO answers (question_id, content, author, is_accepted) VALUES (?, ?, ?, ?)`,
+        [2, 'Ans2', 'UserA', 1]
+      )
+      await db.run(
+        `INSERT INTO answers (question_id, content, author, is_accepted) VALUES (?, ?, ?, ?)`,
+        [3, 'Ans3', 'UserB', 1]
+      )
+      await db.run(
+        `INSERT INTO answers (question_id, content, author, is_accepted) VALUES (?, ?, ?, ?)`,
+        [1, 'Ans4', 'UserC', 0]
+      )
+
+      const res = await request(app).get('/api/leaderboard')
+
+      expect(res.status).toBe(200)
+
+      const { topSolvers, topEarners } = res.body
+
+      // Validation Solvers
+      expect(topSolvers[0].author).toBe('UserA')
+      expect(topSolvers[0].accepted).toBe(2)
+      expect(topSolvers[1].author).toBe('UserB')
+      expect(topSolvers[1].accepted).toBe(1)
+
+      // Validation Earners
+      expect(topEarners[0].author).toBe('UserA')
+      expect(topEarners[0].earned).toBe('300')
+      expect(topEarners[1].author).toBe('UserB')
+      expect(topEarners[1].earned).toBe('50')
+    })
+  })
 })

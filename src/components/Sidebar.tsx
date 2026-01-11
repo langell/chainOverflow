@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { formatBounty, formatDate, parseBountyToWei } from '../utils/format'
 
@@ -26,7 +27,11 @@ const Sidebar: React.FC = () => {
   return (
     <aside className="sidebar">
       <div className="card" style={{ marginBottom: '2rem' }}>
-        <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>🔥 Hot Bounties</h3>
+        <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>
+          <Link to="/?filter=bounties" style={{ textDecoration: 'none', color: 'inherit' }}>
+            🔥 Hot Bounties
+          </Link>
+        </h3>
         <div id="bounties-list">
           {hotBounties.length === 0 ? (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No active bounties</p>

@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import QuestionModal from './components/QuestionModal'
 import Home from './pages/Home'
 import QuestionDetail from './pages/QuestionDetail'
+import Leaderboard from './pages/Leaderboard'
 
 declare global {
   interface Window {
@@ -20,6 +21,7 @@ const App: React.FC = () => {
 
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/question/:id" element={<QuestionDetail />} />
         </Routes>
 

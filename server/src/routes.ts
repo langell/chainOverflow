@@ -291,6 +291,74 @@ router.post('/answers/:id/accept', async (req: Request, res: Response) => {
   }
 })
 
+// GET /leaderboard
+router.get('/leaderboard', async (_req: Request, res: Response) => {
+  try {
+    const db = getDB()
+
+    // Fetch all answers and questions to support MockDatabase which lacks JOIN
+    // In production with real SQL, a JOIN would be more efficient, but this ensures test compatibility
+    const allAnswers = await db.all('SELECT * FROM answers')
+    const allQuestions = await db.all('SELECT * FROM questions')
+
+    const questionBounties = new Map<number, string>()
+    allQuestions.forEach((q) => {
+      questionBounties.set(q.id, q.bounty)
+    })
+
+    const stats: Record<string, { accepted: number; earned: bigint }> = {}
+
+    for (const a of allAnswers) {
+      // Handle varying formats of truthiness (Mock uses boolean, some SQL uses 1/0)
+      const isAccepted = a.is_accepted === 1 || a.is_accepted === true || a.is_accepted === 'true'
+
+      if (!isAccepted) continue
+
+      const author = a.author
+      if (!stats[author]) {
+        stats[author] = { accepted: 0, earned: 0n }
+      }
+
+      stats[author].accepted += 1
+
+      const bountyStr = questionBounties.get(a.question_id)
+      if (bountyStr) {
+        try {
+          const cleanBounty = bountyStr.toString().split(' ')[0]
+          // Simple heuristic: if it contains '.', it's likely ETH, otherwise Wei
+          const val = cleanBounty.includes('.') ? 0n : BigInt(cleanBounty)
+          stats[author].earned += val
+        } catch (_e) {
+          // ignore parsing error
+        }
+      }
+    }
+
+    // Convert to arrays and sort
+    const allUsers = Object.entries(stats).map(([author, data]) => ({
+      author,
+      accepted: data.accepted,
+      earned: data.earned.toString() // return as string for JSON
+    }))
+
+    const topSolvers = [...allUsers].sort((a, b) => b.accepted - a.accepted).slice(0, 10)
+
+    // Sort by earned amount (BigInt comparison)
+    const topEarners = [...allUsers]
+      .sort((a, b) => {
+        const valA = BigInt(a.earned)
+        const valB = BigInt(b.earned)
+        return valA < valB ? 1 : valA > valB ? -1 : 0
+      })
+      .slice(0, 10)
+
+    res.json({ topSolvers, topEarners })
+  } catch (error) {
+    logger.error({ error, msg: 'LEADERBOARD_ERROR' })
+    res.status(500).json({ error: 'Failed to fetch leaderboard' })
+  }
+})
+
 // POST /rewards (Manual Payout)
 // TODO: Protect this with admin middleware in production
 router.post('/rewards', async (req: Request, res: Response) => {

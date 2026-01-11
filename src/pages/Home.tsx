@@ -1,12 +1,23 @@
+import { useSearchParams, Link } from 'react-router-dom'
 import React, { useMemo, useEffect } from 'react'
 import { useStore } from '../store/useStore'
 import Hero from '../components/Hero'
 import QuestionCard from '../components/QuestionCard'
 import Sidebar from '../components/Sidebar'
 import pkg from '../../package.json'
+import { parseBountyToWei } from '../utils/format'
 
 const Home: React.FC = () => {
-  const [currentSort, setCurrentSort] = React.useState('newest')
+  const [searchParams] = useSearchParams()
+  const filterParam = searchParams.get('filter') || 'newest'
+
+  const [currentSort, setCurrentSort] = React.useState(filterParam)
+
+  // Sync URL param changes to local state
+  useEffect(() => {
+    setCurrentSort(searchParams.get('filter') || 'newest')
+  }, [searchParams])
+
   const questions = useStore((state) => state.questions)
   const searchQuery = useStore((state) => state.searchQuery)
   const isSearching = useStore((state) => state.isSearching)
@@ -14,16 +25,38 @@ const Home: React.FC = () => {
   const isLoading = useStore((state) => state.isLoading)
   const fetchFeed = useStore((state) => state.fetchFeed)
 
+  // Determine what to fetch from backend based on sort
+  // Note: 'bounties' filter might need specific backend handling or frontend filtering
   useEffect(() => {
-    fetchFeed(currentSort)
+    // If it's a standard sort the backend understands, send it.
+    // Otherwise fetch 'active' or 'newest' and filter client side.
+    if (['newest', 'active', 'unanswered'].includes(currentSort)) {
+      fetchFeed(currentSort)
+    } else {
+      fetchFeed() // Default fetch for client-side filtering (like 'bounties')
+    }
   }, [fetchFeed, currentSort])
 
   const filteredQuestions = useMemo(() => {
-    if (!searchQuery) return questions
+    let result = questions
+
+    // Apply specific client-side filters
+    if (currentSort === 'bounties') {
+      result = result
+        .filter((q) => q.bounty && parseBountyToWei(q.bounty) > 0n)
+        // Sort bounties highest to lowest
+        .sort((a, b) => {
+          const ba = parseBountyToWei(a.bounty)
+          const bb = parseBountyToWei(b.bounty)
+          return bb > ba ? 1 : bb < ba ? -1 : 0
+        })
+    }
+
+    if (!searchQuery) return result
 
     const query = searchQuery.toLowerCase()
 
-    return questions.filter((q) => {
+    return result.filter((q) => {
       const matchesLocal =
         q.title.toLowerCase().includes(query) ||
         q.author.toLowerCase().includes(query) ||
@@ -31,12 +64,7 @@ const Home: React.FC = () => {
       const matchesDeep = searchResults?.includes(q.id)
       return matchesLocal || matchesDeep
     })
-  }, [questions, searchQuery, searchResults])
-
-  const handleSortChange = (e: React.MouseEvent, sort: string) => {
-    e.preventDefault()
-    setCurrentSort(sort)
-  }
+  }, [questions, searchQuery, searchResults, currentSort])
 
   return (
     <>
@@ -59,7 +87,9 @@ const Home: React.FC = () => {
                     ? 'Top Questions'
                     : currentSort === 'active'
                       ? 'Active Activity'
-                      : 'Unanswered Questions'}
+                      : currentSort === 'bounties'
+                        ? 'Bounty Hunts'
+                        : 'Unanswered Questions'}
               </h2>
               {isSearching && (
                 <span
@@ -76,27 +106,30 @@ const Home: React.FC = () => {
               )}
             </div>
             <div className="nav-links" style={{ fontSize: '0.8rem' }}>
-              <a
-                href="#"
-                onClick={(e) => handleSortChange(e, 'newest')}
+              <Link
+                to="/?filter=newest"
                 style={{ color: currentSort === 'newest' ? 'var(--text-main)' : 'inherit' }}
               >
                 Newest
-              </a>
-              <a
-                href="#"
-                onClick={(e) => handleSortChange(e, 'active')}
+              </Link>
+              <Link
+                to="/?filter=active"
                 style={{ color: currentSort === 'active' ? 'var(--text-main)' : 'inherit' }}
               >
                 Active
-              </a>
-              <a
-                href="#"
-                onClick={(e) => handleSortChange(e, 'unanswered')}
+              </Link>
+              <Link
+                to="/?filter=unanswered"
                 style={{ color: currentSort === 'unanswered' ? 'var(--text-main)' : 'inherit' }}
               >
                 Unanswered
-              </a>
+              </Link>
+              <Link
+                to="/?filter=bounties"
+                style={{ color: currentSort === 'bounties' ? 'var(--text-main)' : 'inherit' }}
+              >
+                Bounties
+              </Link>
             </div>
           </div>
 

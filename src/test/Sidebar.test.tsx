@@ -1,3 +1,4 @@
+import { MemoryRouter } from 'react-router-dom'
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import Sidebar from '../components/Sidebar'
@@ -46,7 +47,11 @@ describe('Sidebar', () => {
   })
 
   it('renders without crashing even with malformed bounty data', () => {
-    render(<Sidebar />)
+    render(
+      <MemoryRouter>
+        <Sidebar />
+      </MemoryRouter>
+    )
     expect(screen.getByText('🔥 Hot Bounties')).toBeDefined()
     // Should show the clean bounty
     expect(screen.getByText('Clean Bounty')).toBeDefined()
@@ -70,7 +75,11 @@ describe('Sidebar', () => {
         }
       ]
     })
-    render(<Sidebar />)
+    render(
+      <MemoryRouter>
+        <Sidebar />
+      </MemoryRouter>
+    )
     expect(screen.getByText('No active bounties')).toBeDefined()
   })
 
@@ -113,7 +122,11 @@ describe('Sidebar', () => {
       ]
     })
 
-    render(<Sidebar />)
+    render(
+      <MemoryRouter>
+        <Sidebar />
+      </MemoryRouter>
+    )
     expect(screen.queryByText('Solved Question')).toBeNull()
     expect(screen.getByText('Unsolved Question')).toBeDefined()
   })
