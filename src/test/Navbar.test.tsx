@@ -11,6 +11,7 @@ vi.mock('../store/useStore', () => ({
 
 describe('Navbar', () => {
   const mockConnectWallet = vi.fn()
+  const mockDisconnectWallet = vi.fn()
   const mockSetIsModalOpen = vi.fn()
 
   beforeEach(() => {
@@ -40,6 +41,7 @@ describe('Navbar', () => {
       selector({
         account: account,
         connectWallet: mockConnectWallet,
+        disconnectWallet: mockDisconnectWallet,
         setIsModalOpen: mockSetIsModalOpen
       })
     )
@@ -50,6 +52,37 @@ describe('Navbar', () => {
       </MemoryRouter>
     )
     expect(screen.getByText('0x1234...7890')).toBeInTheDocument()
+  })
+
+  it('opens dropdown and calls disconnectWallet', () => {
+    const account = '0x1234567890123456789012345678901234567890'
+    ;(useStore as any).mockImplementation((selector: any) =>
+      selector({
+        account: account,
+        connectWallet: mockConnectWallet,
+        disconnectWallet: mockDisconnectWallet,
+        setIsModalOpen: mockSetIsModalOpen
+      })
+    )
+
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    )
+
+    // Dropdown should be closed initially
+    expect(screen.queryByText('Disconnect Wallet')).toBeNull()
+
+    // Click the address button to open dropdown
+    fireEvent.click(screen.getByText('0x1234...7890'))
+
+    // Now Disconnect option should be visible
+    expect(screen.getByText('Disconnect Wallet')).toBeInTheDocument()
+
+    // Click disconnect
+    fireEvent.click(screen.getByText('Disconnect Wallet'))
+    expect(mockDisconnectWallet).toHaveBeenCalled()
   })
 
   it('calls setIsModalOpen when button is clicked', () => {

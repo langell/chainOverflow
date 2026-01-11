@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Search, Wallet, LogOut, ChevronDown, User } from 'lucide-react'
 import { useStore } from '../store/useStore'
+import { shortenAddress } from '../utils/format'
 
 const Navbar: React.FC = () => {
   const account = useStore((state) => state.account)
   const connectWallet = useStore((state) => state.connectWallet)
+  const disconnectWallet = useStore((state) => state.disconnectWallet)
   const setIsModalOpen = useStore((state) => state.setIsModalOpen)
   const searchQuery = useStore((state) => state.searchQuery)
   const setSearchQuery = useStore((state) => state.setSearchQuery)
   const isSearching = useStore((state) => state.isSearching)
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   return (
     <nav className="navbar">
@@ -18,7 +23,7 @@ const Navbar: React.FC = () => {
       <div className="search-container">
         <div className="search-wrapper">
           <span className="search-icon" style={{ opacity: isSearching ? 1 : 0.5 }}>
-            {isSearching ? '⏳' : '🔍'}
+            {isSearching ? '⏳' : <Search size={18} />}
           </span>
           <input
             type="text"
@@ -39,32 +44,122 @@ const Navbar: React.FC = () => {
         <button className="btn-secondary" onClick={() => setIsModalOpen(true)}>
           Ask Question
         </button>
-        {account ? (
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
+
+        <div style={{ position: 'relative' }}>
+          {account ? (
             <button
               className="btn-primary"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               style={{
-                background: 'rgba(139, 92, 246, 0.2)',
-                border: '1px solid var(--accent-violet)',
-                cursor: 'default'
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                paddingRight: '0.75rem',
+                background: isDropdownOpen ? 'rgba(139, 92, 246, 0.3)' : undefined
               }}
             >
-              {`${account.substring(0, 6)}...${account.substring(account.length - 4)}`}
+              <div
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-violet))',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <User size={14} color="white" />
+              </div>
+              <span style={{ fontSize: '0.9rem' }}>{shortenAddress(account)}</span>
+              <ChevronDown size={14} style={{ opacity: 0.7 }} />
             </button>
+          ) : (
             <button
-              className="btn-secondary"
-              onClick={() => useStore.getState().disconnectWallet()}
-              title="Disconnect Wallet"
-              style={{ padding: '0.75rem' }}
+              className="btn-primary"
+              onClick={connectWallet}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
-              Logout
+              <Wallet size={16} />
+              <span>Connect Wallet</span>
             </button>
-          </div>
-        ) : (
-          <button className="btn-primary" onClick={connectWallet}>
-            Connect Wallet
-          </button>
-        )}
+          )}
+
+          {/* Dropdown Menu */}
+          {isDropdownOpen && account && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 0.5rem)',
+                right: 0,
+                width: '220px',
+                background: 'rgba(23, 23, 30, 0.95)',
+                border: '1px solid var(--border-glass)',
+                borderRadius: '12px',
+                padding: '0.5rem',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                zIndex: 1000,
+                animation: 'fadeIn 0.2s ease-out'
+              }}
+            >
+              <div
+                style={{
+                  padding: '0.75rem',
+                  borderBottom: '1px solid var(--border-glass)',
+                  marginBottom: '0.5rem'
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: '0.75rem',
+                    color: 'var(--text-muted)',
+                    marginBottom: '0.25rem'
+                  }}
+                >
+                  Connected as
+                </div>
+                <div style={{ color: 'var(--accent-cyan)', fontWeight: 600, fontSize: '0.9rem' }}>
+                  {shortenAddress(account)}
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  disconnectWallet()
+                  setIsDropdownOpen(false)
+                }}
+                className="dropdown-item"
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-primary)',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 50, 50, 0.1)'
+                  e.currentTarget.style.color = '#ff4444'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.color = 'var(--text-primary)'
+                }}
+              >
+                <LogOut size={16} />
+                Disconnect Wallet
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   )
