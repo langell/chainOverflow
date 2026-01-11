@@ -423,6 +423,7 @@ router.post('/users', async (req: Request, res: Response) => {
       INSERT INTO users (address, handle) 
       VALUES (?, ?)
       ON CONFLICT (address) DO UPDATE SET handle = EXCLUDED.handle
+      RETURNING address
     `
 
     // Adjust for basic SQLite (no ON CONFLICT in standard INSERT syntax used by some simple drivers unless explicitly supported,

@@ -37,7 +37,10 @@ class PostgresWrapper implements IDatabase {
 
   async run(query: string, params: any[] = []) {
     let pgQuery = this.toPostgres(query)
-    if (pgQuery.trim().toLowerCase().startsWith('insert')) {
+    if (
+      pgQuery.trim().toLowerCase().startsWith('insert') &&
+      !pgQuery.toLowerCase().includes('returning')
+    ) {
       pgQuery += ' RETURNING id'
     }
     const client = await pool.connect()

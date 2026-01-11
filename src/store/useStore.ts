@@ -82,7 +82,12 @@ export const useStore = create<AppState>()(
           if (res.ok) {
             const user = await res.json()
             set({ handle: user.handle })
+          } else if (res.status === 404) {
+            // User just hasn't set a handle yet
+            set({ handle: null })
           } else {
+            // Real error
+            console.error('Failed to fetch user:', res.status)
             set({ handle: null })
           }
         } catch {
@@ -485,8 +490,8 @@ export const useStore = create<AppState>()(
         if (typeof window.ethereum !== 'undefined') {
           try {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-            set({ account: accounts[0] })
             await get().fetchUser(accounts[0])
+            set({ account: accounts[0] })
             logger.info({ msg: 'Wallet connected', account: accounts[0] })
           } catch (error) {
             logger.error({ error, msg: 'User denied account access' })
@@ -587,7 +592,8 @@ export const useStore = create<AppState>()(
       name: 'chainoverflow-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        account: state.account
+        account: state.account,
+        handle: state.handle
       })
     }
   )
