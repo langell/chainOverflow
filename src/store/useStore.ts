@@ -139,7 +139,8 @@ export const useStore = create<AppState>()(
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
-            answers: q.answers ? q.answers.length : 0
+            answers: q.answers ? q.answers.length : 0,
+            isAccepted: q.answers ? q.answers.some((a: any) => Boolean(a.is_accepted)) : false
           }))
 
           const answers: Answer[] = data.flatMap((q: any) =>
@@ -181,7 +182,8 @@ export const useStore = create<AppState>()(
             votes: q.votes,
             bounty: q.bounty,
             timestamp: q.timestamp,
-            answers: q.answers ? q.answers.length : 0
+            answers: q.answers ? q.answers.length : 0,
+            isAccepted: q.answers ? q.answers.some((a: any) => Boolean(a.is_accepted)) : false
           }
 
           const questionAnswers: Answer[] = (q.answers || []).map((a: any) => ({

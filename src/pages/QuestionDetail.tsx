@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { CheckCircle } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useStore } from '../store/useStore'
@@ -105,6 +106,24 @@ const QuestionDetail: React.FC = () => {
                   By {question.handle ? question.handle : shortenAddress(question.author)}
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  {question.isAccepted && (
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        color: '#10b981',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        background: 'rgba(16, 185, 129, 0.1)',
+                        padding: '2px 8px',
+                        borderRadius: '12px'
+                      }}
+                    >
+                      <CheckCircle size={14} />
+                      Solved
+                    </span>
+                  )}
                   {question.bounty && (
                     <span className="bounty-badge">💎 {formatBounty(question.bounty)} ETH</span>
                   )}

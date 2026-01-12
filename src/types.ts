@@ -9,6 +9,7 @@ export interface Question {
   answers: number
   bounty?: string
   timestamp: string
+  isAccepted?: boolean
 }
 
 export interface Answer {
