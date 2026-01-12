@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import QuestionDetail from './pages/QuestionDetail'
 import Leaderboard from './pages/Leaderboard'
 import DAO from './pages/DAO'
+import FAQ from './pages/FAQ'
 
 declare global {
   interface Window {
@@ -25,6 +26,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/dao" element={<DAO />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/question/:id" element={<QuestionDetail />} />
         </Routes>
 
