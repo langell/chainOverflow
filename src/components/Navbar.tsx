@@ -48,6 +48,7 @@ const Navbar: React.FC = () => {
           <Link to="/leaderboard">Leaderboard</Link>
           <Link to="/?filter=bounties">Bounties</Link>
           <Link to="/dao">DAO</Link>
+          <Link to="/faq">FAQ</Link>
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
@@ -234,6 +235,14 @@ const Navbar: React.FC = () => {
             style={{ textAlign: 'center' }}
           >
             DAO
+          </Link>
+          <Link
+            to="/faq"
+            onClick={handleMobileLinkClick}
+            className="btn-secondary"
+            style={{ textAlign: 'center' }}
+          >
+            FAQ
           </Link>
         </div>
       </div>
