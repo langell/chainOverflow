@@ -1,21 +1,21 @@
 # ChainOverflow API Usage Guide
 
-This guide provides examples and instructions for interacting with the ChainOverflow Backend API, including the x402 (L402) monetization protocol.
+This guide provides examples and instructions for interacting with the ChainOverflow Backend API, including the x402 monetization protocol.
 
 ## Base URL
 
 Local Development: `http://localhost:3001/api`
 
-## Authentication (x402 / L402)
+## Authentication (x402)
 
-Authenticated endpoints require an **L402** header associated with a Lightning Network payment.
+Authenticated endpoints require an **x402** header associated with a Lightning Network payment.
 
 ### The Payment Flow
 
 1. **Request Resource**: Attempt to access a protected endpoint (e.g., `POST /questions`).
 2. **Receive Challenge (402)**: The server responds with `402 Payment Required` and a `WWW-Authenticate` header containing an invoice and a macaroon.
 3. **Pay Invoice**: Pay the Lightning invoice using a wallet or CLI tool.
-4. **Retry with Token**: Retry the request with the `Authorization` header set to `L402 <macaroon>:<preimage>`.
+4. **Retry with Token**: Retry the request with the `Authorization` header set to `x402 <macaroon>:<preimage>`.
 
 ---
 
@@ -47,7 +47,7 @@ curl "http://localhost:3001/api/search?q=solidity"
 
 ### 2. Create Question (Paid)
 
-Requires L402 payment authentication.
+Requires x402 payment authentication.
 
 **Step 1: Initial Request (Fails with 402)**
 
@@ -55,7 +55,7 @@ Requires L402 payment authentication.
 curl -i -X POST http://localhost:3001/api/questions \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "What is an L402?",
+    "title": "What is an x402?",
     "content": "Can someone explain the protocol?",
     "tags": "l402,bitcoin",
     "author": "dev_user"
@@ -66,7 +66,7 @@ curl -i -X POST http://localhost:3001/api/questions \
 
 ```http
 HTTP/1.1 402 Payment Required
-WWW-Authenticate: L402 macaroon="AgEDBMN...", invoice="lnbc100n..."
+WWW-Authenticate: x402 macaroon="AgEDBMN...", invoice="lnbc100n..."
 ```
 
 **Step 2: Pay & Retry**
@@ -75,9 +75,9 @@ Use the `macaroon` from the response and the `preimage` (proof of payment) from 
 ```bash
 curl -X POST http://localhost:3001/api/questions \
   -H "Content-Type: application/json" \
-  -H "Authorization: L402 AgEDBMN...:a1b2c3d4..." \
+  -H "Authorization: x402 AgEDBMN...:a1b2c3d4..." \
   -d '{
-    "title": "What is an L402?",
+    "title": "What is an x402?",
     "content": "Can someone explain the protocol?",
     "tags": "l402,bitcoin",
     "author": "dev_user"
@@ -103,10 +103,10 @@ Link an answer to a specific question ID.
 ```bash
 curl -X POST http://localhost:3001/api/answers \
   -H "Content-Type: application/json" \
-  -H "Authorization: L402 <macaroon>:<preimage>" \
+  -H "Authorization: x402 <macaroon>:<preimage>" \
   -d '{
     "questionId": 12,
-    "content": "L402 is a protocol for... ",
+    "content": "x402 is a protocol for... ",
     "author": "satoshi_v2"
   }'
 ```
@@ -127,6 +127,6 @@ In the current development environment, the payment validation is mocked.
 ```bash
 curl -X POST http://localhost:3001/api/questions \
   -H "Content-Type: application/json" \
-  -H "Authorization: L402 mock_macaroon_for_invoice_123:secret_preimage" \
+  -H "Authorization: x402 mock_macaroon_for_invoice_123:secret_preimage" \
   -d '{ ... }'
 ```

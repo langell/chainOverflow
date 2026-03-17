@@ -280,12 +280,12 @@ export const useStore = create<AppState>()(
 
         if (response.status === 402) {
           const data = await response.json()
-          logger.info({ data, msg: 'L402 ETH Payment Required' })
+          logger.info({ data, msg: 'x402 ETH Payment Required' })
 
           const { payTo, price, macaroon, vaultAddress, method } = data
 
           if (!window.ethereum) {
-            throw new Error('MetaMask required for ETH L402 payments')
+            throw new Error('MetaMask required for ETH x402 payments')
           }
 
           // 1. Prompt user for ETH payment
@@ -457,7 +457,7 @@ export const useStore = create<AppState>()(
               headers: {
                 ...options.headers,
                 'Content-Type': 'application/json',
-                Authorization: `L402 ${macaroon}:${txHash}`
+                Authorization: `x402 ${macaroon}:${txHash}`
               }
             })
           } catch (err) {

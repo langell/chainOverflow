@@ -6,7 +6,7 @@ dotenv.config()
 
 /**
  * Internal Wallet Service
- * This service manages the API's internal wallet used for L402 payments.
+ * This service manages the API's internal wallet used for x402 payments.
  */
 const getPrivateKey = () => {
   const key = process.env.INTERNAL_WALLET_PRIVATE_KEY

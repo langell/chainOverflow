@@ -2,7 +2,7 @@
 
 ## Objective
 
-Build a Node.js/Express API to handle Question/Answer creation, Indexing/Search, and monetize access using the x402 (L402) protocol.
+Build a Node.js/Express API to handle Question/Answer creation, Indexing/Search, and monetize access using the x402 protocol.
 
 ## Directory Structure
 
@@ -38,17 +38,17 @@ server/
 - `POST /answers`: Accepts JSON. Links to QuestionID. Uploads to IPFS. Stores in SQLite.
 - `GET /search`: Accepts `?q=query`. Performs FTS (Full Text Search) on SQLite `questions` and `answers` tables.
 
-### 3. x402 (L402) Payment Middleware
+### 3. x402 Payment Middleware
 
 - **Protocol**: HTTP 402 Payment Required.
 - **Workflow**:
   1. Client requests resource (e.g., `POST /questions`).
-  2. Middleware checks for `Authorization: L402 <credential>` header.
+  2. Middleware checks for `Authorization: x402 <credential>` header.
   3. **If missing**:
      - Generates a classic Lightning Invoice (mocked or via LnURL provider if configured).
      - Generates a "macaroon" (authentication token entrained with the invoice hash).
-     - Returns `402 Payment Required` header: `WWW-Authenticate: L402 macaroon="...", invoice="..."`.
-  4. **Client**: Pays invoice (out of band), gets "preimage". Constructs header `Authorization: L402 <macaroon>:<preimage>`. Retries request.
+     - Returns `402 Payment Required` header: `WWW-Authenticate: x402 macaroon="...", invoice="..."`.
+  4. **Client**: Pays invoice (out of band), gets "preimage". Constructs header `Authorization: x402 <macaroon>:<preimage>`. Retries request.
   5. **Middleware**: Verifies hash(preimage) matches invoice hash in macaroon. Allows request.
 
 ## Dependencies to Add (Server)

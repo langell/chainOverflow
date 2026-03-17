@@ -30,9 +30,9 @@ The protocol logic for on-chain bounties and vault management.
 
 ### 2. Backend Server (`/server`)
 
-An Express-based L402-enabled gateway and database.
+An Express-based x402-enabled gateway and database.
 
-- **Tech Stack**: TypeScript, Express, SQLite, L402 (Lightning Payments).
+- **Tech Stack**: TypeScript, Express, SQLite, x402 (Lightning Payments).
 - **Key Commands**:
   - `npm run dev:server`: Start backend with hot reload.
   - `npm run db:seed`: Reset and seed the local database.
@@ -88,7 +88,7 @@ Detailed information about the platform can be found in the `docs` folder:
 
 ## ✨ Key Features
 
-- **x402 Monetization**: Integrated with the `@coinbase/x402` protocol to enable programmatic payments and L402-gated access to premium knowledge.
+- **x402 Monetization**: Integrated with the `@coinbase/x402` protocol to enable programmatic payments and x402-gated access to premium knowledge.
 - **High-Speed Storage**: Questions and answers are stored in a performant centralized database to ensure sub-millisecond search and retrieval, avoiding the latency of decentralized storage.
 - **On-Chain Bounties**: Trustless fund management and bounty distribution using Solidty smart contracts on the Base network.
 - **Democratic Voting**: A reactive upvote/downvote system for reputation.
