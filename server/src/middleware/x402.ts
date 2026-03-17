@@ -116,7 +116,7 @@ const requestPayment = (req: Request, res: Response) => {
 
   return res.status(402).json({
     message: 'Payment Required (Smart Contract)',
-    detail: `This endpoint requires a contract call to ${methodName} on Base.`,
+    detail: 'This endpoint requires a micropayment (x402).',
     payTo: internalAddress,
     vaultAddress: getVaultAddress(),
     method: methodName,

@@ -8,13 +8,13 @@ Local Development: `http://localhost:3001/api`
 
 ## Authentication (x402)
 
-Authenticated endpoints require an **x402** header associated with a Lightning Network payment.
+Authenticated endpoints require an **x402** header for payment authentication.
 
 ### The Payment Flow
 
 1. **Request Resource**: Attempt to access a protected endpoint (e.g., `POST /questions`).
 2. **Receive Challenge (402)**: The server responds with `402 Payment Required` and a `WWW-Authenticate` header containing an invoice and a macaroon.
-3. **Pay Invoice**: Pay the Lightning invoice using a wallet or CLI tool.
+3. **Pay Invoice**: Pay the invoice using a compatible wallet or tool.
 4. **Retry with Token**: Retry the request with the `Authorization` header set to `x402 <macaroon>:<preimage>`.
 
 ---

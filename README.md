@@ -32,7 +32,7 @@ The protocol logic for on-chain bounties and vault management.
 
 An Express-based x402-enabled gateway and database.
 
-- **Tech Stack**: TypeScript, Express, SQLite, x402 (Lightning Payments).
+- **Tech Stack**: TypeScript, Express, SQLite, x402.
 - **Key Commands**:
   - `npm run dev:server`: Start backend with hot reload.
   - `npm run db:seed`: Reset and seed the local database.

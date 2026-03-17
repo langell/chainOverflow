@@ -45,7 +45,7 @@ server/
   1. Client requests resource (e.g., `POST /questions`).
   2. Middleware checks for `Authorization: x402 <credential>` header.
   3. **If missing**:
-     - Generates a classic Lightning Invoice (mocked or via LnURL provider if configured).
+     - Generates an invoice (mocked or via provider if configured).
      - Generates a "macaroon" (authentication token entrained with the invoice hash).
      - Returns `402 Payment Required` header: `WWW-Authenticate: x402 macaroon="...", invoice="..."`.
   4. **Client**: Pays invoice (out of band), gets "preimage". Constructs header `Authorization: x402 <macaroon>:<preimage>`. Retries request.
