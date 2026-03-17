@@ -169,7 +169,7 @@ describe('Zustand Store', () => {
     expect(useStore.getState().questions[0].title).toMatch(/scaling research paper/)
   })
 
-  it('should handle L402 payment retry logic', async () => {
+  it('should handle x402 payment retry logic', async () => {
     const { addQuestion, setAccount } = useStore.getState()
     setAccount('tester')
 
@@ -213,7 +213,7 @@ describe('Zustand Store', () => {
       expect.stringContaining('/api/questions'),
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: expect.stringContaining('L402 mock-mac:0xMockTxHash')
+          Authorization: expect.stringContaining('x402 mock-mac:0xMockTxHash')
         })
       })
     )

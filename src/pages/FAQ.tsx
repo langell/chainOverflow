@@ -135,10 +135,10 @@ const FAQ: React.FC = () => {
 
         <FAQItem
           icon={<Wallet size={24} />}
-          question="What is an L402 payment?"
+          question="What is an x402 payment?"
           answer={
             <p>
-              L402 is a standard for <strong>"Pay-to-Ask"</strong> or{' '}
+              x402 is a standard for <strong>"Pay-to-Ask"</strong> or{' '}
               <strong>"Pay-to-Access"</strong> APIs. In ChainOverflow, we use this to ensure that
               every question is backed by real value. When you submit a question, you provide a
               transaction hash as proof of payment. This filters out spam and funds the bounties

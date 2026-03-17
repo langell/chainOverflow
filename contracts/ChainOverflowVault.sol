@@ -8,7 +8,7 @@ import "hardhat/console.sol";
 
 /**
  * @title ChainOverflowVault
- * @dev A vault for managing L402 payments and question bounties for ChainOverflow.
+ * @dev A vault for managing x402 payments and question bounties for ChainOverflow.
  * This version is UUPS upgradeable.
  */
 contract ChainOverflowVault is Initializable, UUPSUpgradeable, OwnableUpgradeable {

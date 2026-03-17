@@ -164,7 +164,7 @@ describe('Server API', () => {
       expect(res.status).toBe(402)
     })
 
-    it('should return 402 if scheme is not L402', async () => {
+    it('should return 402 if scheme is not x402', async () => {
       const res = await request(app)
         .post('/api/questions')
         .set('Authorization', 'Bearer token')
@@ -176,7 +176,7 @@ describe('Server API', () => {
     it('should return 402 if payment proof is invalid', async () => {
       const res = await request(app)
         .post('/api/questions')
-        .set('Authorization', 'L402 token:short')
+        .set('Authorization', 'x402 token:short')
         .send({ title: 'New Q', content: 'test' })
 
       expect(res.status).toBe(402)
@@ -187,7 +187,7 @@ describe('Server API', () => {
       const validPreimage = 'valid_preimage_longer_than_5'
       const res = await request(app)
         .post('/api/questions')
-        .set('Authorization', `L402 token:${validPreimage}`)
+        .set('Authorization', `x402 token:${validPreimage}`)
         .send({
           title: 'AI Question',
           content: 'Will AI answer this?',
@@ -222,7 +222,7 @@ describe('Server API', () => {
       const validPreimage = 'valid_preimage'
       const res = await request(app)
         .post('/api/answers')
-        .set('Authorization', `L402 token:${validPreimage}`)
+        .set('Authorization', `x402 token:${validPreimage}`)
         .send({ questionId: 1, content: 'Paid Answer', author: 'Expert' })
 
       expect(res.status).toBe(201)

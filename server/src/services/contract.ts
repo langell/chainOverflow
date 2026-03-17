@@ -117,7 +117,7 @@ export async function payoutReward(winnerAddress: string, amountWei: string) {
 }
 
 /**
- * Verify an on-chain transaction for L402 payment
+ * Verify an on-chain transaction for x402 payment
  */
 export async function verifyPayment(txHash: string, expectedAmount: string) {
   try {

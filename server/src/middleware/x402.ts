@@ -11,7 +11,7 @@ const getVaultAddress = () => process.env.VAULT_ADDRESS || ''
 const DEFAULT_PRICE = '100000000000000'
 
 /**
- * L402 ETH/EVM Middleware
+ * x402 ETH/EVM Middleware
  * This protects write operations and requires payment proof.
  */
 export const x402Middleware = () => {
@@ -34,7 +34,7 @@ export const x402Middleware = () => {
     if (!authHeader) return requestPayment(req, res)
 
     const [scheme, credentials] = authHeader.split(' ')
-    if (scheme !== 'L402' || !credentials) return requestPayment(req, res)
+    if (scheme !== 'x402' || !credentials) return requestPayment(req, res)
 
     const [token, preimage] = credentials.split(':')
 
@@ -99,16 +99,16 @@ const requestPayment = (req: Request, res: Response) => {
   const requiredAmount = (bountyBigInt > defaultBigInt ? bountyBigInt : defaultBigInt).toString()
 
   logger.info({
-    msg: 'L402 Payment Calculated',
+    msg: 'x402 Payment Calculated',
     inputBounty: req.body?.bounty,
     bountyBigInt: bountyBigInt.toString(),
     requiredAmount
   })
 
-  res.set('WWW-Authenticate', `L402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
+  res.set('WWW-Authenticate', `x402 macaroon="${macaroon}", invoice="eth_payment_needed"`)
 
   logger.info({
-    msg: 'L402 Payment Requested',
+    msg: 'x402 Payment Requested',
     vault: getVaultAddress(),
     payTo: internalAddress,
     price: requiredAmount
@@ -116,7 +116,7 @@ const requestPayment = (req: Request, res: Response) => {
 
   return res.status(402).json({
     message: 'Payment Required (Smart Contract)',
-    detail: `This endpoint requires a contract call to ${methodName} on Base.`,
+    detail: 'This endpoint requires a micropayment (x402).',
     payTo: internalAddress,
     vaultAddress: getVaultAddress(),
     method: methodName,

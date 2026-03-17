@@ -351,7 +351,7 @@ export const seedDB = async (force: boolean = false) => {
       `INSERT INTO questions (title, content, tags, author, bounty) 
        VALUES ($1, $2, $3, $4, $5) RETURNING id`,
       [
-        'How to implement L402 in Express?',
+        'How to implement x402 in Express?',
         'I am trying to add payment-required headers to my API. Any examples?',
         'l402,express,bitcoin',
         '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
